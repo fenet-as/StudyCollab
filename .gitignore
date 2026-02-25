@@ -89,3 +89,7 @@ Desktop.ini
 # Temporary files
 *.swp
 *.swo
+
+
+# Ignore all application properties with secrets
+backend/src/main/resources/application-*.properties
