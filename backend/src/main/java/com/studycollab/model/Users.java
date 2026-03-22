@@ -1,11 +1,11 @@
-package com.example.secPractice.model;
+package com.studycollab.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-public class User {
+public class Users {
 
     @Id
     @GeneratedValue
@@ -23,7 +23,7 @@ public class User {
 
     private LocalDateTime createdAt;
 
-    public User() {
+    public Users() {
         // Default constructor required by JPA
     }
 
