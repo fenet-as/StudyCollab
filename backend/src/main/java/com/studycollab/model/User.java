@@ -1,51 +1,64 @@
-package com.studycollab.model;
+package com.example.secPractice.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
-@Table(name = "users") // table name in database
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;  // unique user ID
+    @GeneratedValue
+    private UUID id;
 
-    @Column(nullable = false, unique = true)
-    private String email;  // user's email, must be unique
+    private String name;
 
-    @Column(nullable = false, unique = true)
-    private String username;  // user's username, must be unique
+    @Column(unique = true, nullable = false)
+    private String email;
 
     @Column(nullable = false)
-    private String password;  // hashed password
+    private String password;
 
-    private String role = "USER"; // role: USER or ADMIN
+    private String role = "ROLE_USER"; // default role for JWT / Spring Security
 
-    private LocalDateTime createdAt = LocalDateTime.now(); // when user was created
+    private LocalDateTime createdAt;
 
-    private LocalDateTime updatedAt; // last updated
-
-    // Constructors
-    public User() {}
-
-    public User(String email, String username, String password) {
-        this.email = email;
-        this.username = username;
-        this.password = password;
+    public User() {
+        // Default constructor required by JPA
     }
 
-    // Getters & setters
-    public Long getId() { return id; }
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    // Getters and setters
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+
     public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", role='" + role + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
+    }
 }
