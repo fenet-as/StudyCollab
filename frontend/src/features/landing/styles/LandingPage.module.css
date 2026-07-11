@@ -1,0 +1,524 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+.landingContainer {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--text-main);
+  background: radial-gradient(circle at top left, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* --- HEADER / NAVBAR --- */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 6%;
+  background: var(--navbar-bg);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--border-color);
+  box-sizing: border-box;
+  width: 100%;
+  transition: background 0.3s ease, border-bottom 0.3s ease;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.logoText {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #1e3a8a;
+}
+
+:global([data-theme="dark"]) .logoText {
+  color: #3b82f6; /* Pop brighter blue on dark mode */
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-shrink: 0;
+}
+
+.navLinks a {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: color 0.15s ease;
+}
+
+.navLinks a:hover {
+  color: #2563eb;
+}
+
+/* Theme Toggle button formatting */
+.themeToggle {
+  background: none;
+  border: 1px solid var(--border-color);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.themeToggle:hover {
+  background-color: var(--login-btn-hover);
+  transform: scale(1.05);
+}
+
+.loginBtn {
+  background: none;
+  border: 1px solid var(--login-btn-border);
+  color: var(--login-btn-text);
+  padding: 0.55rem 1.25rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.loginBtn:hover {
+  background-color: var(--login-btn-hover);
+  border-color: var(--text-sub);
+}
+
+/* --- HERO SECTION --- */
+.heroSection {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  align-items: center;
+  padding: 6.5rem 6%;
+  gap: 3.5rem;
+}
+
+.heroTitle {
+  font-size: 3.75rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--text-main);
+  margin-bottom: 1.5rem;
+}
+
+.heroSubtitle {
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+}
+
+.heroCtaWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.primaryCtaBtn {
+  background: #1e3a8a;
+  color: #ffffff;
+  border: none;
+  padding: 1.1rem 2.2rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  align-self: flex-start;
+  box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.25);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:global([data-theme="dark"]) .primaryCtaBtn {
+  background: #2563eb;
+}
+
+.primaryCtaBtn:hover {
+  background: #172554;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -5px rgba(30, 58, 138, 0.35);
+}
+
+:global([data-theme="dark"]) .primaryCtaBtn:hover {
+  background: #1d4ed8;
+}
+
+.ctaSubtext {
+  font-size: 0.85rem;
+  color: var(--text-sub);
+  padding-left: 0.25rem;
+}
+
+/* --- HERO MOCKUP IMAGE --- */
+.imageWrapper {
+  perspective: 1000px;
+}
+
+.heroImage {
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.12);
+  border: 1px solid var(--border-color);
+  transform: rotateY(-4deg) rotateX(2deg);
+  transition: transform 0.4s ease, border-color 0.3s ease;
+}
+
+.heroImage:hover {
+  transform: rotateY(0deg) rotateX(0deg);
+}
+
+/* --- CORE FEATURES --- */
+.featuresSection {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.5rem;
+  padding: 5rem 6%;
+}
+
+.featureCard {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  padding: 3rem 2.25rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease, border 0.3s ease;
+}
+
+.featureCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+.featureIcon {
+  font-size: 1.75rem;
+  margin-bottom: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+}
+
+.iconNotes { background: #eff6ff; }
+.iconTasks { background: #f5f3ff; }
+.iconFiles { background: #f0fdf4; }
+
+:global([data-theme="dark"]) .iconNotes { background: #1e3a8a; }
+:global([data-theme="dark"]) .iconTasks { background: #4c1d95; }
+:global([data-theme="dark"]) .iconFiles { background: #064e3b; }
+
+.featureCard h3 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+  color: var(--text-main);
+}
+
+.featureCard p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.featurePreviewCode {
+  margin-top: 1.25rem;
+  background: var(--code-bg);
+  border: 1px solid var(--border-color);
+  padding: 0.6rem;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: var(--text-main);
+  font-weight: bold;
+  text-align: center;
+}
+
+.sectionHeading {
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 2.5rem;
+  text-align: center;
+  color: var(--text-main);
+}
+
+/* --- TESTIMONIALS --- */
+.testimonialsSection {
+  padding: 6rem 6%;
+  background: var(--testimonial-bg);
+  transition: background 0.3s ease;
+}
+
+.testimonialGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+}
+
+.testimonialCard {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  padding: 2.5rem;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: background 0.3s ease, border 0.3s ease;
+}
+
+.testimonialCard p {
+  font-size: 1rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  font-style: italic;
+  margin-bottom: 2rem;
+}
+
+.testimonialUser {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.userAvatar {
+  background: #1e3a8a;
+  color: white;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+
+:global([data-theme="dark"]) .userAvatar {
+  background: #2563eb;
+}
+
+.testimonialUser h4 { margin: 0; font-size: 1rem; font-weight: 700; color: var(--text-main); }
+.testimonialUser span { font-size: 0.85rem; color: var(--text-sub); }
+
+/* --- FOOTER --- */
+.footer {
+  background: #0f172a;
+  color: #94a3b8;
+  padding: 6rem 6% 3rem 6%;
+}
+
+:global([data-theme="dark"]) .footer {
+  background: #020617; /* Darker tone contrast for footer on dark layout */
+  border-top: 1px solid var(--border-color);
+}
+
+.footerCta {
+  text-align: center;
+  margin-bottom: 5rem;
+}
+
+.footerCta h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.75rem;
+  color: #ffffff;
+}
+
+.footerBtn {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 0.95rem 2.25rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.footerBtn:hover {
+  background: #1d4ed8;
+}
+
+.footerBottom {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #334155;
+  padding-top: 2.5rem;
+  font-size: 0.9rem;
+}
+
+.footerLinks {
+  display: flex;
+  gap: 2.5rem;
+}
+
+.footerLinks a {
+  text-decoration: none;
+  color: #94a3b8;
+  transition: color 0.15s ease;
+}
+
+.footerLinks a:hover {
+  color: #ffffff;
+}
+
+/* ==========================================
+   BREAKPOINTS & RESPONSIVE DESIGN MEDIA QUERIES
+   ========================================== */
+
+@media (max-width: 1024px) {
+  .heroTitle { font-size: 3rem; }
+  .featuresSection { gap: 1.5rem; padding: 4rem 4%; }
+  .testimonialGrid { gap: 1.5rem; }
+}
+
+@media (max-width: 968px) {
+  .header { padding: 1rem 4%; }
+  .navLinks { gap: 1.25rem; }
+  .navLinks a { display: none; }
+  .heroSection { grid-template-columns: 1fr; text-align: center; padding: 4rem 4% 3rem 4%; gap: 3rem; }
+  .heroLeft { display: flex; flex-direction: column; align-items: center; }
+  .primaryCtaBtn { align-self: center; }
+  .heroImage { transform: none !important; max-width: 650px; margin: 0 auto; }
+  .featuresSection { grid-template-columns: 1fr; max-width: 600px; margin: 0 auto; padding: 3rem 4%; gap: 2rem; }
+  .testimonialGrid { grid-template-columns: 1fr; max-width: 600px; margin: 0 auto; }
+  .footerBottom { flex-direction: column; align-items: center; gap: 1.5rem; text-align: center; }
+}
+
+@media (max-width: 480px) {
+  .header { padding: 0.85rem 4%; gap: 0.5rem; }
+  .logoText, .logoIcon { font-size: 1.1rem; }
+  .navLinks { gap: 0.5rem; }
+  .loginBtn { padding: 0.45rem 0.75rem; font-size: 0.8rem; }
+  .themeToggle { padding: 0.45rem; font-size: 0.95rem; }
+  .navLinks :global(.baseButton) { padding: 0.45rem 0.75rem !important; font-size: 0.8rem !important; }
+  .heroTitle { font-size: 2.25rem; letter-spacing: -0.02em; }
+  .heroSubtitle { font-size: 1rem; line-height: 1.6; }
+  .primaryCtaBtn { width: 100%; padding: 1rem; font-size: 1rem; }
+  .featureCard { padding: 2.25rem 1.5rem; }
+  .sectionHeading { font-size: 1.75rem; margin-bottom: 2rem; }
+  .testimonialCard { padding: 1.75rem; }
+  .footerCta h2 { font-size: 1.85rem; }
+  .footerLinks { flex-direction: column; align-items: center; gap: 1rem; }
+}
+
+@media (max-width: 360px) {
+  .logoText { font-size: 1rem; }
+  .header { padding: 0.75rem 3%; }
+  .loginBtn, .navLinks :global(.baseButton) { padding: 0.4rem 0.6rem !important; font-size: 0.75rem !important; }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ==========================================
+   OPTIMIZED RESPONSIVE DESIGN FOR NAVBAR
+   ========================================== */
+
+/* Compact Smartphones (e.g., iPhone 12/13/14, Galaxy S21) */
+@media (max-width: 480px) {
+  .header {
+    padding: 0.75rem 4%; /* Reduce top/bottom padding to make the navbar slimmer */
+    gap: 0.4rem;
+  }
+
+  .logoText {
+    font-size: 1.05rem; /* Shrink logo text slightly */
+  }
+  
+  .logoIcon {
+    font-size: 1.05rem;
+  }
+
+  .navLinks {
+    gap: 0.4rem; /* Bring the interactive elements closer together */
+  }
+
+  /* 1. Shrink the Login Button */
+  .loginBtn {
+    padding: 0.4rem 0.65rem;
+    font-size: 0.75rem;
+    border-radius: 6px;
+  }
+
+  /* 2. Shrink the Dark Mode / Light Mode Switcher */
+  .themeToggle {
+    padding: 0.4rem;
+    font-size: 0.85rem; /* Scales down the emoji icon inside */
+    border-radius: 6px;
+  }
+
+  /* 3. Force-shrink your custom 'Get Started Free' Button component */
+  .navLinks :global(.baseButton),
+  .navLinks button:not([class*="loginBtn"]):not([class*="themeToggle"]) { 
+    padding: 0.4rem 0.65rem !important; 
+    font-size: 0.75rem !important;
+    min-height: auto !important;
+    line-height: 1 !important;
+    border-radius: 6px !important;
+  }
+
+  /* --- Rest of your mobile adjustments --- */
+  .heroTitle { font-size: 2.25rem; letter-spacing: -0.02em; }
+  .heroSubtitle { font-size: 1rem; line-height: 1.6; }
+  .primaryCtaBtn { width: 100%; padding: 1rem; font-size: 1rem; }
+  .featureCard { padding: 2.25rem 1.5rem; }
+  .sectionHeading { font-size: 1.75rem; margin-bottom: 2rem; }
+  .testimonialCard { padding: 1.75rem; }
+  .footerCta h2 { font-size: 1.85rem; }
+  .footerLinks { flex-direction: column; align-items: center; gap: 1rem; }
+}
+
+/* Micro-Screens (Under 360px wide, e.g., iPhone SE, Galaxy Fold folded) */
+@media (max-width: 360px) {
+  .header {
+    padding: 0.6rem 3%;
+  }
+
+  .logoText {
+    font-size: 0.95rem; /* Safe size to keep branding on one line without clipping */
+  }
+
+  .themeToggle {
+    padding: 0.35rem;
+    font-size: 0.8rem;
+  }
+  
+  .loginBtn, 
+  .navLinks :global(.baseButton),
+  .navLinks button:not([class*="loginBtn"]):not([class*="themeToggle"]) {
+    padding: 0.35rem 0.55rem !important;
+    font-size: 0.7rem !important;
+  }
+}

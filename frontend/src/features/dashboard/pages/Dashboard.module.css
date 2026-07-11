@@ -1,0 +1,340 @@
+.dashboardContainer {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  height: 100vh;
+  background-color: #ffffff;
+  font-family: 'Inter', sans-serif;
+}
+
+/* --- SIDEBAR PANEL --- */
+.sidebar {
+  background-color: #1e3a8a;
+  color: #93c5fd;
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebarLogo {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sectionLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #60a5fa;
+  margin-bottom: 0.75rem;
+  padding-left: 0.5rem;
+}
+
+.groupList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.groupList li {
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.groupList li:hover {
+  background-color: #1d4ed8;
+  color: white;
+}
+
+.activeGroupItem {
+  background-color: #1d4ed8;
+  color: white !important;
+}
+
+.newGroupBtn {
+  background: none;
+  border: 1px dashed #60a5fa;
+  color: #60a5fa;
+  border-radius: 6px;
+  padding: 0.5rem;
+  margin-top: 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  text-align: left;
+  padding-left: 0.75rem;
+}
+
+.newGroupBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+}
+
+.sidebarFooter {
+  margin-top: auto;
+  border-top: 1px solid #1d4ed8;
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: white;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.userAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #a855f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.footerAction {
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding-left: 0.25rem;
+}
+
+.footerAction:hover {
+  color: white;
+}
+
+/* --- WORKSPACE CONTENT AREA --- */
+.contentArea {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f8fafc;
+}
+
+.contentHeader {
+  background: white;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.breadcrumbContext {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.contentHeader h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #0f172a;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.avatarGroup {
+  display: flex;
+}
+
+.stackedAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  border: 2px solid white;
+  margin-left: -8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.manageGroupBtn {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+/* Navigation System Sub-Tabs */
+.tabsNav {
+  background: white;
+  padding: 0 2rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.tabLink {
+  padding: 0.75rem 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.activeTab {
+  color: #1e3a8a;
+  border-bottom-color: #1e3a8a;
+}
+
+/* --- NOTES VIEW LAYOUT --- */
+.notesWorkspace {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.notesSidebar {
+  background: white;
+  border-right: 1px solid #e2e8f0;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.notesSidebarHeader {
+  font-weight: bold;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  color: #0f172a;
+}
+
+.noteListItem {
+  padding: 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+  border: 1px solid transparent;
+  background: #f8fafc;
+}
+
+.noteListItem h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.85rem;
+  color: #334155;
+}
+
+.noteListItem span {
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.activeNoteItem {
+  background-color: #64748b;
+  color: white;
+}
+.activeNoteItem h4, .activeNoteItem span {
+  color: white;
+}
+
+/* Markdown LaTeX Workplane Pane */
+.editorPane {
+  background: white;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.editorToolbar {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.5rem 1.5rem;
+  display: flex;
+  gap: 1.25rem;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.editorToolbar span {
+  cursor: pointer;
+}
+
+.editorContentContainer {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.editorNoteTitle {
+  margin: 0 0 1rem 0;
+  font-size: 1.15rem;
+  color: #0f172a;
+}
+
+.rawMarkdownTextarea {
+  width: 100%;
+  flex-grow: 1;
+  border: none;
+  resize: none;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #334155;
+}
+
+.rawMarkdownTextarea:focus {
+  outline: none;
+}
+
+.editorActionsFooter {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.saveNoteBtn {
+  background: #1e3a8a;
+  color: white;
+  border: none;
+  padding: 0.4rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.deleteNoteBtn {
+  background: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fee2e2;
+  padding: 0.4rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.placeholderTabContent {
+  padding: 3rem;
+  text-align: center;
+  color: #64748b;
+}

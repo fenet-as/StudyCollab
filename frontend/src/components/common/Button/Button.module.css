@@ -1,1 +1,84 @@
-/* Button styles placeholder */
+/* --- Base Button Styles --- */
+.baseButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
+  text-decoration: none;
+}
+
+.baseButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* --- Size Variants --- */
+.small {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+.medium {
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+}
+
+.large {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+}
+
+/* --- Theme/Color Variants --- */
+
+/* Primary: The deep blue used in your main CTAs */
+.primary {
+  background-color: #1e3a8a;
+  color: white;
+  box-shadow: 0 4px 14px rgba(30, 58, 138, 0.2);
+}
+
+.primary:hover:not(:disabled) {
+  background-color: #172554;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(30, 58, 138, 0.3);
+}
+
+/* Secondary: A subtle gray/blue for less important actions */
+.secondary {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+.secondary:hover:not(:disabled) {
+  background-color: #e2e8f0;
+}
+
+/* Outline: Transparent background with a colored border (like your login button) */
+.outline {
+  background-color: transparent;
+  border: 1px solid #4f46e5;
+  color: #4f46e5;
+}
+
+.outline:hover:not(:disabled) {
+  background-color: rgba(79, 70, 229, 0.05);
+}
+
+/* Text: No background or border, just clickable text */
+.text {
+  background-color: transparent;
+  color: #64748b;
+  padding: 0;
+}
+
+.text:hover:not(:disabled) {
+  color: #4f46e5;
+}

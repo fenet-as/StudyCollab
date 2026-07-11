@@ -1,42 +1,42 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* --- Global Theme Design Tokens --- */
+:root {
+  --bg-gradient-start: #f8fafc;
+  --bg-gradient-end: #f1f5f9;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-sub: #64748b;
+  --navbar-bg: rgba(255, 255, 255, 0.85);
+  --card-bg: #ffffff;
+  --border-color: rgba(226, 232, 240, 0.8);
+  --login-btn-border: #cbd5e1;
+  --login-btn-text: #334155;
+  --login-btn-hover: #f8fafc;
+  --code-bg: #f8fafc;
+  --testimonial-bg: rgba(241, 245, 249, 0.6);
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+[data-theme="dark"] {
+  --bg-gradient-start: #0f172a;
+  --bg-gradient-end: #020617;
+  --text-main: #f8fafc;
+  --text-muted: #cbd5e1;
+  --text-sub: #94a3b8;
+  --navbar-bg: rgba(15, 23, 42, 0.85);
+  --card-bg: #1e293b;
+  --border-color: rgba(51, 65, 85, 0.8);
+  --login-btn-border: #334155;
+  --login-btn-text: #e2e8f0;
+  --login-btn-hover: #1e293b;
+  --code-bg: #0f172a;
+  --testimonial-bg: rgba(30, 41, 59, 0.6);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+/* --- Quick Global Resets --- */
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: var(--bg-gradient-start);
+  color: var(--text-main);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
