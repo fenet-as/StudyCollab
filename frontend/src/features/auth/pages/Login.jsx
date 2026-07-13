@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { loginUser } from '../../../api/authApi';
 import styles from './Auth.module.css';
 
 export default function Login() {
   const navigate = useNavigate();
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -22,15 +24,26 @@ export default function Login() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Logging in with:', formData);
-    navigate('/dashboard');
+    setError('');
+
+    try {
+      const data = await loginUser(formData);
+      
+      // Store token into browser cache memory 
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('email', data.email);
+
+      navigate('/dashboard');
+    } catch (err) {
+      const serverMessage = err.response?.data?.message || 'Invalid email or password configuration.';
+      setError(serverMessage);
+    }
   };
 
   return (
     <div className={styles.authContainer}>
-      {/* Corner Theme Toggle */}
       <button 
         className={styles.themeToggle} 
         onClick={() => setIsDark(!isDark)}
@@ -45,6 +58,12 @@ export default function Login() {
         </div>
         
         <h1 className={styles.authTitle}>Welcome Back</h1>
+
+        {error && (
+          <div className={styles.errorBanner} style={{ color: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', padding: '0.75rem', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.875rem', textAlign: 'center', fontWeight: '500' }}>
+            ⚠️ {error}
+          </div>
+        )}
         
         <form onSubmit={handleSubmit} className={styles.authForm}>
           <div className={styles.inputGroup}>

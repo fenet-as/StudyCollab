@@ -1,1 +1,18 @@
-// auth API placeholder
+import axios from 'axios';
+
+const API = axios.create({
+  baseURL: 'http://localhost:8080/api/auth',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+export const registerUser = async (userData) => {
+  const response = await API.post('/register', userData);
+  return response.data; // Standard mapping: { token: "...", email: "..." }
+};
+
+export const loginUser = async (credentials) => {
+  const response = await API.post('/login', credentials);
+  return response.data; // Standard mapping: { token: "...", email: "..." }
+};

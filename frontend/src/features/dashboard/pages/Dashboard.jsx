@@ -1,10 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './Dashboard.module.css';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [activeGroup, setActiveGroup] = useState('Physics 101');
   const [activeTab, setActiveTab] = useState('Notes');
   const [selectedNote, setSelectedNote] = useState('Week 4 Lecture Notes');
+  
+  // Dynamic User State pulled from registration/login cached items
+  const [userEmail, setUserEmail] = useState('');
+  const [userInitials, setUserInitials] = useState('U');
+
+  useEffect(() => {
+    const cachedEmail = localStorage.getItem('email');
+    if (cachedEmail) {
+      setUserEmail(cachedEmail);
+      // Extract initials from email username as an avatar placeholder string
+      const initial = cachedEmail.charAt(0).toUpperCase();
+      setUserInitials(initial);
+    }
+  }, []);
+
+  // Clear tracking tokens to log out safely
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('email');
+    navigate('/login');
+  };
   
   // Note editing state instance matching mockup text
   const [noteContent, setNoteContent] = useState(
@@ -16,7 +39,7 @@ export default function Dashboard() {
       
       {/* --- SIDEBAR --- */}
       <aside className={styles.sidebar}>
-        <div className={styles.sidebarLogo}>
+        <div className={styles.sidebarLogo} onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
           <span className={styles.logoIcon}>🎓</span> StudyCollab
         </div>
         
@@ -40,12 +63,16 @@ export default function Dashboard() {
         
         {/* User Footplate */}
         <div className={styles.sidebarFooter}>
-          <div className={styles.userInfo}>
-            <div className={styles.userAvatar}>JD</div>
-            <span>John Doe</span>
+          <div className={styles.userInfo} title={userEmail}>
+            <div className={styles.userAvatar}>{userInitials}</div>
+            <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '110px' }}>
+              {userEmail ? userEmail.split('@')[0] : 'User'}
+            </span>
           </div>
           <div className={styles.footerAction}>⚙️ Settings</div>
-          <div className={styles.footerAction}>Logout</div>
+          <div className={styles.footerAction} onClick={handleLogout} style={{ color: '#ef4444', fontWeight: '600', cursor: 'pointer' }}>
+            🚪 Logout
+          </div>
         </div>
       </aside>
 
