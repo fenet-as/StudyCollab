@@ -1,0 +1,366 @@
+.tasksContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+/* --- TOOLBAR & SEARCH --- */
+.topToolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.searchWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Clean CSS Search Magnifier fallback */
+.searchIcon {
+  position: absolute;
+  left: 0.85rem;
+  width: 6px;
+  height: 6px;
+  border: 2px solid #9ca3af;
+  border-radius: 50%;
+}
+.searchIcon::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 2px;
+  height: 5px;
+  background: #9ca3af;
+  transform: rotate(-45deg);
+}
+
+.taskSearchInput {
+  padding: 0.65rem 1rem 0.65rem 2.25rem;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  width: 280px;
+  outline: none;
+  transition: all 0.15s ease;
+  color: #1f2937;
+}
+
+.taskSearchInput:focus {
+  border-color: #1e3a8a;
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.08);
+}
+
+/* --- ADD TASK BUTTON --- */
+.addTaskBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #1e3a8a;
+  color: #ffffff;
+  border: none;
+  font-weight: 600;
+  padding: 0.65rem 1.25rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 4px rgba(30, 58, 138, 0.1);
+  transition: all 0.2s ease;
+}
+
+.addTaskBtn:hover {
+  background: #172554;
+  transform: translateY(-1px);
+}
+
+.btnPlus {
+  font-size: 1.1rem;
+  line-height: 1;
+  font-weight: 500;
+}
+
+/* --- KANBAN BOARD SYSTEM --- */
+.kanbanBoard {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.kanbanColumn {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.25rem;
+  min-height: 550px;
+}
+
+.columnHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.titleGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.titleGroup h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #475569;
+  margin: 0;
+}
+
+.todoDot { color: #ef4444; font-size: 0.65rem; }
+.doneDot { color: #10b981; font-size: 0.65rem; }
+
+.taskCountBadge {
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+}
+
+.columnBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* --- TASK CARDS --- */
+.taskCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.taskCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+}
+
+.completedTaskCard {
+  border-left: 4px solid #10b981;
+}
+
+.cardTopRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Priority Micro-badges */
+.prioBadge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  letter-spacing: 0.02em;
+}
+
+.high { background: #fee2e2; color: #ef4444; }
+.medium { background: #fef3c7; color: #d97706; }
+.donePrio { background: #d1fae5; color: #065f46; }
+
+.cardActions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.actionIconButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  transition: all 0.15s ease;
+}
+
+.actionIconButton:hover {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.taskCardTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+}
+
+.taskCardDesc {
+  font-size: 0.85rem;
+  color: #64748b;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.cardBottomRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.25rem;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 0.75rem;
+}
+
+.dueDateBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Clean Custom CSS Indicator for time placeholder */
+.clockIcon {
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid #94a3b8;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+}
+.clockIcon::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  width: 3px;
+  height: 1.5px;
+  background: #94a3b8;
+}
+
+/* Neutralized letter initials layout for profile pictures */
+.assignedUserAvatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border: 1px solid #e2e8f0;
+}
+
+.emptyColumnState {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+  .kanbanBoard {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ==========================================================================
+   🌙 DARK MODE COMPATIBILITY IMPLEMENTATION
+   ========================================================================== */
+
+:global([data-theme='dark']) .taskSearchInput {
+  background: #1f2937;
+  border-color: #374151;
+  color: #f9fafb;
+}
+:global([data-theme='dark']) .taskSearchInput:focus {
+  border-color: #3b82f6;
+}
+
+:global([data-theme='dark']) .addTaskBtn {
+  background: #2563eb;
+}
+:global([data-theme='dark']) .addTaskBtn:hover {
+  background: #1d4ed8;
+}
+
+:global([data-theme='dark']) .kanbanColumn {
+  background: #111827;
+  border-color: #374151;
+}
+
+:global([data-theme='dark']) .columnHeader {
+  border-color: #374151;
+}
+
+:global([data-theme='dark']) .titleGroup h3 {
+  color: #9ca3af;
+}
+
+:global([data-theme='dark']) .taskCountBadge {
+  background: #374151;
+  color: #9ca3af;
+}
+
+:global([data-theme='dark']) .taskCard {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+:global([data-theme='dark']) .taskCardTitle {
+  color: #f9fafb;
+}
+
+:global([data-theme='dark']) .taskCardDesc {
+  color: #9ca3af;
+}
+
+:global([data-theme='dark']) .cardBottomRow {
+  border-color: #374151;
+}
+
+:global([data-theme='dark']) .dueDateBadge {
+  color: #9ca3af;
+}
+
+:global([data-theme='dark']) .assignedUserAvatar {
+  background: #374151;
+  color: #e5e7eb;
+  border-color: #4b5563;
+}
+
+:global([data-theme='dark']) .actionIconButton:hover {
+  background: #374151;
+  color: #f3f4f6;
+}
+
+:global([data-theme='dark']) .emptyColumnState {
+  border-color: #374151;
+  color: #6b7280;
+}

@@ -1,1 +1,123 @@
 /* AddTaskModal styles placeholder */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(17, 24, 39, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: #ffffff;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 460px;
+  padding: 1.75rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.modalHeader h2 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: #9ca3af;
+  cursor: pointer;
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.formGroup label {
+  font-size: 0.825rem;
+  font-weight: 700;
+  color: #4b5563;
+}
+
+.formGroup input, .formGroup textarea, .formGroup select {
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  font-family: inherit;
+  font-size: 0.9rem;
+  background: #ffffff;
+  color: #111827;
+  outline: none;
+}
+
+.formGroup input:focus, .formGroup textarea:focus, .formGroup select:focus {
+  border-color: #1e3a8a;
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+}
+
+.formRow {
+  display: flex;
+  gap: 1rem;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.cancelBtn, .createBtn {
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+}
+
+.cancelBtn {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.cancelBtn:hover {
+  background: #e5e7eb;
+}
+
+.createBtn {
+  background: #1e3a8a;
+  color: #ffffff;
+}
+
+.createBtn:hover {
+  background: #172554;
+}

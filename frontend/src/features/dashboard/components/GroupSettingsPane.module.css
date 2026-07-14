@@ -1,0 +1,365 @@
+/* frontend/src/features/dashboard/components/GroupSettingsPane.module.css */
+
+.paneContainer {
+  padding: 1.5rem;
+  max-width: 800px; /* Aligns all cards in a professional, readable vertical stack */
+  margin: 0 auto;
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.paneHeader {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  padding-bottom: 1.25rem;
+}
+
+.paneHeader h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary, #1e293b);
+  margin: 0 0 0.35rem 0;
+}
+
+.paneHeader p {
+  font-size: 0.95rem;
+  color: var(--text-secondary, #64748b);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Vertical Stack Layout */
+.settingsLayoutStack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Base Card Styling */
+.settingsCard {
+  background-color: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease;
+}
+
+.settingsCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.cardIcon {
+  font-size: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: var(--icon-bg-fallback, #f1f5f9);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.cardHeader h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary, #1e293b);
+  margin: 0 0 0.15rem 0;
+}
+
+.cardSubtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #64748b);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Forms & Inputs */
+.settingsForm, 
+.addMemberForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.inputGroup label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-primary, #475569);
+}
+
+.inputGroup input,
+.inputGroup textarea,
+.inputGroupRow input {
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background-color: var(--input-bg, #ffffff);
+  color: var(--text-primary, #1e293b);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.inputGroup input:focus,
+.inputGroup textarea:focus,
+.inputGroupRow input:focus {
+  outline: none;
+  border-color: var(--primary-color, #3b82f6);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.inputGroupRow {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.inputGroupRow input {
+  flex: 1;
+}
+
+/* Action Buttons */
+.saveBtn, 
+.addBtn,
+.copyButton {
+  padding: 0.65rem 1.25rem;
+  background-color: var(--primary-color, #2563eb);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.saveBtn:hover:not(:disabled),
+.addBtn:hover,
+.copyButton:hover {
+  background-color: var(--primary-hover, #1d4ed8);
+}
+
+.saveBtn:active:not(:disabled),
+.addBtn:active,
+.copyButton:active {
+  transform: scale(0.98);
+}
+
+.saveBtn {
+  align-self: flex-start;
+}
+
+.saveBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Invite Link Styles */
+.inviteLinkContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.linkDisplayBox {
+  display: flex;
+  align-items: center;
+  border: 1px dashed var(--primary-color, #3b82f6);
+  background-color: var(--bg-highlight, #f8fafc);
+  border-radius: 8px;
+  padding: 0.35rem;
+  gap: 0.5rem;
+}
+
+.linkInput {
+  border: none !important;
+  background: transparent !important;
+  flex-grow: 1;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8rem;
+  padding-left: 0.5rem;
+  color: var(--text-secondary, #475569);
+  outline: none;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.copyButton {
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.copyButton.copied {
+  background-color: #10b981;
+}
+
+.inviteWarning {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #64748b);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Members Management List */
+.membersListWrapper {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.memberRowItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  background-color: var(--row-bg, #ffffff);
+  transition: background-color 0.15s ease;
+}
+
+.memberRowItem:hover {
+  background-color: #f8fafc;
+}
+
+.memberRowItem:last-child {
+  border-bottom: none;
+}
+
+.memberIdentityCluster {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.avatarMiniBadge {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.memberTextSpecs h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary, #1e293b);
+  margin: 0;
+}
+
+.memberTextSpecs span {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #64748b);
+}
+
+.memberControlsCluster {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Badges */
+.roleBadge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+}
+
+.roleBadge.owner {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.roleBadge.admin {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.roleBadge.member {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+/* Action Buttons inside member rows */
+.promoteActionBtn, 
+.removeActionBtn {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background-color: transparent;
+}
+
+.promoteActionBtn {
+  border: 1px solid var(--border-color, #cbd5e1);
+  color: var(--text-primary, #334155);
+}
+
+.promoteActionBtn:hover {
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.removeActionBtn {
+  border: 1px solid #fee2e2;
+  color: #ef4444;
+}
+
+.removeActionBtn:hover {
+  background-color: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
+}
+
+/* Notification Banners */
+.successMsg, 
+.errorMsg {
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  display: inline-block;
+  margin-top: 0.5rem;
+}
+
+.successMsg {
+  background-color: #f0fdf4;
+  color: #16a34a;
+}
+
+.errorMsg {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

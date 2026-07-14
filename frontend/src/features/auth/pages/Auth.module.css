@@ -72,6 +72,38 @@
   letter-spacing: -0.02em;
 }
 
+/* Modern User-Friendly Error Banner Styling */
+.errorBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  color: #dc2626;
+  background-color: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.18);
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+:global([data-theme="dark"]) .errorBanner {
+  color: #fca5a5;
+  background-color: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.errorIcon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+
+.errorText {
+  flex-grow: 1;
+}
+
 .authForm {
   display: flex;
   flex-direction: column;

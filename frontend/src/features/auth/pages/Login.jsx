@@ -22,6 +22,7 @@ export default function Login() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (error) setError('');
   };
 
   const handleSubmit = async (e) => {
@@ -37,8 +38,14 @@ export default function Login() {
 
       navigate('/dashboard');
     } catch (err) {
-      const serverMessage = err.response?.data?.message || 'Invalid email or password configuration.';
-      setError(serverMessage);
+      // User-friendly error mapping
+      if (!err.response) {
+        setError('Connection timed out. Please check your internet connection or verify the backend server is running.');
+      } else if (err.response.status === 403 || err.response.status === 401) {
+        setError('The email or password you entered is incorrect.');
+      } else {
+        setError(err.response?.data?.message || 'An unexpected error occurred during login. Please try again.');
+      }
     }
   };
 
@@ -60,8 +67,9 @@ export default function Login() {
         <h1 className={styles.authTitle}>Welcome Back</h1>
 
         {error && (
-          <div className={styles.errorBanner} style={{ color: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', padding: '0.75rem', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.875rem', textAlign: 'center', fontWeight: '500' }}>
-            ⚠️ {error}
+          <div className={styles.errorBanner}>
+            <span className={styles.errorIcon}>⚠️</span>
+            <div className={styles.errorText}>{error}</div>
           </div>
         )}
         

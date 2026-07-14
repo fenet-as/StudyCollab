@@ -65,7 +65,6 @@ export default function Register() {
       return;
     }
 
-    // Prepare clean payload payload structure mapping to Spring Boot fields
     const registrationPayload = {
       fullName: formData.fullName.trim(),
       email: formData.email.trim().toLowerCase(),
@@ -93,30 +92,24 @@ export default function Register() {
       
       console.group('❌ [Auth Debug] Registration Request Failed');
       
+      // User-friendly structural mapping
       if (err.response) {
-        // Server responded with an error status code outside the 2xx range
         console.error('HTTP Status Code:', err.response.status);
         console.error('Server Error Data Body:', err.response.data);
-        console.error('Server Error Headers:', err.response.headers);
-
-        // Introspect common Spring Boot error field paths
-        const serverErrorPayload = err.response.data;
-        const targetErrorMessage = 
-          serverErrorPayload?.message || 
-          serverErrorPayload?.error ||
-          (typeof serverErrorPayload === 'string' ? serverErrorPayload : null) ||
-          'The application backend rejected this registration validation data.';
-
-        setError(`[Server Error ${err.response.status}] ${targetErrorMessage}`);
-
+        
+        if (err.response.status === 409) {
+          setError('An account with this email address already exists.');
+        } else if (err.response.status === 400) {
+          setError('Please check your entries. The registration data provided is invalid.');
+        } else {
+          setError(err.response.data?.message || 'The server could not process your account creation request right now.');
+        }
       } else if (err.request) {
-        // Request was sent but no response came back from your local server port
         console.error('No Response Received. Raw Request Instance details:', err.request);
-        setError('Unable to contact server. Please verify your backend server is active at port 8080.');
+        setError('Unable to reach the server. Please ensure your backend application is actively running.');
       } else {
-        // Something else triggered an error during axios compilation
         console.error('Axios Config/Setup Failure Message:', err.message);
-        setError(`Configuration breakdown: ${err.message}`);
+        setError('A system setup error occurred. Please refresh and try again.');
       }
       
       console.groupEnd();
@@ -141,24 +134,9 @@ export default function Register() {
         <h1 className={styles.authTitle}>Get Started</h1>
 
         {error && (
-          <div 
-            className={styles.errorBanner} 
-            style={{ 
-              color: '#ef4444', 
-              backgroundColor: 'rgba(239, 68, 68, 0.1)', 
-              padding: '0.75rem', 
-              borderRadius: '8px', 
-              marginBottom: '1rem', 
-              fontSize: '0.85rem', 
-              textAlign: 'left', 
-              fontWeight: '500',
-              border: '1px solid rgba(239, 68, 68, 0.2)',
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word'
-            }}
-          >
-            ⚠️ <strong>Error Details:</strong>
-            <div style={{ marginTop: '0.25rem', opacity: 0.9 }}>{error}</div>
+          <div className={styles.errorBanner}>
+            <span className={styles.errorIcon}>⚠️</span>
+            <div className={styles.errorText}>{error}</div>
           </div>
         )}
         
