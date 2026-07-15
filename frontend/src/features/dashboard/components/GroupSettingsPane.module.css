@@ -1,5 +1,9 @@
 /* frontend/src/features/dashboard/components/GroupSettingsPane.module.css */
 
+/* ==========================================================================
+   1. LAYOUT & CARD BASICS
+   ========================================================================== */
+
 .paneContainer {
   padding: 1.5rem;
   max-width: 800px; /* Aligns all cards in a professional, readable vertical stack */
@@ -28,25 +32,25 @@
   line-height: 1.5;
 }
 
-/* Vertical Stack Layout */
 .settingsLayoutStack {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-/* Base Card Styling */
 .settingsCard {
   background-color: var(--card-bg, #ffffff);
   border: 1px solid var(--border-color, #e2e8f0);
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.04);
-  transition: box-shadow 0.2s ease;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
-.settingsCard:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+/* Active Highlight when Editing Details */
+.settingsCard.editingActive {
+  border-color: var(--primary-color, #3b82f6);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.08);
 }
 
 .cardHeader {
@@ -68,8 +72,16 @@
   flex-shrink: 0;
 }
 
+.cardHeaderTitleBlock {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+}
+
 .cardHeader h3 {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--text-primary, #1e293b);
   margin: 0 0 0.15rem 0;
@@ -82,7 +94,10 @@
   line-height: 1.4;
 }
 
-/* Forms & Inputs */
+/* ==========================================================================
+   2. FORMS & GENERAL INPUTS
+   ========================================================================== */
+
 .settingsForm, 
 .addMemberForm {
   display: flex;
@@ -93,35 +108,42 @@
 .inputGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.45rem;
 }
 
 .inputGroup label {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--text-primary, #475569);
+  letter-spacing: 0.05em;
+  color: var(--text-secondary, #475569);
 }
 
-.inputGroup input,
-.inputGroup textarea,
-.inputGroupRow input {
-  padding: 0.65rem 0.85rem;
-  border: 1px solid var(--border-color, #cbd5e1);
+/* Read-Only State for Details Input */
+.readOnlyInput {
+  background-color: var(--icon-bg-fallback, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
+  color: var(--text-secondary, #64748b);
+  padding: 0.75rem 1rem;
   border-radius: 8px;
-  font-size: 0.9rem;
-  background-color: var(--input-bg, #ffffff);
-  color: var(--text-primary, #1e293b);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  font-size: 0.95rem;
+  width: 100%;
+  pointer-events: none;
+  resize: none;
 }
 
-.inputGroup input:focus,
-.inputGroup textarea:focus,
-.inputGroupRow input:focus {
+/* Focused, Active State during details editing */
+.editableInputActive {
+  background-color: var(--input-bg, #ffffff);
+  border: 1.5px solid var(--primary-color, #3b82f6);
+  color: var(--text-primary, #0f172a);
+  padding: 0.72rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  width: 100%;
   outline: none;
-  border-color: var(--primary-color, #3b82f6);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .inputGroupRow {
@@ -131,9 +153,49 @@
 
 .inputGroupRow input {
   flex: 1;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background-color: var(--input-bg, #ffffff);
+  color: var(--text-primary, #1e293b);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* Action Buttons */
+.inputGroupRow input:focus {
+  outline: none;
+  border-color: var(--primary-color, #3b82f6);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+/* ==========================================================================
+   3. BUTTONS & ACTIONS
+   ========================================================================== */
+
+.editToggleBtn {
+  background-color: var(--icon-bg-fallback, #f8fafc);
+  color: var(--text-secondary, #475569);
+  border: 1px solid var(--border-color, #e2e8f0);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.editToggleBtn:hover {
+  background-color: #f1f5f9;
+  color: var(--text-primary, #0f172a);
+  border-color: #cbd5e1;
+}
+
+.formActionsRow {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
 .saveBtn, 
 .addBtn,
 .copyButton {
@@ -160,16 +222,31 @@
   transform: scale(0.98);
 }
 
-.saveBtn {
-  align-self: flex-start;
-}
-
 .saveBtn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* Invite Link Styles */
+.cancelBtn {
+  background-color: #f1f5f9;
+  color: var(--text-secondary, #475569);
+  border: none;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.cancelBtn:hover {
+  background-color: #e2e8f0;
+}
+
+/* ==========================================================================
+   4. INVITE LINK STYLES
+   ========================================================================== */
+
 .inviteLinkContainer {
   display: flex;
   flex-direction: column;
@@ -217,13 +294,23 @@
   margin: 0;
 }
 
-/* Members Management List */
+/* ==========================================================================
+   5. MEMBERS MANAGEMENT LIST
+   ========================================================================== */
+
 .membersListWrapper {
   display: flex;
   flex-direction: column;
   border: 1px solid var(--border-color, #e2e8f0);
   border-radius: 10px;
-  overflow: hidden;
+  overflow: visible; /* CRITICAL: Allows dropdowns to spill outside the card */
+}
+
+.emptyMembersBox {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary, #64748b);
+  font-size: 0.9rem;
 }
 
 .memberRowItem {
@@ -281,7 +368,7 @@
   gap: 0.75rem;
 }
 
-/* Badges */
+/* Role Badges */
 .roleBadge {
   font-size: 0.75rem;
   font-weight: 600;
@@ -289,7 +376,7 @@
   border-radius: 6px;
 }
 
-.roleBadge.owner {
+.roleBadge.owner, .roleBadge.creator {
   background-color: #fef3c7;
   color: #b45309;
 }
@@ -304,41 +391,117 @@
   color: #475569;
 }
 
-/* Action Buttons inside member rows */
-.promoteActionBtn, 
-.removeActionBtn {
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.35rem 0.75rem;
-  border-radius: 6px;
+/* ==========================================================================
+   6. THREE-DOT ACTION MENU DROPDOWN
+   ========================================================================== */
+
+.dropdownContainer {
+  position: relative;
+  display: inline-block;
+}
+
+.threeDotsBtn {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--text-secondary, #64748b);
   cursor: pointer;
-  transition: all 0.15s ease;
-  background-color: transparent;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.promoteActionBtn {
-  border: 1px solid var(--border-color, #cbd5e1);
+.threeDotsBtn:hover {
+  background-color: var(--icon-bg-fallback, #f1f5f9);
+  color: var(--text-primary, #1e293b);
+}
+
+/* Isolated Action Dropdown Box */
+.actionDropdownMenu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 0.5rem;
+  background-color: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 10px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  z-index: 100;
+  min-width: 170px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0.35rem;
+  animation: dropdownFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dropdownHeader {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary, #94a3b8);
+  padding: 0.5rem 0.75rem 0.35rem;
+  border-bottom: 1px solid var(--border-color, #f1f5f9);
+  margin-bottom: 0.25rem;
+}
+
+/* Individual list item buttons inside dropdown */
+.dropdownItemBtn {
+  background: transparent;
+  border: none;
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 500;
   color: var(--text-primary, #334155);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
 }
 
-.promoteActionBtn:hover {
-  background-color: #f1f5f9;
-  border-color: #94a3b8;
-  color: #0f172a;
+.dropdownItemBtn:hover {
+  background-color: var(--icon-bg-fallback, #f1f5f9);
+  color: var(--text-primary, #0f172a);
 }
 
-.removeActionBtn {
-  border: 1px solid #fee2e2;
+.actionIcon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Destructive Dropdown Item (Remove Member) */
+.dropdownItemBtn.destructive {
   color: #ef4444;
 }
 
-.removeActionBtn:hover {
-  background-color: #ef4444;
-  color: #ffffff;
-  border-color: #ef4444;
+.dropdownItemBtn.destructive:hover {
+  background-color: #fef2f2;
+  color: #b91c1c;
 }
 
-/* Notification Banners */
+/* Subdued label when no actions are possible */
+.disabledDropdownNotice {
+  padding: 0.65rem 0.75rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #94a3b8);
+  font-style: italic;
+  text-align: center;
+}
+
+/* ==========================================================================
+   7. MESSAGES, NOTIFICATIONS & ANIMATIONS
+   ========================================================================== */
+
 .successMsg, 
 .errorMsg {
   font-size: 0.8rem;
@@ -362,4 +525,58 @@
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+
+/* Inline Notification / Toast styling */
+.toastNotification {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  animation: slideInDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.toastSuccess {
+  background-color: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.toastError {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.toastNotification p {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }

@@ -181,6 +181,7 @@
 
 .high { background: #fee2e2; color: #ef4444; }
 .medium { background: #fef3c7; color: #d97706; }
+.low { background: #eff6ff; color: #3b82f6; } /* Added soft blue for low priority */
 .donePrio { background: #d1fae5; color: #065f46; }
 
 .cardActions {
@@ -291,7 +292,7 @@
 
 
 /* ==========================================================================
-   🌙 DARK MODE COMPATIBILITY IMPLEMENTATION
+    🌙 DARK MODE COMPATIBILITY IMPLEMENTATION
    ========================================================================== */
 
 :global([data-theme='dark']) .taskSearchInput {
@@ -332,6 +333,11 @@
   background: #1f2937;
   border-color: #374151;
 }
+
+/* Dark mode overrides for priority badges */
+:global([data-theme='dark']) .high { background: #7f1d1d; color: #fca5a5; }
+:global([data-theme='dark']) .medium { background: #78350f; color: #fcd34d; }
+:global([data-theme='dark']) .low { background: #1e3a8a; color: #93c5fd; } /* Custom dark mode style for low priority */
 
 :global([data-theme='dark']) .taskCardTitle {
   color: #f9fafb;

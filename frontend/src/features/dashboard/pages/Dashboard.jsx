@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Dashboard.module.css';
 
+import NotesPage from '../../notes/pages/NotesPage';
+
 import CreateGroupModal from '../../../components/interactive/CreateGroupModal/CreateGroupModal';
 import DeleteConfirmModal from '../../../components/interactive/DeleteConfirmModal/DeleteConfirmModal';
 import GroupOverview from '../components/GroupOverview';
@@ -362,34 +364,13 @@ export default function Dashboard() {
                 />
               )}
 
-              {activeTab === 'Notes' && (
-                <div className={styles.notesWorkspace}>
-                  <div className={styles.notesSidebar}>
-                    <div className={styles.notesSidebarHeader}>Notes List</div>
-                    <div 
-                      className={`${styles.noteListItem} ${selectedNote === 'Week 4 Lecture Notes' ? styles.activeNoteItem : ''}`}
-                      onClick={() => setSelectedNote('Week 4 Lecture Notes')}
-                    >
-                      <h4>Week 4 Lecture Notes</h4>
-                      <span>Last Edited: 33 mins ago</span>
-                    </div>
-                  </div>
+              
+                
 
-                  <div className={styles.editorPane}>
-                    <div className={styles.editorToolbar}>
-                      <span><b>B</b></span><span><i>I</i></span><span>H1</span><span>LaTeX</span>
-                    </div>
-                    <div className={styles.editorContentContainer}>
-                      <textarea 
-                        className={styles.rawMarkdownTextarea}
-                        value={noteContent} 
-                        onChange={(e) => setNoteContent(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
+{activeTab === 'Notes' && (
+  <NotesPage group={activeGroup} />
+)}
+           
               {(activeTab === 'Files' || activeTab === 'Chat') && (
                 <div className={styles.placeholderTabContent}>
                   <div className={styles.emptyIllustration}>💬</div>

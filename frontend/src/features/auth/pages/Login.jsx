@@ -35,6 +35,9 @@ export default function Login() {
       // Store token into browser cache memory 
       localStorage.setItem('token', data.token);
       localStorage.setItem('email', data.email);
+      
+      // ⬇️ ADD THIS LINE TO SAVE THE NEW DATABASE USER ID ⬇️
+      localStorage.setItem('userId', data.id);
 
       navigate('/dashboard');
     } catch (err) {

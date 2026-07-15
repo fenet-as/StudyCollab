@@ -84,7 +84,7 @@ export const groupApi = {
   },
 
   // ==========================================
-  //       GROUP SETTINGS & MEMBERSHIP
+  //        GROUP SETTINGS & MEMBERSHIP
   // ==========================================
 
   // Update group name and description
@@ -132,5 +132,36 @@ export const groupApi = {
     }
 
     return await response.json();
-  }
+  },
+
+  // Demote an Administrator back to a standard Member
+  demoteAdminToMember: async (groupId, memberUserId) => {
+    // 💡 FIXED: Uses ${BASE_URL} string interpolations to point directly to port 8080
+    const response = await fetch(`${BASE_URL}/${groupId}/members/${memberUserId}/demote`, {
+      method: 'PUT',
+      headers: getAuthHeaders()
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(errText || 'Failed to demote administrator');
+    }
+
+    return await response.json();
+  },
+
+  // Remove a member entirely from the group
+  removeMember: async (groupId, memberUserId) => {
+    const response = await fetch(`${BASE_URL}/${groupId}/members/${memberUserId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(errText || 'Failed to remove member');
+    }
+
+    return await response.json(); // Returns updated group representation
+  },
 };

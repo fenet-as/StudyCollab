@@ -83,8 +83,12 @@ export default function Register() {
       console.log('Full Response Data:', data);
       console.groupEnd();
 
+      // Store the auth response tokens and attributes into browser cache memory
       localStorage.setItem('token', data.token);
       localStorage.setItem('email', data.email);
+      
+      // ⬇️ ADD THIS LINE TO SAVE THE NEW DATABASE USER ID ON REGISTRATION ⬇️
+      localStorage.setItem('userId', data.id);
 
       navigate('/dashboard');
     } catch (err) {

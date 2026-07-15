@@ -256,3 +256,82 @@
   color: var(--text-main, var(--text-primary, #0f172a));
   font-weight: 500;
 }
+
+
+
+/* Add/adjust these styling classes inside your CSS module */
+
+.cardHeaderTitleBlock {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+/* Edit action button styled cleanly alongside the header */
+.editToggleBtn {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  background-color: var(--bg-highlight, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 6px;
+  color: var(--text-primary, #475569);
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.editToggleBtn:hover {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+/* Styling for Read-Only mode inputs to look flat and elegant */
+.readOnlyInput {
+  background-color: #fafbfc !important;
+  border-color: #e2e8f0 !important;
+  color: #475569 !important;
+  cursor: default;
+  outline: none !important;
+  box-shadow: none !important;
+  user-select: all;
+}
+
+/* Horizontal alignment of cancel and save buttons */
+.formActionsRow {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.cancelBtn {
+  padding: 0.65rem 1.25rem;
+  background-color: transparent;
+  color: var(--text-secondary, #64748b);
+  font-weight: 600;
+  font-size: 0.85rem;
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cancelBtn:hover:not(:disabled) {
+  background-color: #f8fafc;
+  color: var(--text-primary, #0f172a);
+}
+
+.cancelBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Handle empty states gracefully */
+.emptyMembersBox {
+  padding: 1.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #64748b);
+  background-color: #fafafa;
+}
