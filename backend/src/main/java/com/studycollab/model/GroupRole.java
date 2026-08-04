@@ -1,4 +1,7 @@
 package com.studycollab.model;
 
-public class GroupRole {
+public enum GroupRole {
+    CREATOR,
+    ADMIN,
+    MEMBER
 }
