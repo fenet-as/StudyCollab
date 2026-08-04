@@ -1,0 +1,25 @@
+# Spring Boot configuration files with secrets
+src/main/resources/application.properties
+src/main/resources/application.yml
+src/main/resources/application-*.properties
+src/main/resources/application-*.yml
+
+# Environment variables
+.env
+
+# Build files
+target/
+*.jar
+*.war
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
