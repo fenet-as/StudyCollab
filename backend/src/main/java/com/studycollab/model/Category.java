@@ -1,8 +1,10 @@
 package com.studycollab.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.studycollab.model.FileResource;
+import com.studycollab.model.StudyGroup;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,23 +24,18 @@ public class Category {
     @Column(nullable = false)
     private String name;
 
-    // Self-referential relationship to support subcategories
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
-    @JsonIgnore
     private Category parent;
 
-    // 🌟 UPDATED: Cascade changes downward recursively to delete subcategories
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Category> children = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id", nullable = false)
-    @JsonIgnore
     private StudyGroup studyGroup;
 
-    // 🌟 UPDATED: Cascade deletion downward to delete all associated files when category dies
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<FileResource> files = new ArrayList<>();

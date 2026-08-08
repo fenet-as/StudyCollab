@@ -1,0 +1,111 @@
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.85rem;
+}
+
+.cardHeader h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.viewAllBtn {
+  background: transparent;
+  border: none;
+  color: var(--primary-color);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--radius-sm);
+  transition: background-color 0.15s ease;
+}
+
+.viewAllBtn:hover {
+  background-color: var(--icon-bg);
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.membersGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  padding: 0.5rem 0;
+}
+
+.memberAvatarCircle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  width: 54px;
+  cursor: pointer;
+}
+
+.avatarImg, .avatarFallback, .moreCircle {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-full);
+  transition: transform 0.2s ease;
+}
+
+.avatarImg {
+  object-fit: cover;
+  border: 2px solid var(--border-color);
+}
+
+.avatarFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--badge-owner-bg);
+  color: var(--badge-owner-text);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.moreCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--badge-admin-bg);
+  color: var(--badge-admin-text);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.memberAvatarCircle:hover .avatarImg,
+.memberAvatarCircle:hover .avatarFallback,
+.memberAvatarCircle:hover .moreCircle {
+  transform: scale(1.08);
+}
+
+.memberNameLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}

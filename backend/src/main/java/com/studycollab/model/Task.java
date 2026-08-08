@@ -1,8 +1,7 @@
-// backend/src/main/java/com/studycollab/model/Task.java
 package com.studycollab.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tasks")
@@ -13,7 +12,7 @@ public class Task {
     }
 
     public enum Status {
-        TODO, DONE
+        TODO, IN_PROGRESS, DONE
     }
 
     @Id
@@ -35,13 +34,12 @@ public class Task {
     private Priority priority = Priority.MEDIUM;
 
     @Column(name = "due_date")
-    private LocalDate dueDate;
+    private LocalDateTime dueDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assignee_id")
     private User assignee;
 
-    // ADDED: The user who created/assigned this task
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id")
     private User creator;
@@ -50,21 +48,40 @@ public class Task {
     @JoinColumn(name = "group_id", nullable = false)
     private StudyGroup studyGroup;
 
-    // Constructors
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     public Task() {}
 
-    public Task(String title, String description, Status status, Priority priority, LocalDate dueDate, User assignee, User creator, StudyGroup studyGroup) {
+    public Task(String title, String description, Status status, Priority priority, LocalDateTime dueDate, User assignee, User creator, StudyGroup studyGroup) {
         this.title = title;
         this.description = description;
-        this.status = status;
-        this.priority = priority;
+        this.status = status != null ? status : Status.TODO;
+        this.priority = priority != null ? priority : Priority.MEDIUM;
         this.dueDate = dueDate;
         this.assignee = assignee;
-        this.creator = creator; // Updated
+        this.creator = creator;
         this.studyGroup = studyGroup;
     }
 
-    // Getters and Setters
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public StudyGroup getGroup() {
+        return studyGroup;
+    }
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -80,16 +97,18 @@ public class Task {
     public Priority getPriority() { return priority; }
     public void setPriority(Priority priority) { this.priority = priority; }
 
-    public LocalDate getDueDate() { return dueDate; }
-    public void setDueDate(LocalDate dueDate) { this.dueDate = dueDate; }
+    public LocalDateTime getDueDate() { return dueDate; }
+    public void setDueDate(LocalDateTime dueDate) { this.dueDate = dueDate; }
 
     public User getAssignee() { return assignee; }
     public void setAssignee(User assignee) { this.assignee = assignee; }
 
-    // ADDED
     public User getCreator() { return creator; }
     public void setCreator(User creator) { this.creator = creator; }
 
     public StudyGroup getStudyGroup() { return studyGroup; }
     public void setStudyGroup(StudyGroup studyGroup) { this.studyGroup = studyGroup; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
 }

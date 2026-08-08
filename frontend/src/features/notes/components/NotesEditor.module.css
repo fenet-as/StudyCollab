@@ -1,0 +1,292 @@
+/* frontend/src/features/notes/components/NotesEditor.module.css */
+
+.canvasContainer {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+  transition: background-color 0.25s ease;
+}
+
+.canvasContainer.split > div {
+  width: 50%;
+}
+
+.canvasContainer.edit .editorBox,
+.canvasContainer.preview .previewBox {
+  width: 100%;
+}
+
+.editorBox {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border-right: 1px solid var(--border-color);
+  padding: 1.25rem;
+  background-color: var(--card-bg);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+/* Dedicated Top Action Toolbar */
+.topActionsBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+  width: 100%;
+}
+
+.actionsLeft,
+.actionsRight {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Sidebar Toggle Class */
+.sidebarToggleBtn {
+  display: flex;
+}
+
+/* Title Container */
+.titleContainer {
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
+.titleInput {
+  width: 100%;
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-primary);
+  padding: 0.25rem 0;
+}
+
+.titleInput::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+.inputError {
+  color: var(--danger-text) !important;
+}
+
+/* Action Buttons */
+.actionIconButton {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: 0.4rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.actionIconButton:hover {
+  background-color: var(--bg-highlight);
+  color: var(--text-primary);
+}
+
+.primarySaveBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background-color: var(--primary-color);
+  color: #ffffff;
+  border: none;
+  padding: 0.42rem 0.85rem;
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
+}
+
+.primarySaveBtn:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.primarySaveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.secondaryActionBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background-color: var(--btn-secondary-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 0.42rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.secondaryActionBtn:hover {
+  background-color: var(--btn-secondary-hover);
+  border-color: var(--border-subtle);
+}
+
+.btnText {
+  white-space: nowrap;
+}
+
+/* Writing Canvas */
+.textareaInput {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border: none;
+  resize: none;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  background: transparent;
+  color: var(--text-primary);
+  caret-color: var(--primary-color);
+}
+
+.textareaInput::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+.characterCounterFooter {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border-color);
+}
+
+.counterError {
+  color: var(--danger-text);
+  font-weight: 600;
+}
+
+.previewBox {
+  padding: 1.5rem;
+  overflow-y: auto;
+  overflow-x: auto;
+  height: 100%;
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.previewTitle {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.previewContent {
+  font-family: 'Inter', sans-serif;
+  line-height: 1.7;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.previewContent code {
+  font-family: monospace;
+  background-color: var(--code-bg);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--radius-sm);
+}
+
+.latexBlock {
+  margin: 1rem 0;
+  text-align: center;
+  overflow-x: auto;
+  color: var(--text-primary);
+}
+
+.latexInline {
+  padding: 0 0.25rem;
+  color: var(--text-primary);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile Adjustments */
+@media (max-width: 767px) {
+  /* Completely hide sidebar collapse button on smaller screens */
+  .sidebarToggleBtn {
+    display: none !important;
+  }
+
+  .canvasContainer.split {
+    flex-direction: column;
+  }
+
+  .canvasContainer.split > .editorBox,
+  .canvasContainer.split > .previewBox {
+    width: 100% !important;
+  }
+
+  .editorBox,
+  .previewBox {
+    padding: 0.75rem;
+    border-right: none;
+    border-bottom: none;
+  }
+
+  .topActionsBar {
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.375rem;
+  }
+
+  .titleInput {
+    font-size: 1.15rem;
+  }
+
+  .btnText {
+    display: none;
+  }
+
+  .primarySaveBtn,
+  .secondaryActionBtn {
+    padding: 0.4rem;
+  }
+
+  .textareaInput,
+  .previewContent {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+}

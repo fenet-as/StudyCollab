@@ -1,16 +1,17 @@
 package com.studycollab.dto.auth;
 
-public class UpdateNameRequest {
-    private String fullName;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-    // Constructors
-    public UpdateNameRequest() {}
+public record UpdateNameRequest(
+// Inbound DTO record for handling user profile name update requests.
 
-    public UpdateNameRequest(String fullName) {
-        this.fullName = fullName;
-    }
+        @NotBlank(message = "Full name cannot be blank")
+        // Ensures the full name field is not empty or composed solely of whitespace.
 
-    // Getter and Setter
-    public String getFullName() { return fullName; }
-    public void setFullName(String fullName) { this.fullName = fullName; }
-}
+        @Size(max = 100, message = "Full name cannot exceed 100 characters")
+        // Restricts the maximum length of the updated full name to 100 characters.
+
+        String fullName
+        // Stores the new full name value submitted by the user.
+) {}

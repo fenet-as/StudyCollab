@@ -1,0 +1,122 @@
+.card {
+  background-color: var(--card-bg, #1e293b);
+  border: 1px solid var(--border-color, #334155);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.iconBox {
+  width: 38px;
+  height: 38px;
+  background-color: var(--icon-bg, rgba(59, 130, 246, 0.1));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color, #60a5fa);
+  flex-shrink: 0;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+}
+
+.cardHeader h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary, #f8fafc);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #94a3b8);
+  margin: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input {
+  flex: 1;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--border-color, #475569);
+  background-color: var(--input-bg, #0f172a);
+  color: var(--text-primary, #f8fafc);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  outline: none;
+  min-width: 0;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input:focus {
+  border-color: var(--primary-color, #3b82f6);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.addBtn {
+  padding: 0.6rem 1.1rem;
+  background-color: var(--primary-color, #2563eb);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+.addBtn:hover:not(:disabled) {
+  background-color: var(--primary-hover, #1d4ed8);
+}
+
+.addBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.successMsg, .errorMsg {
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.45rem 0.75rem;
+  border-radius: 6px;
+  margin: 0;
+}
+
+.successMsg { 
+  background-color: rgba(16, 185, 129, 0.15); 
+  color: #34d399; 
+}
+
+.errorMsg { 
+  background-color: rgba(239, 68, 68, 0.15); 
+  color: #f87171; 
+}
+
+@media (max-width: 500px) {
+  .row {
+    flex-direction: column;
+  }
+  .addBtn {
+    width: 100%;
+  }
+}

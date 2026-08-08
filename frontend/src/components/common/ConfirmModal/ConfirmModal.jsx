@@ -11,7 +11,7 @@ export default function ConfirmModal({
   cancelText = "Cancel",
   isDestructive = false,
   isLoading = false,
-  error = '' // Added error prop
+  error = ''
 }) {
   if (!isOpen) return null;
 
@@ -26,7 +26,6 @@ export default function ConfirmModal({
         <div className={styles.modalBody}>
           <p className={styles.messageText}>{message}</p>
           
-          {/* Display error message if API call fails */}
           {error && (
             <div className={styles.errorBox}>
               <span>❌</span> {error}

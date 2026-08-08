@@ -1,29 +1,32 @@
-# ==========================
-# Java / Spring Boot
-# ==========================
 
-# Compiled class files
-*.class
 
-# Log files
-*.log
+.env
+*/target/
+*/node_modules/
+*/dist/
+.DS_Store
 
-# BlueJ files
-*.ctxt
+#######################################
+# OS Generated Files
+#######################################
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
 
-# Package Files
-*.jar
-*.war
-*.ear
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
 
-# Spring Boot / Maven / Gradle
-target/
-build/
-out/
-!.mvn/wrapper/maven-wrapper.jar
+# Linux
+.nfs*
+
+
+#######################################
+# IDE Files
+#######################################
 
 # IntelliJ IDEA
 .idea/
@@ -33,59 +36,168 @@ out/
 out/
 
 # Eclipse
-.project
 .classpath
+.project
 .settings/
-bin/
 
 # VS Code
 .vscode/
 
-# ==========================
-# Node / React frontend
-# ==========================
+# NetBeans
+/nbproject/private/
 
-# Node modules
-node_modules/
 
-# Build outputs
+#######################################
+# Java / Spring Boot Backend
+#######################################
+
+# Compiled classes
+*.class
+
+# Build directories
+target/
 build/
-dist/
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/maven-wrapper.jar
+
+# Gradle
+.gradle/
+!gradle-wrapper.jar
+
+# Package files
+*.jar
+*.war
+*.ear
 
 # Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+*.log
 
-# Env files
+# Spring Boot generated files
+spring.log
+
+# Application secrets
+application-local.properties
+application-secret.properties
+application-dev.properties
+
+# Environment variables
+.env
+.env.*
+
+# Keystore files
+*.jks
+*.keystore
+*.p12
+
+
+#######################################
+# React / Vite Frontend
+#######################################
+
+# Dependencies
+node_modules/
+
+# Production builds
+dist/
+build/
+
+# Vite cache
+.vite/
+
+# React environment files
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# ==========================
-# OS files
-# ==========================
+# npm logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
+# Coverage
+coverage/
 
-# Mac
-.DS_Store
-.AppleDouble
-.LSOverride
 
-# ==========================
-# Misc / IDE or other
-# ==========================
+#######################################
+# PostgreSQL / Database
+#######################################
 
-# JetBrains
-*.idea/
-*.iml
+# Database dumps
+*.sql
+*.dump
+*.backup
 
-# Temporary files
+# Local database files
+postgres-data/
+pgdata/
+
+# SQLite (if ever used)
+*.sqlite
+*.db
+
+
+#######################################
+# Docker
+#######################################
+
+# Docker volumes
+**/data/
+
+# Docker overrides
+docker-compose.override.yml
+
+
+#######################################
+# Testing
+#######################################
+
+# Test reports
+test-results/
+surefire-reports/
+failsafe-reports/
+
+# Jest
+.jest/
+
+
+#######################################
+# Security / Secrets
+#######################################
+
+# Environment variables
+.env
+
+# Credentials
+*.pem
+*.key
+*.crt
+
+# Firebase
+firebase-debug.log
+.firebase/
+
+
+#######################################
+# Temporary Files
+#######################################
+
+*.tmp
+*.temp
 *.swp
 *.swo
+*.bak
+*.cache
+
+
+#######################################
+# Uploads / User Generated Files
+#######################################
+
+uploads/
+storage/
+media/

@@ -1,108 +1,132 @@
-// backend/src/main/java/com/studycollab/service/tasks/TasksService.java
 package com.studycollab.service.tasks;
 
 import com.studycollab.dto.tasks.TaskRequestDto;
 import com.studycollab.dto.tasks.TaskResponseDto;
+import com.studycollab.dto.tasks.TaskUpdateDto;
+import com.studycollab.exception.CustomExceptions.BadRequestException;
 import com.studycollab.exception.CustomExceptions.ResourceNotFoundException;
 import com.studycollab.model.StudyGroup;
 import com.studycollab.model.Task;
 import com.studycollab.model.User;
-import com.studycollab.repository.tasks.TasksRepository;
 import com.studycollab.repository.auth.UserRepository;
 import com.studycollab.repository.group.GroupRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.studycollab.repository.tasks.TasksRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class TasksService {
 
-    @Autowired
-    private TasksRepository tasksRepository;
+    private final TasksRepository tasksRepository;
+    private final UserRepository userRepository;
+    private final GroupRepository groupRepository;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private GroupRepository groupRepository;
+    public TasksService(TasksRepository tasksRepository,
+                        UserRepository userRepository,
+                        GroupRepository groupRepository) {
+        this.tasksRepository = tasksRepository;
+        this.userRepository = userRepository;
+        this.groupRepository = groupRepository;
+    }
 
     @Transactional(readOnly = true)
-    public List<TaskResponseDto> getTasksByGroup(Long groupId) {
-        return tasksRepository.findByStudyGroupId(groupId)
+    public List<TaskResponseDto> getTasksByGroup(Long groupId, User currentUser) {
+        StudyGroup group = findGroupById(groupId);
+        validateMembership(currentUser, group);
+
+        return tasksRepository.findByStudyGroupId(group.getId())
                 .stream()
                 .map(TaskResponseDto::new)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public TaskResponseDto createTask(TaskRequestDto dto) {
-        StudyGroup group = groupRepository.findById(dto.getGroupId())
-                .orElseThrow(() -> new ResourceNotFoundException("Study group not found with id: " + dto.getGroupId()));
+    public TaskResponseDto createTask(TaskRequestDto dto, User creator) {
+        StudyGroup group = findGroupById(dto.getGroupId());
+        validateMembership(creator, group);
 
         User assignee = null;
         if (dto.getAssigneeId() != null) {
-            assignee = userRepository.findById(dto.getAssigneeId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Assignee user not found with id: " + dto.getAssigneeId()));
+            assignee = findUserById(dto.getAssigneeId());
+            validateMembership(assignee, group);
         }
 
-        User creator = null;
-        if (dto.getCreatorId() != null) {
-            creator = userRepository.findById(dto.getCreatorId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Creator user not found with id: " + dto.getCreatorId()));
-        }
+        LocalDateTime dueDateTime = (dto.getDueDate() != null) ? dto.getDueDate().atStartOfDay() : null;
 
         Task task = new Task(
                 dto.getTitle(),
                 dto.getDescription(),
                 dto.getStatus() != null ? dto.getStatus() : Task.Status.TODO,
                 dto.getPriority() != null ? dto.getPriority() : Task.Priority.MEDIUM,
-                dto.getDueDate(),
+                dueDateTime,
                 assignee,
                 creator,
                 group
         );
 
-        Task saved = tasksRepository.save(task);
-        return new TaskResponseDto(saved);
+        return new TaskResponseDto(tasksRepository.save(task));
     }
 
     @Transactional
-    public TaskResponseDto updateTask(Long taskId, TaskRequestDto dto) {
-        Task task = tasksRepository.findById(taskId)
-                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
+    public TaskResponseDto updateTask(Long taskId, TaskUpdateDto dto, User currentUser) {
+        Task task = findTaskById(taskId);
+        validateMembership(currentUser, task.getStudyGroup());
 
         if (dto.getTitle() != null) task.setTitle(dto.getTitle());
         if (dto.getDescription() != null) task.setDescription(dto.getDescription());
         if (dto.getStatus() != null) task.setStatus(dto.getStatus());
         if (dto.getPriority() != null) task.setPriority(dto.getPriority());
-        if (dto.getDueDate() != null) task.setDueDate(dto.getDueDate());
+        if (dto.getDueDate() != null) task.setDueDate(dto.getDueDate().atStartOfDay());
 
-        // FIX: Only modify assignee if assigneeId is explicitly provided in the payload.
-        // This prevents drag-and-drop status changes from wiping out the assignee.
         if (dto.getAssigneeId() != null) {
-            User assignee = userRepository.findById(dto.getAssigneeId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Assignee user not found with id: " + dto.getAssigneeId()));
+            User assignee = findUserById(dto.getAssigneeId());
+            validateMembership(assignee, task.getStudyGroup());
             task.setAssignee(assignee);
         }
 
-        if (dto.getCreatorId() != null) {
-            User creator = userRepository.findById(dto.getCreatorId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Creator user not found with id: " + dto.getCreatorId()));
-            task.setCreator(creator);
-        }
-
-        Task updated = tasksRepository.save(task);
-        return new TaskResponseDto(updated);
+        return new TaskResponseDto(tasksRepository.save(task));
     }
 
     @Transactional
-    public void deleteTask(Long taskId) {
-        if (!tasksRepository.existsById(taskId)) {
-            throw new ResourceNotFoundException("Task not found with id: " + taskId);
+    public void deleteTask(Long taskId, User currentUser) {
+        Task task = findTaskById(taskId);
+        validateMembership(currentUser, task.getStudyGroup());
+
+        tasksRepository.delete(task);
+    }
+
+    // --- Private Helper Methods ---
+
+    private Task findTaskById(Long id) {
+        return tasksRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
+    }
+
+    private User findUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+    }
+
+    private StudyGroup findGroupById(Long id) {
+        return groupRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Study group not found with id: " + id));
+    }
+
+    private void validateMembership(User user, StudyGroup group) {
+        if (user == null) {
+            return;
         }
-        tasksRepository.deleteById(taskId);
+
+        boolean isMember = group.getMembers() != null && group.getMembers().stream()
+                .anyMatch(member -> member.getUser() != null
+                        && member.getUser().getId().equals(user.getId()));
+
+        if (!isMember) {
+            throw new BadRequestException("User " + user.getId() + " is not a member of group " + group.getId());
+        }
     }
 }

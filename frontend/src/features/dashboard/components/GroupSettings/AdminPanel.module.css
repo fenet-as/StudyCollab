@@ -1,0 +1,203 @@
+.paneContainer {
+  padding: 1.5rem;
+  max-width: 800px;
+  margin: 0 auto;
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--text-main);
+}
+
+.paneHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.85rem;
+  margin-bottom: 1.75rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1.25rem;
+}
+
+.backBtn {
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background-color: var(--btn-secondary-bg);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.45rem 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.backBtn:hover {
+  background-color: var(--btn-secondary-hover);
+  color: var(--text-main);
+}
+
+.titleWrapper h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+  margin: 0 0 0.25rem 0;
+}
+
+.titleWrapper p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.settingsLayoutStack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Danger Zone Area */
+.dangerZoneCard {
+  background-color: var(--danger-card-bg);
+  border: 1px solid var(--danger-card-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dangerIconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--danger-icon-bg);
+  border-radius: var(--radius-md);
+  padding: 0.625rem;
+  flex-shrink: 0;
+}
+
+.dangerIcon {
+  color: var(--danger-text);
+}
+
+.dangerHeaderText h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--danger-header-title);
+  margin: 0 0 0.25rem 0;
+}
+
+.dangerHeaderText p {
+  font-size: 0.875rem;
+  color: var(--danger-header-sub);
+  margin: 0;
+}
+
+.dangerBtn {
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background-color: var(--danger-btn-bg);
+  color: var(--danger-btn-text);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 0.625rem 1.125rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease-in-out;
+  box-shadow: var(--shadow-sm);
+}
+
+.dangerBtn:hover {
+  background-color: var(--danger-btn-hover);
+  transform: translateY(-1px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .paneContainer {
+    padding: 1rem 0.75rem;
+  }
+
+  .dangerZoneCard {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dangerBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+
+
+
+/* Access Denied State */
+.accessDeniedCard {
+  background-color: var(--card-bg);
+  border: 1px solid var(--danger-card-border);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.accessDeniedIconWrapper {
+  background-color: var(--danger-bg);
+  border-radius: var(--radius-full);
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.accessDeniedIcon {
+  color: var(--danger-text);
+}
+
+.accessDeniedCard h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--danger-header-title);
+  margin: 0 0 0.5rem 0;
+}
+
+.accessDeniedCard p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  max-width: 480px;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
+}

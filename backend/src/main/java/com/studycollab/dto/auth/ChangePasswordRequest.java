@@ -1,21 +1,23 @@
 package com.studycollab.dto.auth;
 
-public class ChangePasswordRequest {
-    private String currentPassword;
-    private String newPassword;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-    // Constructors
-    public ChangePasswordRequest() {}
+public record ChangePasswordRequest(
+// Inbound DTO record for authenticated password change operations.
 
-    public ChangePasswordRequest(String currentPassword, String newPassword) {
-        this.currentPassword = currentPassword;
-        this.newPassword = newPassword;
-    }
+        @NotBlank(message = "Current password cannot be blank")
+        // Ensures the current password input field is not empty or blank.
 
-    // Getters and Setters
-    public String getCurrentPassword() { return currentPassword; }
-    public void setCurrentPassword(String currentPassword) { this.currentPassword = currentPassword; }
+        String currentPassword,
+        // Stores the user's existing password for verification.
 
-    public String getNewPassword() { return newPassword; }
-    public void setNewPassword(String newPassword) { this.newPassword = newPassword; }
-}
+        @NotBlank(message = "New password cannot be blank")
+        // Ensures the new password input field is not empty or blank.
+
+        @Size(min = 6, max = 100, message = "New password must be between 6 and 100 characters")
+        // Enforces length requirements ensuring the new password is between 6 and 100 characters.
+
+        String newPassword
+        // Stores the requested new password value to be hashed and saved.
+) {}

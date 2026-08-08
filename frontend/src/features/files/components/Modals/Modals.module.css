@@ -1,0 +1,221 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--modal-overlay);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: background-color 0.25s ease;
+}
+
+.modalContent {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  padding: 1.75rem 2rem;
+  border-radius: var(--radius-lg);
+  width: 420px;
+  max-width: 90%;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.modalContent h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.15rem;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.modalDescription {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.formGroup label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.formGroup input, 
+.formGroup select {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  outline: none;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.25s ease;
+}
+
+.formGroup input:focus, 
+.formGroup select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--icon-bg);
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.modalActions button {
+  background: var(--btn-secondary-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.modalActions button:hover {
+  background-color: var(--btn-secondary-hover);
+}
+
+.modalSubmitBtn {
+  background-color: var(--primary-color) !important;
+  border: none !important;
+  color: #ffffff !important;
+}
+
+.modalSubmitBtn:hover {
+  background-color: var(--primary-hover) !important;
+}
+
+.modalSubmitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.filePickerContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background-color: var(--bg-primary);
+  border: 1px dashed var(--border-color);
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  align-items: center;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.browseBtn {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.browseBtn:hover {
+  background-color: var(--btn-secondary-bg);
+}
+
+.selectedFileFeedback {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.confirmModalContent {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  width: 420px;
+  max-width: 90%;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  border-top: 4px solid var(--danger-border);
+  box-shadow: var(--shadow-lg);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.warningIcon {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.confirmModalContent h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+}
+
+.confirmDescription {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.alertEmphasis {
+  color: var(--danger-text);
+  font-weight: 500;
+}
+
+.confirmModalActions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.confirmModalActions button {
+  padding: 0.55rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.cancelBtn {
+  background-color: var(--btn-secondary-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.cancelBtn:hover {
+  background-color: var(--btn-secondary-hover);
+}
+
+.confirmDeleteBtn {
+  background-color: var(--danger-border);
+  border: none;
+  color: #ffffff;
+}
+
+.confirmDeleteBtn:hover {
+  background-color: var(--danger-text);
+}

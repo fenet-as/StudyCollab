@@ -1,0 +1,211 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 6%;
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--border-color);
+  box-sizing: border-box;
+  width: 100%;
+  transition: background 0.3s ease, border-bottom 0.3s ease;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.logoText {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--primary-color);
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-shrink: 0;
+}
+
+.navLinks a {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: color 0.15s ease;
+}
+
+.navLinks a:hover {
+  color: var(--primary-color);
+}
+
+.themeToggle {
+  background: var(--bg-secondary, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--border-color);
+  color: var(--text-main, #e2e8f0); /* 👈 Ensures the icon (Sun/Moon) is light & visible in dark mode */
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.themeToggle:hover {
+  background-color: var(--login-btn-hover);
+  color: var(--primary-color); /* 👈 Highlights the icon on hover */
+  border-color: var(--primary-color);
+  transform: scale(1.05);
+}
+
+
+.themeToggle svg {
+  display: block;
+  stroke-width: 2px;
+}
+
+
+.loginBtn {
+  background: none;
+  border: 1px solid var(--login-btn-border);
+  color: var(--login-btn-text);
+  padding: 0.55rem 1.25rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.loginBtn:hover {
+  background-color: var(--login-btn-hover);
+  border-color: var(--text-sub);
+}
+
+@media (max-width: 968px) {
+  .header { padding: 1rem 4%; }
+  .navLinks { gap: 1.25rem; }
+  .navLinks a { display: none; }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 0.75rem 4%;
+    gap: 0.4rem;
+  }
+
+  .logoText,
+  .logoIcon {
+    font-size: 1.05rem;
+  }
+
+  .navLinks {
+    gap: 0.4rem;
+  }
+
+  .loginBtn {
+    padding: 0.4rem 0.65rem;
+    font-size: 0.75rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .themeToggle {
+    padding: 0.4rem;
+    font-size: 0.85rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .navLinks :global(.baseButton),
+  .navLinks button:not([class*="loginBtn"]):not([class*="themeToggle"]) {
+    padding: 0.4rem 0.65rem !important;
+    font-size: 0.75rem !important;
+    min-height: auto !important;
+    line-height: 1 !important;
+    border-radius: var(--radius-sm) !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .header {
+    padding: 0.6rem 3%;
+  }
+
+  .logoText {
+    font-size: 0.95rem;
+  }
+
+  .themeToggle {
+    padding: 0.35rem;
+    font-size: 0.8rem;
+  }
+
+  .loginBtn,
+  .navLinks :global(.baseButton),
+  .navLinks button:not([class*="loginBtn"]):not([class*="themeToggle"]) {
+    padding: 0.35rem 0.55rem !important;
+    font-size: 0.7rem !important;
+  }
+}
+
+
+/* Add/replace these rules in Header.module.css */
+
+
+
+.getStartedBtn {
+  background-color: var(--primary-color);
+  color: #ffffff; /* 👈 Always keep text pure white for maximum contrast on primary backgrounds */
+  border-radius: var(--radius-md);
+  padding: 0.55rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.getStartedBtn:hover {
+  background-color: var(--primary-hover, #2563eb);
+  color: #ffffff; /* 👈 Guarantees text remains crisp & bright on hover */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); /* Subtle glow effect */
+}
+
+.getStartedBtn:active {
+  transform: translateY(0);
+}
+
+/* Mobile responsive rules */
+@media (max-width: 480px) {
+  .loginBtn,
+  .getStartedBtn {
+    padding: 0.4rem 0.65rem;
+    font-size: 0.75rem;
+    border-radius: var(--radius-sm);
+  }
+}
+
+@media (max-width: 360px) {
+  .loginBtn,
+  .getStartedBtn {
+    padding: 0.35rem 0.55rem;
+    font-size: 0.7rem;
+  }
+}
+
+
+

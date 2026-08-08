@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { GraduationCap, Sun, Moon, AlertTriangle, Loader2, ArrowRight } from 'lucide-react';
 import { registerUser } from '../../../api/authApi';
+import { useTheme } from '../../../context/ThemeContext';
 import styles from './Auth.module.css';
 
 export default function Register() {
   const navigate = useNavigate();
+  const { isDark, toggleTheme } = useTheme();
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -13,15 +17,6 @@ export default function Register() {
     password: '',
     confirmPassword: ''
   });
-
-  const [isDark, setIsDark] = useState(() => {
-    return document.documentElement.getAttribute('data-theme') === 'dark';
-  });
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  }, [isDark]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -71,36 +66,18 @@ export default function Register() {
       password: formData.password
     };
 
-    console.group('🚀 [Auth Debug] Initiating Registration Request');
-    console.log('Target Payload Structure:', registrationPayload);
-    console.groupEnd();
-
     try {
       const data = await registerUser(registrationPayload);
 
-      console.group('✅ [Auth Debug] Registration Succeeded');
-      console.log('Server Response Token Received:', data.token ? 'Present' : 'Missing');
-      console.log('Full Response Data:', data);
-      console.groupEnd();
-
-      // Store the auth response tokens and attributes into browser cache memory
       localStorage.setItem('token', data.token);
       localStorage.setItem('email', data.email);
-      
-      // ⬇️ ADD THIS LINE TO SAVE THE NEW DATABASE USER ID ON REGISTRATION ⬇️
       localStorage.setItem('userId', data.id);
 
       navigate('/dashboard');
     } catch (err) {
       setLoading(false);
       
-      console.group('❌ [Auth Debug] Registration Request Failed');
-      
-      // User-friendly structural mapping
       if (err.response) {
-        console.error('HTTP Status Code:', err.response.status);
-        console.error('Server Error Data Body:', err.response.data);
-        
         if (err.response.status === 409) {
           setError('An account with this email address already exists.');
         } else if (err.response.status === 400) {
@@ -109,14 +86,10 @@ export default function Register() {
           setError(err.response.data?.message || 'The server could not process your account creation request right now.');
         }
       } else if (err.request) {
-        console.error('No Response Received. Raw Request Instance details:', err.request);
         setError('Unable to reach the server. Please ensure your backend application is actively running.');
       } else {
-        console.error('Axios Config/Setup Failure Message:', err.message);
         setError('A system setup error occurred. Please refresh and try again.');
       }
-      
-      console.groupEnd();
     }
   };
 
@@ -124,22 +97,23 @@ export default function Register() {
     <div className={styles.authContainer}>
       <button 
         className={styles.themeToggle} 
-        onClick={() => setIsDark(!isDark)}
+        onClick={toggleTheme}
         aria-label="Toggle dark mode"
       >
-        {isDark ? '☀️' : '🌙'}
+        {isDark ? <Sun size={20} /> : <Moon size={20} />}
       </button>
 
       <div className={styles.authCard}>
         <div className={styles.logo} onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-          <span className={styles.logoIcon}>🎓</span> StudyCollab
+          <GraduationCap size={28} className={styles.logoIcon} />
+          <span>StudyCollab</span>
         </div>
         
         <h1 className={styles.authTitle}>Get Started</h1>
 
         {error && (
           <div className={styles.errorBanner}>
-            <span className={styles.errorIcon}>⚠️</span>
+            <AlertTriangle size={18} className={styles.errorIcon} />
             <div className={styles.errorText}>{error}</div>
           </div>
         )}
@@ -151,7 +125,7 @@ export default function Register() {
               type="text"
               id="fullName"
               name="fullName"
-              placeholder="Full Name"
+              placeholder="John Doe"
               value={formData.fullName}
               onChange={handleChange}
               disabled={loading}
@@ -165,7 +139,7 @@ export default function Register() {
               type="email"
               id="email"
               name="email"
-              placeholder="Email"
+              placeholder="name@example.com"
               value={formData.email}
               onChange={handleChange}
               disabled={loading}
@@ -202,7 +176,17 @@ export default function Register() {
           </div>
 
           <button type="submit" className={styles.authSubmitBtn} disabled={loading}>
-            {loading ? 'Registering User...' : 'Register'}
+            {loading ? (
+              <>
+                <Loader2 size={18} className={styles.spinnerIcon} />
+                <span>Creating Account...</span>
+              </>
+            ) : (
+              <>
+                <span>Register</span>
+                <ArrowRight size={18} />
+              </>
+            )}
           </button>
         </form>
 

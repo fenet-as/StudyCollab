@@ -1,5 +1,5 @@
 // frontend/src/api/tasksApi.js
-const API_BASE_URL = 'http://localhost:8080/api/tasks';
+const API_BASE_URL = '/api/tasks';
 
 // Reusable helper to generate security headers matching groupApi.js
 const getAuthHeaders = () => {

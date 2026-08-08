@@ -261,6 +261,17 @@ public class GroupController {
 
 
 
+    @GetMapping("/{groupId}/members")
+    public ResponseEntity<List<GroupMemberSummaryDto>> getGroupMembers(
+            @PathVariable Long groupId,
+            @AuthenticationPrincipal User currentUser) {
+
+        List<GroupMemberSummaryDto> members = groupService.getGroupMembersSummary(groupId, currentUser);
+        return ResponseEntity.ok(members);
+    }
+
+
+
 
 }
 

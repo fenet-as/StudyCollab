@@ -1,0 +1,149 @@
+/* Category Tree styles */
+.categoryTree {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.categoryItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.6rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: background-color 0.15s ease, color 0.15s ease;
+  user-select: none;
+  position: relative;
+}
+
+.categoryItem:hover {
+  background-color: var(--btn-secondary-bg);
+}
+
+.categorySelected {
+  background-color: var(--icon-bg) !important;
+  color: var(--primary-color) !important;
+  font-weight: 600;
+}
+
+.categoryLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.expandArrow {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.65rem;
+  cursor: pointer;
+  padding: 0.2rem;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.expandArrow:hover {
+  color: var(--text-primary);
+  background-color: var(--btn-secondary-bg);
+}
+
+.bulletPlaceholder {
+  width: 14px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.folderIcon {
+  font-size: 1.05rem;
+}
+
+.categoryLabelText {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.categorySelected .categoryLabelText {
+  color: var(--primary-color);
+}
+
+.categoryChildrenContainer {
+  border-left: 1px dashed var(--border-color);
+  margin-left: 14px;
+  padding-left: 2px;
+}
+
+.actionMenuWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.folderActionToggle {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: var(--radius-sm);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.folderActionToggle:hover {
+  background-color: var(--btn-secondary-bg);
+  color: var(--text-primary);
+}
+
+.actionDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 999;
+  min-width: 140px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: 0.35rem 0;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.actionDropdown button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.825rem;
+  font-weight: 500;
+  text-align: left;
+  border: none;
+  background: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.actionDropdown button:hover {
+  background-color: var(--btn-secondary-bg);
+}
+
+/* Delete option using global danger system variables */
+.deleteOption {
+  color: var(--danger-text) !important;
+}
+
+.deleteOption:hover {
+  background-color: var(--danger-bg) !important;
+}

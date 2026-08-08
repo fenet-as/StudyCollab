@@ -1,100 +1,95 @@
-// backend/src/main/java/com/studycollab/controller/auth/UserController.java
 package com.studycollab.controller.auth;
 
 import com.studycollab.dto.auth.ChangePasswordRequest;
 import com.studycollab.dto.auth.UpdateNameRequest;
+import com.studycollab.dto.common.ApiResponse;
+import com.studycollab.dto.files.AvatarUploadResponse;
+import com.studycollab.dto.user.UserProfileResponse;
 import com.studycollab.model.User;
-import com.studycollab.service.auth.AuthService;
+import com.studycollab.service.files.AvatarService;
+import com.studycollab.service.user.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
-import java.util.Map;
 
 @RestController
+// Marks this class as a Spring REST controller that processes requests and returns JSON responses.
 @RequestMapping("/api/users")
+// Maps the base endpoint route for all user profile operations to "/api/users".
 public class UserController {
 
-    private final AuthService authService;
+    private final UserService userService;
+    private final AvatarService avatarService;
 
-    public UserController(AuthService authService) {
-        this.authService = authService;
+    public UserController(UserService userService, AvatarService avatarService) {
+        // Injects user profile service and dedicated avatar storage service dependencies via constructor.
+        this.userService = userService;
+        this.avatarService = avatarService;
     }
 
-    /**
-     * 💡 GET /api/users/me
-     * Pulls the current user details on mounting the settings layout
-     */
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(Principal principal) {
-        try {
-            String email = principal.getName();
-            User user = authService.getUserByEmail(email);
+    // Maps GET requests sent to "/api/users/me" to fetch logged-in user profile details.
+    public ResponseEntity<UserProfileResponse> getCurrentUser(Principal principal) {
+        // Obtains authenticated user details from Spring Security via Principal object.
 
-            return ResponseEntity.ok(Map.of(
-                    "fullName", user.getFullName(),
-                    "email", user.getEmail(),
-                    "avatarUrl", user.getAvatarUrl() != null ? user.getAvatarUrl() : ""
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
+        UserProfileResponse response = userService.getCurrentUserProfile(principal.getName());
+        // Delegates user profile retrieval logic to the user service using the authenticated user's email.
+
+        return ResponseEntity.ok(response);
+        // Returns an HTTP 200 OK response containing the profile payload.
     }
 
-    /**
-     * PUT /api/users/profile
-     */
     @PutMapping("/profile")
-    public ResponseEntity<?> updateProfileName(Principal principal, @RequestBody UpdateNameRequest request) {
-        try {
-            String email = principal.getName();
-            authService.updateProfileName(email, request);
-            return ResponseEntity.ok(Map.of("message", "Profile name updated successfully"));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
+    // Maps PUT requests sent to "/api/users/profile" to update profile details.
+    public ResponseEntity<ApiResponse> updateProfileName(
+            Principal principal,
+            @Valid @RequestBody UpdateNameRequest request
+    ) {
+        // Receives and validates the payload containing the user's updated full name.
+
+        userService.updateProfileName(principal.getName(), request);
+        // Calls user service to apply the full name update for the authenticated user.
+
+        return ResponseEntity.ok(ApiResponse.success("Profile name updated successfully"));
+        // Returns an HTTP 200 OK response wrapping a success confirmation message.
     }
 
-    /**
-     * 💡 PUT /api/users/avatar
-     * Accepts modern dynamic multipart form files for uploading picture changes
-     */
     @PutMapping("/avatar")
-    public ResponseEntity<?> updateAvatar(Principal principal, @RequestParam("file") MultipartFile file) {
-        try {
-            if (file.isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("message", "File cannot be completely empty"));
-            }
+    // Maps PUT requests sent to "/api/users/avatar" for processing avatar file uploads.
+    public ResponseEntity<AvatarUploadResponse> updateAvatar(
+            @AuthenticationPrincipal User currentUser,
+            @RequestParam("file") MultipartFile file
+    ) {
+        // Injects the authenticated User domain model directly and binds the uploaded multipart file parameter.
 
-            String email = principal.getName();
+        AvatarUploadResponse response = avatarService.processAndSaveAvatar(file, currentUser.getId());
+        // Uploads the image to Cloudflare R2 storage and links the new avatar URL to the user's account ID.
 
-            // For production apps, save files to an external S3 bucket/disk storage cluster here.
-            // For rapid local testing, we simulate a local save and echo back a clean runtime asset key string:
-            String syntheticStoragePath = "/assets/avatars/" + email.replaceAll("[^a-zA-Z0-9]", "") + "_" + file.getOriginalFilename();
-
-            authService.updateAvatarUrl(email, syntheticStoragePath);
-
-            return ResponseEntity.ok(Map.of(
-                    "message", "Profile photo uploaded successfully",
-                    "avatarUrl", syntheticStoragePath
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
+        return ResponseEntity.ok(response);
+        // Returns an HTTP 200 OK response containing the updated avatar file details and public URL.
     }
 
-    /**
-     * PUT /api/users/change-password
-     */
     @PutMapping("/change-password")
-    public ResponseEntity<?> changePassword(Principal principal, @RequestBody ChangePasswordRequest request) {
-        try {
-            String email = principal.getName();
-            authService.changePassword(email, request);
-            return ResponseEntity.ok(Map.of("message", "Password safety updated successfully"));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
+    // Maps PUT requests sent to "/api/users/change-password" to change passwords.
+    public ResponseEntity<ApiResponse> changePassword(
+            Principal principal,
+            @Valid @RequestBody ChangePasswordRequest request
+    ) {
+        // Receives and validates request body containing current and new password values.
+
+        userService.changePassword(principal.getName(), request);
+        // Calls user service to verify current credentials and encode the new password.
+
+        return ResponseEntity.ok(ApiResponse.success("Password safety updated successfully"));
+        // Returns an HTTP 200 OK status with a success message confirming the password update.
     }
 }

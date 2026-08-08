@@ -1,11 +1,11 @@
-/* AddTaskModal styles placeholder */
+/* AddTaskModal styles */
 .modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(17, 24, 39, 0.4);
+  background: rgba(11, 17, 32, 0.6);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -14,13 +14,14 @@
 }
 
 .modalContent {
-  background: #ffffff;
-  border-radius: 14px;
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
   width: 100%;
   max-width: 460px;
   padding: 1.75rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .modalHeader {
@@ -29,22 +30,32 @@
   align-items: center;
   margin-bottom: 1.25rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .modalHeader h2 {
   font-size: 1.2rem;
-  font-weight: 800;
-  color: #111827;
+  font-weight: 700;
+  color: var(--text-primary);
   margin: 0;
 }
 
 .closeBtn {
   background: none;
   border: none;
-  font-size: 1.1rem;
-  color: #9ca3af;
+  color: var(--text-secondary);
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.closeBtn:hover {
+  color: var(--text-primary);
+  background-color: var(--btn-secondary-bg);
 }
 
 .modalForm {
@@ -62,25 +73,83 @@
 
 .formGroup label {
   font-size: 0.825rem;
-  font-weight: 700;
-  color: #4b5563;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
-.formGroup input, .formGroup textarea, .formGroup select {
+.formGroup input, 
+.formGroup textarea, 
+.formGroup select {
   padding: 0.65rem 0.85rem;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
   font-family: inherit;
   font-size: 0.9rem;
-  background: #ffffff;
-  color: #111827;
+  background: var(--input-bg);
+  color: var(--text-primary);
   outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.25s ease;
 }
 
-.formGroup input:focus, .formGroup textarea:focus, .formGroup select:focus {
-  border-color: #1e3a8a;
-  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+/* Fix dropdown options readability in dark mode */
+.formGroup select option {
+  background: var(--card-bg);
+  color: var(--text-primary);
 }
+
+.formGroup input::placeholder,
+.formGroup textarea::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.formGroup input:focus, 
+.formGroup textarea:focus, 
+.formGroup select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--icon-bg);
+}
+
+/* ============================================================= */
+/* 🗓️ Date Picker Theme & Icon Color Adjustments                */
+/* ============================================================= */
+
+.datePickerInput {
+  color-scheme: light; /* Default light popup */
+  position: relative;
+  cursor: pointer;
+}
+
+/* 1. Light Mode Calendar Icon (Clean dark slate tint) */
+.datePickerInput::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  opacity: 0.85;
+  padding: 0.1rem;
+  filter: invert(0.3) sepia(0.2);
+  transition: opacity 0.15s ease, filter 0.2s ease;
+}
+
+.datePickerInput::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  filter: invert(0.1);
+}
+
+/* 2. Dark Mode Calendar Popup & Bright Icon Override */
+:global([data-theme="dark"]) .datePickerInput {
+  color-scheme: dark; /* Switch native datepicker popup to dark mode */
+}
+
+:global([data-theme="dark"]) .datePickerInput::-webkit-calendar-picker-indicator {
+  /* Inverts the dark SVG icon to bright light blue/white */
+  filter: invert(0.95) brightness(1.2);
+}
+
+:global([data-theme="dark"]) .datePickerInput::-webkit-calendar-picker-indicator:hover {
+  filter: invert(1) brightness(1.5);
+}
+
+/* ============================================================= */
 
 .formRow {
   display: flex;
@@ -94,30 +163,49 @@
   margin-top: 0.5rem;
 }
 
-.cancelBtn, .createBtn {
+.cancelBtn, 
+.createBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
   padding: 0.65rem 1.25rem;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-family: inherit;
   font-size: 0.9rem;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  border: none;
+  border: 1px solid transparent;
+  transition: background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
 .cancelBtn {
-  background: #f3f4f6;
-  color: #4b5563;
+  background: var(--btn-secondary-bg);
+  color: var(--text-primary);
+  border-color: var(--border-color);
 }
 
 .cancelBtn:hover {
-  background: #e5e7eb;
+  background: var(--btn-secondary-hover);
 }
 
 .createBtn {
-  background: #1e3a8a;
-  color: #ffffff;
+  background: var(--primary-color);
+  color: #FFFFFF;
 }
 
-.createBtn:hover {
-  background: #172554;
+.createBtn:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
 }
+
+.createBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+
+
+
+

@@ -1,18 +1,32 @@
-// backend/src/main/java/com/studycollab/dto/tasks/TaskRequestDto.java
 package com.studycollab.dto.tasks;
 
 import com.studycollab.model.Task.Priority;
 import com.studycollab.model.Task.Status;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalDate;
 
 public class TaskRequestDto {
+
+    @NotBlank(message = "Title is required")
+    @Size(max = 150, message = "Title must not exceed 150 characters")
     private String title;
+
+    @Size(max = 2000, message = "Description must not exceed 2000 characters")
     private String description;
+
     private Status status;
     private Priority priority;
+
+    @FutureOrPresent(message = "Due date must be today or in the future")
     private LocalDate dueDate;
+
     private Long assigneeId;
-    private Long creatorId; // ADDED
+
+    @NotNull(message = "Group ID is required")
     private Long groupId;
 
     // Getters and Setters
@@ -33,10 +47,6 @@ public class TaskRequestDto {
 
     public Long getAssigneeId() { return assigneeId; }
     public void setAssigneeId(Long assigneeId) { this.assigneeId = assigneeId; }
-
-    // ADDED
-    public Long getCreatorId() { return creatorId; }
-    public void setCreatorId(Long creatorId) { this.creatorId = creatorId; }
 
     public Long getGroupId() { return groupId; }
     public void setGroupId(Long groupId) { this.groupId = groupId; }

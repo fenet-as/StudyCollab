@@ -46,14 +46,35 @@ public class GroupOverviewService {
                 .build();
 
         // 2. Fetch Recent Items
-        var upcomingTasks = tasksRepository.findTop5ByStudyGroupIdAndStatusOrderByDueDateAsc(groupId, Task.Status.TODO)
-                .stream().map(t -> GroupOverviewDto.UpcomingTaskDto.builder()
+
+
+
+
+        var upcomingTasks = tasksRepository
+                .findTop5ByStudyGroupIdAndStatusOrderByDueDateAsc(groupId, Task.Status.TODO)
+                .stream()
+                .map(t -> GroupOverviewDto.UpcomingTaskDto.builder()
                         .id(t.getId())
                         .title(t.getTitle())
-                        .dueDate(t.getDueDate())
+                        .dueDate(
+                                t.getDueDate() != null
+                                        ? t.getDueDate().toLocalDate()
+                                        : null
+                        )
                         .priority(t.getPriority())
+                        .assigneeId(
+                                t.getAssignee() != null
+                                        ? t.getAssignee().getId()
+                                        : null
+                        )
+                        .assigneeName(
+                                t.getAssignee() != null
+                                        ? t.getAssignee().getFullName()
+                                        : "Unassigned"
+                        )
                         .build()
-                ).collect(Collectors.toList());
+                )
+                .collect(Collectors.toList());
 
         var recentNotes = notesRepository.findTop5ByStudyGroupIdOrderByUpdatedAtDesc(groupId)
                 .stream().map(n -> GroupOverviewDto.RecentNoteDto.builder()

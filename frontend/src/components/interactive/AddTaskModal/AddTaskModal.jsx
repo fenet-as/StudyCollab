@@ -1,5 +1,6 @@
 // frontend/src/components/interactive/AddTaskModal/AddTaskModal.jsx
 import React, { useState, useEffect } from 'react';
+import { X, Calendar, Plus, Check } from 'lucide-react';
 import styles from './AddTaskModal.module.css';
 
 export default function AddTaskModal({ onClose, onSubmit, groupMembers = [], taskToEdit = null }) {
@@ -100,7 +101,9 @@ export default function AddTaskModal({ onClose, onSubmit, groupMembers = [], tas
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
           <h2>{taskToEdit ? 'Edit Task Details' : 'Create New Task'}</h2>
-          <button className={styles.closeBtn} onClick={onClose}>✕</button>
+          <button className={styles.closeBtn} onClick={onClose} aria-label="Close modal">
+            <X size={20} />
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className={styles.modalForm}>
@@ -169,6 +172,7 @@ export default function AddTaskModal({ onClose, onSubmit, groupMembers = [], tas
               <input 
                 type="date" 
                 id="dueDate"
+                className={styles.datePickerInput}
                 min={getTodayString()}
                 value={formData.dueDate}
                 onChange={(e) => setFormData({...formData, dueDate: e.target.value})}
@@ -181,7 +185,17 @@ export default function AddTaskModal({ onClose, onSubmit, groupMembers = [], tas
               Cancel
             </button>
             <button type="submit" className={styles.createBtn} disabled={groupMembers.length === 0}>
-              {taskToEdit ? 'Save Changes' : 'Create Task'}
+              {taskToEdit ? (
+                <>
+                  <Check size={18} />
+                  <span>Save Changes</span>
+                </>
+              ) : (
+                <>
+                  <Plus size={18} />
+                  <span>Create Task</span>
+                </>
+              )}
             </button>
           </div>
         </form>

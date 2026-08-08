@@ -1,4 +1,3 @@
-// backend/src/main/java/com/studycollab/dto/tasks/TaskResponseDto.java
 package com.studycollab.dto.tasks;
 
 import com.studycollab.model.Task;
@@ -23,7 +22,7 @@ public class TaskResponseDto {
         this.description = task.getDescription();
         this.status = task.getStatus().name();
         this.priority = task.getPriority().name();
-        this.dueDate = task.getDueDate();
+        this.dueDate = (task.getDueDate() != null) ? task.getDueDate().toLocalDate() : null;
         this.groupId = task.getStudyGroup().getId();
 
         if (task.getAssignee() != null) {

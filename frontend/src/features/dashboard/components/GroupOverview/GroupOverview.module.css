@@ -1,0 +1,41 @@
+.overviewContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  padding: 0.25rem;
+  font-family: inherit;
+}
+
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.statusMessage {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-muted);
+}
+
+.warningMessage {
+  color: var(--warning-btn-text);
+  text-align: center;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.errorMessage {
+  color: var(--danger-text);
+  text-align: center;
+  padding: 2rem;
+}
+
+@media (max-width: 1024px) {
+  .dashboardGrid {
+    grid-template-columns: 1fr;
+  }
+}

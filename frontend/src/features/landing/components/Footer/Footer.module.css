@@ -1,0 +1,72 @@
+.footer {
+  background: var(--bg-highlight);
+  border-top: 1px solid var(--border-color);
+  color: var(--text-muted);
+  padding: 6rem 6% 3rem 6%;
+}
+
+.footerCta {
+  text-align: center;
+  margin-bottom: 5rem;
+}
+
+.footerCta h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.75rem;
+  color: var(--text-main);
+}
+
+.footerBtn {
+  background: var(--primary-color);
+  color: var(--card-bg);
+  border: none;
+  padding: 0.95rem 2.25rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.footerBtn:hover {
+  background: var(--primary-hover);
+}
+
+.footerBottom {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 2.5rem;
+  font-size: 0.9rem;
+}
+
+.footerLinks {
+  display: flex;
+  gap: 2.5rem;
+}
+
+.footerLinks a {
+  text-decoration: none;
+  color: var(--text-secondary);
+  transition: color 0.15s ease;
+}
+
+.footerLinks a:hover {
+  color: var(--text-main);
+}
+
+@media (max-width: 968px) {
+  .footerBottom { 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 1.5rem; 
+    text-align: center; 
+  }
+}
+
+@media (max-width: 480px) {
+  .footerCta h2 { font-size: 1.85rem; }
+  .footerLinks { flex-direction: column; align-items: center; gap: 1rem; }
+}

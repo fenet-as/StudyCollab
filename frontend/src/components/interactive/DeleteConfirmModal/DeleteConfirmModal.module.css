@@ -1,60 +1,105 @@
 /* frontend/src/components/interactive/DeleteConfirmModal/DeleteConfirmModal.module.css */
+
 .modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(4px);
+  background-color: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  padding: 1rem;
 }
 
 .modalContent {
-  background: white;
+  background-color: var(--card-bg);
+  color: var(--text-primary);
   width: 100%;
-  max-width: 450px;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  max-width: 440px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
-  animation: modalScaleIn 0.2s ease-out;
+  position: relative;
+  animation: modalScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.closeBtn {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 0.4rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.closeBtn:hover:not(:disabled) {
+  background-color: var(--bg-highlight);
+  color: var(--text-primary);
 }
 
 .modalHeader {
-  background-color: #fef2f2;
-  border-bottom: 1px solid #fee2e2;
-  padding: 1.25rem;
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
+}
+
+.iconContainer {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background-color: var(--danger-icon-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .warningIcon {
-  font-size: 1.5rem;
+  color: var(--danger-text);
 }
 
 .modalHeader h3 {
   margin: 0;
-  color: #991b1b;
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 700;
+  color: var(--text-primary);
+}
+
+.subTitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
 .modalForm {
-  padding: 1.5rem;
+  padding: 0 1.5rem 1.5rem 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
 }
 
 .warningText {
-  color: #475569;
-  font-size: 0.95rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
   line-height: 1.5;
   margin: 0;
+}
+
+.warningText strong {
+  color: var(--text-primary);
 }
 
 .inputGroup {
@@ -65,26 +110,33 @@
 
 .inputGroup label {
   font-size: 0.85rem;
-  color: #334155;
+  color: var(--text-muted);
+}
+
+.inputGroup label strong {
+  color: var(--text-primary);
 }
 
 .textInput {
-  padding: 0.75rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 0.95rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--border-color);
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .textInput:focus {
-  border-color: #ef4444;
+  border-color: var(--danger-btn-bg);
+  box-shadow: 0 0 0 3px var(--danger-bg);
 }
 
 .errorMessage {
   margin: 0;
   font-size: 0.85rem;
-  color: #ef4444;
+  color: var(--danger-text);
   font-weight: 500;
 }
 
@@ -92,42 +144,95 @@
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
-  margin-top: 0.5rem;
+  margin-top: 0.25rem;
 }
 
 .cancelBtn {
-  background-color: #f1f5f9;
-  color: #475569;
-  border: none;
-  padding: 0.65rem 1.25rem;
-  border-radius: 6px;
+  background-color: var(--btn-secondary-bg);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  padding: 0.65rem 1.15rem;
+  border-radius: var(--radius-md);
   font-weight: 600;
+  font-size: 0.875rem;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color 0.15s ease;
 }
 
-.cancelBtn:hover {
-  background-color: #e2e8f0;
+.cancelBtn:hover:not(:disabled) {
+  background-color: var(--btn-secondary-hover);
 }
 
 .deleteBtn {
-  background-color: #ef4444;
-  color: white;
+  background-color: var(--danger-btn-bg);
+  color: var(--danger-btn-text);
   border: none;
-  padding: 0.65rem 1.25rem;
-  border-radius: 6px;
+  padding: 0.65rem 1.15rem;
+  border-radius: var(--radius-md);
   font-weight: 600;
+  font-size: 0.875rem;
   cursor: pointer;
-  transition: background-color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
 }
 
 .deleteBtn:hover:not(:disabled) {
-  background-color: #dc2626;
+  background-color: var(--danger-btn-hover);
 }
 
 .deleteBtn:disabled {
-  background-color: #fca5a5;
+  opacity: 0.45;
   cursor: not-allowed;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes modalScaleIn {
+  from {
+    transform: scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+
+/* Animation Entry/Exit States */
+.fadeIn {
+  animation: fadeInOverlay 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.fadeOut {
+  animation: fadeOutOverlay 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.scaleUp {
+  animation: modalScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.scaleDown {
+  animation: modalScaleOut 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOutOverlay {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
 @keyframes modalScaleIn {
@@ -138,5 +243,16 @@
   to {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+@keyframes modalScaleOut {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.95);
+    opacity: 0;
   }
 }

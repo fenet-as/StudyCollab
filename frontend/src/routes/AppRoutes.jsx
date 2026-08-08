@@ -4,6 +4,10 @@ import Login from '../features/auth/pages/Login';
 import Register from '../features/auth/pages/Register';
 import Dashboard from '../features/dashboard/pages/Dashboard';
 import LandingPage from '../features/landing/pages/LandingPage';
+import CloudflareTestPage from './CloudflareTestPage';
+import GroupAvatarTestPage from '../../tests/GroupAvatarTestPage';
+
+
 
 // Simple check to safeguard secure UI containers
 const ProtectedRoute = ({ children }) => {
@@ -22,6 +26,10 @@ export default function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       
+
+    <Route path="/test" element={<GroupAvatarTestPage />} />
+
+
       <Route 
         path="/dashboard" 
         element={
