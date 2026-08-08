@@ -1,0 +1,479 @@
+/* ==========================================================================
+   Sidebar Base Styles
+   ========================================================================== */
+.sidebar {
+  width: 260px;
+  height: 100vh; /* Constrains sidebar to viewport height so content scrolls inside */
+  background-color: var(--card-bg);
+  border-right: 1px solid var(--border-color);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  flex-shrink: 0;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              padding 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              background-color 0.25s ease;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ==========================================================================
+   Desktop-Only Collapsed States (screens larger than 768px)
+   ========================================================================== */
+@media (min-width: 769px) {
+  .sidebar.collapsed {
+    width: 72px;
+    padding: 20px 10px;
+  }
+
+  .sidebar.collapsed .sidebarTopRow {
+    flex-direction: column;
+    height: auto;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .sidebar.collapsed .collapseHideText,
+  .sidebar.collapsed .sectionLabel {
+    display: none !important;
+    opacity: 0;
+  }
+
+  .sidebar.collapsed .groupItem {
+    justify-content: center;
+    padding: 0.6rem 0;
+  }
+
+  .sidebar.collapsed .groupMainInfo {
+    justify-content: center;
+    flex: initial;
+  }
+
+  .sidebar.collapsed .sidebarActionButtons {
+    align-items: center;
+  }
+
+  .sidebar.collapsed .newGroupBtn {
+    padding: 0.65rem 0;
+    width: 100%;
+  }
+
+  .sidebar.collapsed .sidebarFooter {
+    align-items: center;
+  }
+
+  .sidebar.collapsed .footerAction {
+    width: 100%;
+    justify-content: center;
+    padding: 0.45rem 0;
+  }
+}
+
+/* ==========================================================================
+   Header / Logo Row
+   ========================================================================== */
+.sidebarTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 1.5rem;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.sidebarLogo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+  color: var(--primary-color);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.sidebarLogo:hover {
+  opacity: 0.85;
+}
+
+.logoIcon {
+  flex-shrink: 0;
+}
+
+.collapseToggleBtn {
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.collapseToggleBtn:hover {
+  background-color: var(--bg-highlight);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+.collapseHideText {
+  opacity: 1;
+  transition: opacity 0.15s ease;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   Section Labels & Status Text
+   ========================================================================== */
+.sectionLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  padding: 0 0.4rem;
+  flex-shrink: 0;
+}
+
+.loadingText,
+.errorText {
+  padding: 0.5rem 0.6rem;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.loadingText {
+  color: var(--text-muted);
+}
+
+.errorText {
+  color: var(--danger-text);
+}
+
+/* ==========================================================================
+   Group List (Scrollable Area)
+   ========================================================================== */
+.groupList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 0%;
+  min-height: 0; /* Unlocks flex item shrinking for scrolling */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Scrollbar Customization for Group List */
+.groupList::-webkit-scrollbar {
+  width: 5px;
+}
+
+.groupList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.groupList::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.groupList::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+.groupItem {
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  font-size: 0.9rem;
+  border: 1px solid transparent;
+}
+
+.groupItem:hover {
+  background-color: var(--bg-highlight);
+  color: var(--text-primary);
+}
+
+.activeGroupItem {
+  background-color: var(--icon-bg) !important;
+  color: var(--primary-color) !important;
+  font-weight: 600;
+  border-color: rgba(var(--primary-rgb, 99, 102, 241), 0.15);
+}
+
+.groupMainInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.groupMainInfo span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.groupAvatarImg {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.groupIcon {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  transition: color 0.15s ease;
+}
+
+.activeGroupItem .groupIcon {
+  color: var(--primary-color);
+}
+
+.deleteSidebarGroupBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  opacity: 0;
+  transform: scale(0.85);
+  transition: all 0.15s ease;
+}
+
+.groupItem:hover .deleteSidebarGroupBtn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.deleteSidebarGroupBtn:hover {
+  background-color: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+/* ==========================================================================
+   Action Buttons (New Group / Join Group)
+   ========================================================================== */
+.sidebarActionButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--border-color);
+  flex-shrink: 0;
+}
+
+.newGroupBtn {
+  border: none;
+  background-color: var(--primary-color);
+  color: var(--card-bg);
+  padding: 0.65rem 0.9rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.newGroupBtn:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.newGroupBtn:active {
+  transform: translateY(0);
+}
+
+.joinGroupBtn {
+  background-color: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  box-shadow: none;
+}
+
+.joinGroupBtn:hover {
+  background-color: var(--bg-highlight);
+  border-color: var(--text-muted);
+  color: var(--text-primary);
+  box-shadow: none;
+}
+
+.btnIcon {
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Sidebar Footer
+   ========================================================================== */
+.sidebarFooter {
+  margin-top: auto;
+  border-top: 1px solid var(--border-color);
+  padding-top: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.4rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.userInfo:hover {
+  background-color: var(--bg-highlight);
+}
+
+.userAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background-color: var(--badge-admin-bg);
+  color: var(--badge-admin-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.userEmailText {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.footerAction {
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.footerAction:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-highlight);
+}
+
+.logoutAction {
+  color: var(--danger-text);
+}
+
+.logoutAction:hover {
+  background-color: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+.footerIcon {
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Mobile Drawer Styles (screens smaller than 768px)
+   ========================================================================== */
+.drawerBackdrop {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .drawerBackdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 105;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px !important;
+    height: 100vh !important;
+    padding: 20px 16px !important;
+    z-index: 110;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.12);
+  }
+
+  .sidebar.mobileOpen {
+    transform: translateX(0);
+  }
+
+  .collapseToggleBtn {
+    display: none !important;
+  }
+}
+
+
+
+/* Ensure the avatar circle cuts off square image corners */
+.userAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--primary-color, #4f46e5);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  overflow: hidden; /* Clips the child img to a circle */
+  flex-shrink: 0;
+}
+
+/* Make sure the image fills the avatar circle completely */
+.userAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

@@ -1,559 +1,68 @@
-/* Dashboard.module.css */
-
-:root{
-  --bg:#f8fafc;
-  --card:#fff;
-  --border:#e5e7eb;
-  --text:#0f172a;
-  --muted:#64748b;
-  --primary:#1e3a8a;
-  --primary-soft:#eef2ff;
-  --accent:#8b5cf6;
-  --danger:#ef4444;
-}
-
-*{box-sizing:border-box}
-
 .dashboardContainer {
   display: flex;
   min-height: 100vh;
   width: 100vw;
-  background: var(--bg);
-  font-family: Inter, sans-serif;
-  color: var(--text);
-  transition: background-color 0.2s ease, color 0.2s ease;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
   overflow-x: hidden;
 }
 
-/* --- THE SIDEBAR MECHANICS --- */
-.sidebar {
-  width: 260px;
-  background: #fff;
-  border-right: 1px solid var(--border);
-  padding: 24px 18px;
+.contentArea {
   display: flex;
   flex-direction: column;
-  align-self: stretch;
-  flex-shrink: 0;
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease, background-color 0.2s ease;
+  flex: 1;
+  height: 100vh;
   overflow: hidden;
 }
 
-/* Collapse Transition Target Modifiers */
-.sidebar.collapsed {
-  width: 72px;
-  padding: 24px 10px;
-}
-
-.sidebarTopRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: 2rem;
-}
-
-.sidebar.collapsed .sidebarTopRow {
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.sidebarLogo {
-  font-size: 1.35rem;
-  font-weight: 700;
-  display: flex;
-  gap: .6rem;
-  align-items: center;
-  color: var(--primary);
-  white-space: nowrap;
-}
-
-.collapseToggleBtn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.1rem;
-  padding: 0.4rem;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s ease;
-}
-.collapseToggleBtn:hover {
-  background-color: #f1f5f9;
-}
-.dashboardContainer[data-theme='dark'] .collapseToggleBtn:hover {
-  background-color: #374151;
-}
-
-/* Hides targeted textual labels cleanly inside layout transitions */
-.collapseHideText {
-  opacity: 1;
-  transition: opacity 0.15s ease;
-  white-space: nowrap;
-}
-.sidebar.collapsed .collapseHideText {
-  display: none;
-  opacity: 0;
-}
-
-.sectionLabel {
-  font-size: .75rem;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  color: #94a3b8;
-  margin-bottom: .75rem;
-}
-.sidebar.collapsed .sectionLabel {
-  display: none;
-}
-
-.groupList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.groupItem, .groupList li {
-  padding: .8rem 1rem;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: .2s;
-  color: #475569;
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-}
-.groupList li:hover { background: #f1f5f9; }
-.activeGroupItem { background: var(--primary-soft)!important; color: var(--primary)!important; font-weight: 600; }
-
-/* Keep icons centered when collapsed */
-.sidebar.collapsed .groupItem, 
-.sidebar.collapsed .groupList li {
-  justify-content: center;
-  padding: 0.8rem 0;
-}
-.sidebar.collapsed .groupIcon {
-  font-size: 1.25rem;
-}
-
-.newGroupBtn {
-  margin-top: 1rem;
-  border: none;
-  background: var(--primary);
-  color: #fff;
-  padding: .8rem 1rem;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: .2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.newGroupBtn:hover { background: #1d4ed8; transform: translateY(-1px); }
-
-.sidebar.collapsed .newGroupBtn {
-  padding: 0.8rem 0;
-  width: 100%;
-}
-.btnIcon { display: inline-block; }
-
-.sidebarFooter {
-  margin-top: auto;
-  border-top: 1px solid var(--border);
-  padding-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: .9rem;
-}
-.sidebar.collapsed .sidebarFooter {
-  align-items: center;
-}
-
-.userInfo { display: flex; align-items: center; gap: .7rem; }
-.userAvatar {
-  width: 38px; height: 38px; border-radius: 50%;
-  background: var(--accent); color: #fff;
-  display: flex; align-items: center; justify-content: center; font-weight: 700;
-  flex-shrink: 0;
-}
-.userEmailText { font-weight: 600; }
-
-.footerAction { cursor: pointer; color: var(--muted); transition: .2s; display: flex; align-items: center; gap: 0.5rem; }
-.footerAction:hover { color: var(--primary); }
-
-.sidebar.collapsed .footerAction {
-  width: 100%;
-  justify-content: center;
-  padding: 0.25rem 0;
-}
-.footerIcon { font-size: 1.1rem; }
-
-/* --- INTERIOR PLATFORM --- */
-.contentArea { display: flex; flex-direction: column; flex: 1; height: 100vh; overflow: hidden; }
-
-.contentHeader {
-  background: #fff;
-  border-bottom: 1px solid var(--border);
-  padding: 1.25rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.contentHeader h2 { margin: 0; font-size: 1.8rem; }
-.headerRight { display: flex; align-items: center; gap: 1rem; }
-.avatarGroup { display: flex; }
-.stackedAvatar {
-  width: 34px; height: 34px; border-radius: 50%;
-  background: #e2e8f0;
-  border: 2px solid #fff;
-  margin-left: -10px;
-  display: flex; align-items: center; justify-content: center;
-}
-.archiveGroupBtn {
-  background: #fff;
-  border: 1px solid var(--border);
-  padding: .75rem 1rem;
-  border-radius: 12px;
-  cursor: pointer;
-}
-
-.tabsNav {
-  display: flex;
-  gap: .5rem;
-  padding: 1rem 2rem;
-  background: #fff;
-  border-bottom: 1px solid var(--border);
-}
-.tabLink {
-  padding: .65rem 1rem;
-  border-radius: 10px;
-  cursor: pointer;
-  color: var(--muted);
-  transition: .2s;
-  font-weight: 500;
-}
-.tabLink:hover { background: #f1f5f9; }
-.activeTab { background: var(--primary-soft); color: var(--primary); }
-
-.viewPortWrapper { flex: 1; overflow: auto; padding: 2rem; }
-
-.notesWorkspace {
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 1.5rem;
-  height: 100%;
-}
-.notesSidebar, .editorPane {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  box-shadow: 0 2px 10px rgba(0,0,0,.04);
-}
-.notesSidebar { padding: 1rem; overflow: auto; }
-.notesSidebarHeader { font-weight: 700; margin-bottom: 1rem; }
-.noteListItem {
-  padding: 1rem;
-  border-radius: 12px;
-  background: #f8fafc;
-  margin-bottom: .75rem;
-  cursor: pointer;
-  transition: .2s;
-  border: 1px solid transparent;
-}
-.noteListItem:hover { transform: translateY(-2px); border-color: #dbeafe; }
-.activeNoteItem {
-  background: var(--primary-soft);
-  border-color: #c7d2fe;
-}
-.activeNoteItem h4 { color: var(--primary); }
-.noteListItem h4 { margin: 0 0 .35rem; }
-.noteListItem span { font-size: .8rem; color: var(--muted); }
-
-.editorPane { display: flex; flex-direction: column; overflow: hidden; }
-.editorToolbar {
-  padding: .9rem 1.5rem;
-  border-bottom: 1px solid var(--border);
-  display: flex; gap: 1rem; color: var(--muted); }
-.editorContentContainer {
+.viewPortWrapper {
   flex: 1;
+  overflow: auto;
   padding: 2rem;
-  max-width: 900px;
-  width: 100%;
-  margin: 0 auto;
 }
-.rawMarkdownTextarea {
-  width: 100%; height: 100%;
-  border: none; resize: none;
-  font-size: 1rem; line-height: 1.8;
-  font-family: ui-monospace, monospace;
-  outline: none;
-}
-.editorActionsFooter {
-  padding: 1rem 1.5rem;
-  border-top: 1px solid var(--border);
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-}
-.saveNoteBtn, .deleteNoteBtn {
-  padding: .8rem 1.2rem;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.saveNoteBtn { background: var(--primary); color: #fff; border: none; }
-.deleteNoteBtn { background: #fff; border: 1px solid #fecaca; color: var(--danger); }
 
 .placeholderTabContent {
-  background: #fff;
-  border: 1px solid var(--border);
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-radius: 16px;
-  padding: 5rem;
+  padding: 5rem 2rem;
   text-align: center;
-}
-.emptyIllustration { font-size: 4rem; margin-bottom: 1rem; }
-
-/* --- DARK MIXIN SYNCS --- */
-.dashboardContainer[data-theme='dark'] {
-  --bg: #111827;
-  --card: #1f2937;
-  --border: #374151;
-  --text: #f3f4f6;
-  --muted: #cbd5e1;
-  background-color: #111827;
-}
-.dashboardContainer[data-theme='dark'] .sidebar,
-.dashboardContainer[data-theme='dark'] .contentHeader,
-.dashboardContainer[data-theme='dark'] .tabsNav,
-.dashboardContainer[data-theme='dark'] .notesSidebar,
-.dashboardContainer[data-theme='dark'] .editorPane,
-.dashboardContainer[data-theme='dark'] .placeholderTabContent {
-  background: var(--card);
-  color: var(--text);
-  border-color: var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-.dashboardContainer[data-theme='dark'] .groupItem,
-.dashboardContainer[data-theme='dark'] .groupList li {
-  color: #cbd5e1;
-}
-.dashboardContainer[data-theme='dark'] .groupList li:hover {
-  background: #2d3748;
-}
-.dashboardContainer[data-theme='dark'] .activeGroupItem {
-  background: #1e3a8a !important;
-  color: #ffffff !important;
-}
-.dashboardContainer[data-theme='dark'] .tabLink:hover {
-  background: #2d3748;
-}
-.dashboardContainer[data-theme='dark'] .activeTab {
-  background: #1e3a8a;
-  color: #ffffff;
-}
-.dashboardContainer[data-theme='dark'] .stackedAvatar {
-  border-color: var(--card);
-  background: #374151;
+.placeholderTabContent h3 {
+  color: var(--text-primary);
 }
 
-/* ==========================================
-   📱 MOBILE & RESPONSIVE COMPACT RULES
-   ========================================== */
+.placeholderTabContent p {
+  color: var(--text-secondary);
+}
+
+.emptyState {
+  height: 80%;
+}
+
+.emptyIllustration {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 @media (max-width: 768px) {
   .dashboardContainer {
     flex-direction: column;
   }
-  
-  .sidebar {
-    width: 100% !important;
-    height: auto !important;
-    padding: 1rem !important;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .sidebarTopRow {
-    margin-bottom: 0.5rem !important;
-    flex-direction: row !important;
-  }
-
-  .collapseToggleBtn {
-    display: none; /* No collapse button on real mobile layout screen viewports */
-  }
-
-  .collapseHideText {
-    display: inline !important;
-    opacity: 1 !important;
-  }
-
-  .groupList {
-    flex-direction: row;
-    overflow-x: auto;
-    padding-bottom: 4px;
-  }
-
-  .groupItem, .groupList li {
-    padding: 0.5rem 0.75rem;
-    white-space: nowrap;
-  }
-
-  .newGroupBtn {
-    margin-top: 0.5rem;
-    padding: 0.5rem 1rem;
-  }
-
-  .sidebarFooter {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
-  }
 
   .contentArea {
-    height: auto;
-  }
-
-  .contentHeader {
-    padding: 1rem;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-
-  .tabsNav {
-    padding: 0.5rem 1rem;
-    overflow-x: auto;
-    white-space: nowrap;
+    height: calc(100vh - 60px);
   }
 
   .viewPortWrapper {
     padding: 1rem;
   }
-
-  .notesWorkspace {
-    grid-template-columns: 1fr;
-  }
-}
-
-
-
-
-
-/* Restricts uploaded group avatar images to keep sidebar item sizing perfect */
-.groupAvatarImg {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 0.5rem; /* Space between image and text */
-  flex-shrink: 0;
-}
-
-/* Ensures member circle avatars center raw letters instead of just emojis */
-.stackedAvatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: #3b82f6; /* Modern fallback blue */
-  color: white;
-  font-weight: 600;
-  font-size: 0.85rem;
-  
-  /* Centers the letters perfectly */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  border: 2px solid var(--border-color, #ffffff);
-  margin-left: -8px; /* Classic overlapping stacked avatar look */
-  transition: transform 0.2s;
-  user-select: none;
-}
-
-/* Lightly staggers hover overlap effect */
-.stackedAvatar:hover {
-  transform: translateY(-4px);
-  z-index: 10;
-}
-
-
-
-
-
-
-
-
-
-
-/* Styling for group item wrapper to arrange icon, text, and action buttons beautifully */
-.groupItemWithDelete {
-  display: flex !important;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.6rem 1rem;
-  position: relative;
-  transition: background-color 0.15s ease-in-out;
-}
-
-.groupMainInfo {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Red trash can icon that only appears when hovering the specific list item */
-.deleteSidebarGroupBtn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.95rem;
-  opacity: 0;
-  transform: scale(0.9);
-  transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
-}
-
-.groupItemWithDelete:hover .deleteSidebarGroupBtn {
-  opacity: 1;
-  transform: scale(1.0);
-}
-
-.deleteSidebarGroupBtn:hover {
-  background-color: #fee2e2;
-}
-
-
-
-
-
-/* Ensure these blocks match your dashboard's global theme definitions */
-
-[data-theme='light'] {
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --card-bg: #ffffff;
-  --border-color: #e2e8f0;
-  --input-bg: #ffffff;
-  --icon-bg: #f8fafc;
-  --button-primary-bg: #0f172a;
-  --button-primary-text: #ffffff;
-  --scrollbar-thumb: #cbd5e1;
-}
-
-[data-theme='dark'] {
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --card-bg: #1e293b;       /* Dark grey-blue card surfaces */
-  --border-color: #334155;   /* Secondary muted borders */
-  --input-bg: #0f172a;      /* Deep contrast inputs */
-  --icon-bg: #334155;
-  --button-primary-bg: #6366f1; /* Vibrant contrast action buttons */
-  --button-primary-text: #ffffff;
-  --scrollbar-thumb: #475569;
 }

@@ -4,23 +4,25 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public class RegisterRequest {
-    @NotBlank(message = "Name cannot be empty")
-    private String fullName;
+/**
+ * Inbound payload for user registration.
+ */
+public record RegisterRequest(
+        @NotBlank(message = "Full name cannot be blank")
+        // Ensures the full name field is present and contains non-whitespace characters.
+        @Size(max = 100, message = "Full name cannot exceed 100 characters")
+        // Enforces a maximum length constraint of 100 characters on the full name.
+        String fullName,
 
-    @NotBlank(message = "Email cannot be empty")
-    @Email(message = "Invalid email formatting")
-    private String email;
+        @NotBlank(message = "Email address cannot be blank")
+        // Ensures the email field is not empty or blank.
+        @Email(message = "Invalid email formatting")
+        // Validates that the input string conforms to a valid email format.
+        String email,
 
-    @NotBlank(message = "Password cannot be empty")
-    @Size(min = 6, message = "Password must be at least 6 characters")
-    private String password;
-
-    // Getters and Setters
-    public String getFullName() { return fullName; }
-    public void setFullName(String fullName) { this.fullName = fullName; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-}
+        @NotBlank(message = "Password cannot be blank")
+        // Ensures the user provides a non-blank password string.
+        @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters")
+        // Enforces a secure password length between 6 and 100 characters.
+        String password
+) {}

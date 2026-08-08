@@ -1,0 +1,173 @@
+.tableWrapper {
+  flex: 1; /* Expands table to fill all available bottom area */
+  display: flex;
+  flex-direction: column;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  overflow: auto; /* Handles inner scrolling if file list overflows */
+  -webkit-overflow-scrolling: touch;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.filesTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  min-width: 500px;
+}
+
+.filesTable th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background-color: var(--bg-highlight);
+  font-weight: 600;
+  font-size: 0.775rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.filesTable td {
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.875rem;
+  vertical-align: middle;
+  color: var(--text-main);
+}
+
+.fileRow {
+  cursor: pointer; /* Indicates whole row is clickable */
+  transition: background-color 0.12s ease;
+}
+
+.fileRow:hover {
+  background-color: var(--bg-highlight);
+}
+
+.fileNameCell {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.fileIcon {
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+}
+
+.fileNameAndInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.fileName {
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.fileSize {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.uploaderText, 
+.dateText {
+  color: var(--text-muted);
+}
+
+.emptyStateRow {
+  text-align: center;
+  padding: 3.5rem !important;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.actionMenuWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.fileActionToggle {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: var(--radius-sm);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.fileActionToggle:hover {
+  background-color: var(--btn-secondary-bg);
+  color: var(--text-main);
+}
+
+.actionDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 999;
+  min-width: 140px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: 0.35rem 0;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.actionDropdown button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.825rem;
+  font-weight: 500;
+  text-align: left;
+  border: none;
+  background: none;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.actionDropdown button:hover {
+  background-color: var(--btn-secondary-bg);
+}
+
+/* Delete option using global danger tokens */
+.deleteOption {
+  color: var(--danger-text) !important;
+}
+
+.deleteOption:hover {
+  background-color: var(--danger-bg) !important;
+}
+
+@media (max-width: 640px) {
+  .filesTable {
+    min-width: 100%;
+  }
+
+  .uploaderColumn,
+  .dateColumn {
+    display: none;
+  }
+
+  .filesTable th,
+  .filesTable td {
+    padding: 0.65rem 0.75rem;
+    font-size: 0.8rem;
+  }
+}

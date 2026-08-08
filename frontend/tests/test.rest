@@ -1,0 +1,134 @@
+
+
+
+
+
+
+#######################################################
+### 1. LOGIN - Get JWT Token
+#######################################################
+
+
+
+
+
+@baseUrl = http://localhost:8080
+@token = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0QGdtYWlsLmNvbSIsImlhdCI6MTc4NjA5NTI5MCwiZXhwIjoxNzg2MTgxNjkwfQ.m9P5FGARwUDMv2Vx56Z__r0rj-4RpwfclZzuO_WfikgLeYarpI7_2W5WYoi6Ulie
+
+
+### Get Current User's Groups
+GET http://localhost:8080/api/groups/my-groups
+Authorization: Bearer {{token}}
+Accept: application/json
+
+
+###
+GET {{baseUrl}}/api/groups/63/members
+Authorization: Bearer {{token}}
+Accept: application/json
+
+
+###
+
+
+GET http://localhost:8080/api/tasks/group/60
+Authorization: Bearer {{token}}
+
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@gmail.com",
+  "password": "123456"
+}
+
+
+
+###
+# Get all tasks for a group (default pagination)
+
+GET {{baseUrl}}/api/tasks/group/60
+Authorization: Bearer {{token}}
+
+###
+
+# Get tasks with pagination
+
+GET {{baseUrl}}/api/tasks/group/60?page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+# Filter by status
+
+GET {{baseUrl}}/api/tasks/group/60?status=TODO
+Authorization: Bearer {{token}}
+
+###
+
+# Filter by priority
+
+GET {{baseUrl}}/api/tasks/group/60?priority=HIGH
+Authorization: Bearer {{token}}
+
+###
+
+# Filter by both status and priority
+
+GET {{baseUrl}}/api/tasks/group/60?status=IN_PROGRESS&priority=MEDIUM
+Authorization: Bearer {{token}}
+
+###
+
+# Create a new task
+
+POST {{baseUrl}}/api/tasks
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Complete Spring Boot Assignment",
+  "description": "Finish the backend implementation",
+  "groupId": 60,
+  "creatorId": 1,
+  "assigneeId": 2,
+  "status": "TODO",
+  "priority": "HIGH",
+  "dueDate": "2026-08-15T18:00:00"
+}
+
+###
+
+# Update a task
+
+PUT {{baseUrl}}/api/tasks/60
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Complete Spring Boot Assignment v2",
+  "description": "Backend completed, start testing",
+  "status": "IN_PROGRESS",
+  "priority": "HIGH",
+  "assigneeId": 2,
+  "dueDate": "2026-08-18T18:00:00"
+}
+
+###
+
+# Update only the task status
+
+PUT {{baseUrl}}/api/tasks/60
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "status": "DONE"
+}
+
+###
+
+# Delete a task
+
+DELETE {{baseUrl}}/api/tasks/60
+Authorization: Bearer {{token}}

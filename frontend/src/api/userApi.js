@@ -33,12 +33,12 @@ export const userApi = {
   // Process dynamic multipart form image file streams
   updateAvatar: async (file) => {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('avatar', file); // 'avatar' matches @RequestParam("avatar") in AvatarController
 
     const config = getAuthHeaders();
     config.headers['Content-Type'] = 'multipart/form-data';
 
-    const response = await API.put('/api/users/avatar', formData, config);
+    const response = await API.post('/api/avatars/upload', formData, config);
     return response.data;
   },
 

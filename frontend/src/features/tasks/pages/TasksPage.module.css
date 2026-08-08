@@ -1,3 +1,5 @@
+/* frontend/src/features/tasks/pages/TasksPage.module.css */
+
 .tasksContainer {
   display: flex;
   flex-direction: column;
@@ -18,15 +20,15 @@
   align-items: center;
 }
 
-/* Clean CSS Search Magnifier fallback */
 .searchIcon {
   position: absolute;
   left: 0.85rem;
   width: 6px;
   height: 6px;
-  border: 2px solid #9ca3af;
-  border-radius: 50%;
+  border: 2px solid var(--text-secondary);
+  border-radius: var(--radius-full);
 }
+
 .searchIcon::after {
   content: '';
   position: absolute;
@@ -34,26 +36,30 @@
   left: 5px;
   width: 2px;
   height: 5px;
-  background: #9ca3af;
+  background-color: var(--text-secondary);
   transform: rotate(-45deg);
 }
 
 .taskSearchInput {
   padding: 0.65rem 1rem 0.65rem 2.25rem;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
-  font-family: inherit;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background-color: var(--input-bg);
+  font-family: 'Inter', sans-serif;
   font-size: 0.9rem;
   width: 280px;
   outline: none;
-  transition: all 0.15s ease;
-  color: #1f2937;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.25s ease;
+  color: var(--text-primary);
+}
+
+.taskSearchInput::placeholder {
+  color: var(--text-secondary);
 }
 
 .taskSearchInput:focus {
-  border-color: #1e3a8a;
-  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.08);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--icon-bg);
 }
 
 /* --- ADD TASK BUTTON --- */
@@ -61,22 +67,23 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: #1e3a8a;
+  background-color: var(--primary-color);
   color: #ffffff;
-  border: none;
+  border: 1px solid transparent;
   font-weight: 600;
   padding: 0.65rem 1.25rem;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  font-family: inherit;
+  font-family: 'Inter', sans-serif;
   font-size: 0.9rem;
-  box-shadow: 0 2px 4px rgba(30, 58, 138, 0.1);
-  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .addTaskBtn:hover {
-  background: #172554;
+  background-color: var(--primary-hover);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .btnPlus {
@@ -94,11 +101,14 @@
 }
 
 .kanbanColumn {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
+  background-color: var(--bg-highlight);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
   padding: 1.25rem;
   min-height: 550px;
+  max-height: 80vh;
+  overflow-y: auto;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .columnHeader {
@@ -107,7 +117,7 @@
   align-items: center;
   margin-bottom: 1.25rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .titleGroup {
@@ -117,23 +127,32 @@
 }
 
 .titleGroup h3 {
+  font-family: 'Poppins', 'Inter', sans-serif;
   font-size: 0.9rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  color: #475569;
+  color: var(--text-muted);
   margin: 0;
 }
 
-.todoDot { color: #ef4444; font-size: 0.65rem; }
-.doneDot { color: #10b981; font-size: 0.65rem; }
+.todoDot { 
+  color: var(--danger-text); 
+  font-size: 0.65rem; 
+}
+
+.doneDot { 
+  color: var(--badge-owner-text); 
+  font-size: 0.65rem; 
+}
 
 .taskCountBadge {
-  background: #e2e8f0;
-  color: #475569;
+  background-color: var(--btn-secondary-bg);
+  color: var(--text-muted);
+  font-family: 'Inter', sans-serif;
   font-size: 0.75rem;
   font-weight: 700;
   padding: 0.15rem 0.5rem;
-  border-radius: 20px;
+  border-radius: var(--radius-full);
 }
 
 .columnBody {
@@ -144,24 +163,26 @@
 
 /* --- TASK CARDS --- */
 .taskCard {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 1.25rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.15rem;
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .taskCard:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-subtle);
 }
 
 .completedTaskCard {
-  border-left: 4px solid #10b981;
+  border-left: 4px solid var(--badge-owner-text);
 }
 
 .cardTopRow {
@@ -172,17 +193,35 @@
 
 /* Priority Micro-badges */
 .prioBadge {
+  font-family: 'Inter', sans-serif;
   font-size: 0.65rem;
   font-weight: 700;
   padding: 0.2rem 0.5rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   letter-spacing: 0.02em;
 }
 
-.high { background: #fee2e2; color: #ef4444; }
-.medium { background: #fef3c7; color: #d97706; }
-.low { background: #eff6ff; color: #3b82f6; } /* Added soft blue for low priority */
-.donePrio { background: #d1fae5; color: #065f46; }
+.high { 
+  background-color: var(--danger-bg); 
+  color: var(--danger-text); 
+  border: 1px solid var(--danger-border);
+}
+
+.medium { 
+  background-color: var(--warning-btn-bg); 
+  color: var(--warning-btn-text); 
+  border: 1px solid var(--warning-btn-border);
+}
+
+.low { 
+  background-color: var(--badge-owner-bg); 
+  color: var(--badge-owner-text); 
+}
+
+.donePrio { 
+  background-color: var(--badge-owner-bg); 
+  color: var(--badge-owner-text); 
+}
 
 .cardActions {
   display: flex;
@@ -190,7 +229,7 @@
 }
 
 .actionIconButton {
-  background: none;
+  background: transparent;
   border: none;
   cursor: pointer;
   width: 24px;
@@ -198,58 +237,136 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 0.8rem;
-  color: #94a3b8;
-  transition: all 0.15s ease;
+  color: var(--text-secondary);
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .actionIconButton:hover {
-  background: #f1f5f9;
-  color: #334155;
+  background-color: var(--btn-secondary-bg);
+  color: var(--text-primary);
 }
 
 .taskCardTitle {
-  font-size: 1rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--text-primary);
   margin: 0;
+  line-height: 1.35;
 }
 
 .taskCardDesc {
-  font-size: 0.85rem;
-  color: #64748b;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.825rem;
+  color: var(--text-secondary);
   line-height: 1.45;
   margin: 0;
 }
 
+/* --- SIDE-BY-SIDE ASSIGNMENT METADATA --- */
+.assignmentMetaContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  background-color: var(--bg-highlight);
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  margin-top: 0.25rem;
+}
+
+.assignmentItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.metaLabel {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.675rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.userChip {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 0;
+}
+
+.userAvatarSm {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background-color: var(--badge-admin-bg);
+  color: var(--badge-admin-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.assigneeAvatar {
+  background-color: var(--badge-owner-bg);
+  color: var(--badge-owner-text);
+}
+
+.userName {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metaDivider {
+  width: 1px;
+  height: 24px;
+  background-color: var(--border-color);
+  flex-shrink: 0;
+}
+
+/* --- CARD BOTTOM ROW --- */
 .cardBottomRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 0.25rem;
-  border-top: 1px solid #f1f5f9;
-  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 0.65rem;
 }
 
 .dueDateBadge {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
+  font-family: 'Inter', sans-serif;
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
-/* Clean Custom CSS Indicator for time placeholder */
 .clockIcon {
   width: 10px;
   height: 10px;
-  border: 1.5px solid #94a3b8;
-  border-radius: 50%;
+  border: 1.5px solid var(--text-secondary);
+  border-radius: var(--radius-full);
   display: inline-block;
   position: relative;
 }
+
 .clockIcon::after {
   content: '';
   position: absolute;
@@ -257,116 +374,21 @@
   left: 4px;
   width: 3px;
   height: 1.5px;
-  background: #94a3b8;
-}
-
-/* Neutralized letter initials layout for profile pictures */
-.assignedUserAvatar {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: #f1f5f9;
-  color: #475569;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
-  font-weight: 700;
-  border: 1px solid #e2e8f0;
+  background-color: var(--text-secondary);
 }
 
 .emptyColumnState {
   text-align: center;
   padding: 3rem 1rem;
-  color: #94a3b8;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-secondary);
   font-size: 0.85rem;
-  border: 1px dashed #cbd5e1;
-  border-radius: 10px;
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-md);
 }
 
 @media (max-width: 768px) {
   .kanbanBoard {
     grid-template-columns: 1fr;
   }
-}
-
-
-/* ==========================================================================
-    🌙 DARK MODE COMPATIBILITY IMPLEMENTATION
-   ========================================================================== */
-
-:global([data-theme='dark']) .taskSearchInput {
-  background: #1f2937;
-  border-color: #374151;
-  color: #f9fafb;
-}
-:global([data-theme='dark']) .taskSearchInput:focus {
-  border-color: #3b82f6;
-}
-
-:global([data-theme='dark']) .addTaskBtn {
-  background: #2563eb;
-}
-:global([data-theme='dark']) .addTaskBtn:hover {
-  background: #1d4ed8;
-}
-
-:global([data-theme='dark']) .kanbanColumn {
-  background: #111827;
-  border-color: #374151;
-}
-
-:global([data-theme='dark']) .columnHeader {
-  border-color: #374151;
-}
-
-:global([data-theme='dark']) .titleGroup h3 {
-  color: #9ca3af;
-}
-
-:global([data-theme='dark']) .taskCountBadge {
-  background: #374151;
-  color: #9ca3af;
-}
-
-:global([data-theme='dark']) .taskCard {
-  background: #1f2937;
-  border-color: #374151;
-}
-
-/* Dark mode overrides for priority badges */
-:global([data-theme='dark']) .high { background: #7f1d1d; color: #fca5a5; }
-:global([data-theme='dark']) .medium { background: #78350f; color: #fcd34d; }
-:global([data-theme='dark']) .low { background: #1e3a8a; color: #93c5fd; } /* Custom dark mode style for low priority */
-
-:global([data-theme='dark']) .taskCardTitle {
-  color: #f9fafb;
-}
-
-:global([data-theme='dark']) .taskCardDesc {
-  color: #9ca3af;
-}
-
-:global([data-theme='dark']) .cardBottomRow {
-  border-color: #374151;
-}
-
-:global([data-theme='dark']) .dueDateBadge {
-  color: #9ca3af;
-}
-
-:global([data-theme='dark']) .assignedUserAvatar {
-  background: #374151;
-  color: #e5e7eb;
-  border-color: #4b5563;
-}
-
-:global([data-theme='dark']) .actionIconButton:hover {
-  background: #374151;
-  color: #f3f4f6;
-}
-
-:global([data-theme='dark']) .emptyColumnState {
-  border-color: #374151;
-  color: #6b7280;
 }

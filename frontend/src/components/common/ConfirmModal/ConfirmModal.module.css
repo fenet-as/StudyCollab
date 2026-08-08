@@ -4,22 +4,25 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.65);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 1rem;
+  backdrop-filter: blur(2px);
 }
 
 .modalContent {
-  background-color: #ffffff;
+  background-color: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
   border-radius: 12px;
   width: 100%;
   max-width: 440px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   animation: modalFadeIn 0.2s ease-out;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .modalHeader {
@@ -36,7 +39,7 @@
 .modalHeader h3 {
   margin: 0;
   font-size: 1.25rem;
-  color: #111827;
+  color: var(--text-primary, #111827);
 }
 
 .modalBody {
@@ -46,7 +49,7 @@
 .messageText {
   margin: 0;
   font-size: 0.95rem;
-  color: #4b5563;
+  color: var(--text-secondary, #4b5563);
   line-height: 1.5;
 }
 
@@ -55,11 +58,12 @@
   justify-content: flex-end;
   gap: 0.75rem;
   padding: 1rem 1.5rem;
-  background-color: #f9fafb;
-  border-top: 1px solid #f3f4f6;
+  background-color: var(--card-bg, #ffffff);
+  border-top: 1px solid var(--border-color, #f3f4f6);
 }
 
-.cancelBtn, .confirmBtn {
+.cancelBtn, 
+.confirmBtn {
   padding: 0.625rem 1.25rem;
   border-radius: 6px;
   font-size: 0.9rem;
@@ -70,35 +74,51 @@
 }
 
 .cancelBtn {
-  background-color: #ffffff;
-  border-color: #d1d5db;
-  color: #374151;
+  background-color: var(--btn-secondary-bg, #ffffff);
+  border-color: var(--border-color, #d1d5db);
+  color: var(--text-primary, #374151);
 }
 
 .cancelBtn:hover:not(:disabled) {
-  background-color: #f9fafb;
+  background-color: var(--btn-secondary-hover, #f9fafb);
 }
 
 .confirmBtn {
-  background-color: #4f46e5;
+  background-color: var(--primary-color, #4f46e5);
   color: #ffffff;
 }
 
 .confirmBtn:hover:not(:disabled) {
-  background-color: #4338ca;
+  background-color: var(--primary-hover, #4338ca);
 }
 
 .confirmBtn.destructiveBtn {
-  background-color: #ef4444;
+  background-color: var(--danger-btn-bg, #ef4444);
+  color: var(--danger-btn-text, #ffffff);
 }
 
 .confirmBtn.destructiveBtn:hover:not(:disabled) {
-  background-color: #dc2626;
+  background-color: var(--danger-btn-hover, #dc2626);
 }
 
-.cancelBtn:disabled, .confirmBtn:disabled {
+.cancelBtn:disabled, 
+.confirmBtn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.errorBox {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--danger-bg, #fef2f2);
+  border: 1px solid var(--danger-border, #fee2e2);
+  border-radius: 6px;
+  color: var(--danger-text, #991b1b);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
 }
 
 @keyframes modalFadeIn {
@@ -110,22 +130,4 @@
     opacity: 1;
     transform: scale(1);
   }
-}
-
-
-
-/* Append this to the bottom of your ConfirmModal.module.css file */
-
-.errorBox {
-  margin-top: 1rem;
-  padding: 0.75rem 1rem;
-  background-color: #fef2f2;
-  border: 1px solid #fee2e2;
-  border-radius: 6px;
-  color: #991b1b;
-  font-size: 0.85rem;
-  line-height: 1.4;
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
 }

@@ -1,0 +1,44 @@
+.settingsContainer {
+  padding: 2.5rem 1.5rem;
+  max-width: 700px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.settingsHeader {
+  margin-bottom: 2.5rem;
+}
+
+.settingsHeader h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+}
+
+.settingsHeader p {
+  margin: 0 0 1.25rem 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.currentUserBadge {
+  display: inline-block;
+  background-color: var(--bg-highlight);
+  color: var(--text-main);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  border: 1px solid var(--border-color);
+}
+
+.settingsVerticalLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  padding-bottom: 3rem;
+}

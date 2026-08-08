@@ -473,4 +473,36 @@ public class GroupService {
     }
 
 
+    @Transactional(readOnly = true)
+    public List<GroupMemberSummaryDto> getGroupMembersSummary(Long groupId, User currentUser) {
+        StudyGroup group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new CustomExceptions.ResourceNotFoundException("Group not found with id: " + groupId));
+
+        // Ensure the requesting user is a member of the group
+        validateMembership(currentUser, group);
+
+        return group.getMembers().stream()
+                .map(member -> new GroupMemberSummaryDto(
+                        member.getUser().getId(),
+                        member.getUser().getFullName(), // Use getUser().getName() if that's your field name
+                        member.getUser().getEmail()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    private void validateMembership(User user, StudyGroup group) {
+        if (user == null) {
+            return;
+        }
+
+        boolean isMember = group.getMembers() != null && group.getMembers().stream()
+                .anyMatch(member -> member.getUser() != null
+                        && member.getUser().getId().equals(user.getId()));
+
+        if (!isMember) {
+            throw new CustomExceptions.BadRequestException("User " + user.getId() + " is not a member of group " + group.getId());
+        }
+    }
+
+
 }

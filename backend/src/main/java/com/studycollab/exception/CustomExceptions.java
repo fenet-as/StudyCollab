@@ -1,34 +1,30 @@
 package com.studycollab.exception;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 public class CustomExceptions {
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public static class ResourceNotFoundException extends RuntimeException {
+    public static class ResourceNotFoundException extends BaseBusinessException {
         public ResourceNotFoundException(String message) {
-            super(message);
+            super(message, HttpStatus.NOT_FOUND);
         }
     }
 
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public static class UnauthorizedException extends RuntimeException {
+    public static class UnauthorizedException extends BaseBusinessException {
         public UnauthorizedException(String message) {
-            super(message);
+            super(message, HttpStatus.UNAUTHORIZED);
         }
     }
 
+    public static class UnauthorizedAccessException extends BaseBusinessException {
+        public UnauthorizedAccessException(String message, HttpStatus status) {
+            super(message, HttpStatus.FORBIDDEN);
+        }
+    }
 
-
-
-
-
-    // Add this missing class to resolve your compiler error:
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public static class BadRequestException extends RuntimeException {
+    public static class BadRequestException extends BaseBusinessException {
         public BadRequestException(String message) {
-            super(message);
+            super(message, HttpStatus.BAD_REQUEST);
         }
     }
 }

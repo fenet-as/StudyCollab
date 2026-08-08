@@ -1,24 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { GraduationCap, Sun, Moon, AlertTriangle, ArrowRight } from 'lucide-react';
 import { loginUser } from '../../../api/authApi';
+import { useTheme } from '../../../context/ThemeContext';
 import styles from './Auth.module.css';
 
 export default function Login() {
   const navigate = useNavigate();
+  const { isDark, toggleTheme } = useTheme();
+  
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-
-  const [isDark, setIsDark] = useState(() => {
-    return document.documentElement.getAttribute('data-theme') === 'dark';
-  });
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  }, [isDark]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -32,16 +27,12 @@ export default function Login() {
     try {
       const data = await loginUser(formData);
       
-      // Store token into browser cache memory 
       localStorage.setItem('token', data.token);
       localStorage.setItem('email', data.email);
-      
-      // ⬇️ ADD THIS LINE TO SAVE THE NEW DATABASE USER ID ⬇️
       localStorage.setItem('userId', data.id);
 
       navigate('/dashboard');
     } catch (err) {
-      // User-friendly error mapping
       if (!err.response) {
         setError('Connection timed out. Please check your internet connection or verify the backend server is running.');
       } else if (err.response.status === 403 || err.response.status === 401) {
@@ -56,22 +47,23 @@ export default function Login() {
     <div className={styles.authContainer}>
       <button 
         className={styles.themeToggle} 
-        onClick={() => setIsDark(!isDark)}
+        onClick={toggleTheme}
         aria-label="Toggle dark mode"
       >
-        {isDark ? '☀️' : '🌙'}
+        {isDark ? <Sun size={20} /> : <Moon size={20} />}
       </button>
 
       <div className={styles.authCard}>
         <div className={styles.logo} onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-          <span className={styles.logoIcon}>🎓</span> StudyCollab
+          <GraduationCap size={28} className={styles.logoIcon} />
+          <span>StudyCollab</span>
         </div>
         
         <h1 className={styles.authTitle}>Welcome Back</h1>
 
         {error && (
           <div className={styles.errorBanner}>
-            <span className={styles.errorIcon}>⚠️</span>
+            <AlertTriangle size={18} className={styles.errorIcon} />
             <div className={styles.errorText}>{error}</div>
           </div>
         )}
@@ -83,7 +75,7 @@ export default function Login() {
               type="email"
               id="email"
               name="email"
-              placeholder="Email"
+              placeholder="name@example.com"
               value={formData.email}
               onChange={handleChange}
               required
@@ -96,7 +88,7 @@ export default function Login() {
               type="password"
               id="password"
               name="password"
-              placeholder="Password"
+              placeholder="Enter your password"
               value={formData.password}
               onChange={handleChange}
               required
@@ -104,7 +96,8 @@ export default function Login() {
           </div>
 
           <button type="submit" className={styles.authSubmitBtn}>
-            Login
+            <span>Login</span>
+            <ArrowRight size={18} />
           </button>
         </form>
 

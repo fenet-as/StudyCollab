@@ -1,6 +1,7 @@
 package com.studycollab.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.studycollab.config.properties.CloudflareR2Properties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -12,61 +13,57 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 import java.net.URI;
 
+// Marks this class as a Spring configuration source for bean definitions.
 @Configuration
+// Enables binding of custom properties defined in CloudflareR2Properties.
+@EnableConfigurationProperties(CloudflareR2Properties.class)
 public class CloudflareR2Config {
 
-    @Value("${cloudflare.r2.accessKey}")
-    private String accessKey;
+    private final CloudflareR2Properties properties;
 
-    @Value("${cloudflare.r2.secretKey}")
-    private String secretKey;
-
-    @Value("${cloudflare.r2.endpoint:}")
-    private String endpoint;
-
-    private String getSanitizedEndpoint() {
-        if (endpoint == null || endpoint.trim().isEmpty()) {
-            throw new IllegalArgumentException(
-                    "CRITICAL CONFIG ERROR: 'cloudflare.r2.endpoint' property is missing or empty!"
-            );
-        }
-        String cleanEndpoint = endpoint.trim();
-        if (!cleanEndpoint.startsWith("http://") && !cleanEndpoint.startsWith("https://")) {
-            cleanEndpoint = "https://" + cleanEndpoint;
-        }
-        return cleanEndpoint;
+    // Injects the bound Cloudflare R2 properties via constructor injection.
+    public CloudflareR2Config(CloudflareR2Properties properties) {
+        this.properties = properties;
     }
 
+    // Creates and manages the main AWS SDK S3 client bean configured for Cloudflare R2.
     @Bean
     public S3Client s3Client() {
-        AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
+        // Creates static AWS credentials using the configured access and secret keys.
+        AwsBasicCredentials credentials = AwsBasicCredentials.create(properties.accessKey(), properties.secretKey());
 
+        // Configures S3 settings specifically needed for R2 compatibility (path-style access, no chunked encoding).
         S3Configuration serviceConfiguration = S3Configuration.builder()
                 .pathStyleAccessEnabled(true)
                 .chunkedEncodingEnabled(false)
                 .build();
 
+        // Builds the S3 client pointing to the R2 custom endpoint and region.
         return S3Client.builder()
-                .endpointOverride(URI.create(getSanitizedEndpoint()))
+                .endpointOverride(URI.create(properties.getSanitizedEndpoint()))
                 .credentialsProvider(StaticCredentialsProvider.create(credentials))
-                .region(Region.US_EAST_1) // 🔥 AWS SDK v2 requires US_EAST_1 for R2 custom endpoints
+                .region(Region.US_EAST_1)
                 .serviceConfiguration(serviceConfiguration)
                 .build();
     }
 
+    // Creates and manages the S3 Presigner bean used for generating pre-signed URLs for direct upload/download.
     @Bean
     public S3Presigner s3Presigner() {
-        AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
+        // Creates static AWS credentials using the configured access and secret keys.
+        AwsBasicCredentials credentials = AwsBasicCredentials.create(properties.accessKey(), properties.secretKey());
 
+        // Configures settings for the presigner (disables checksum validation for R2 compatibility).
         S3Configuration serviceConfiguration = S3Configuration.builder()
                 .pathStyleAccessEnabled(true)
                 .checksumValidationEnabled(false)
                 .build();
 
+        // Builds the S3Presigner pointing to the R2 endpoint and region.
         return S3Presigner.builder()
-                .endpointOverride(URI.create(getSanitizedEndpoint()))
+                .endpointOverride(URI.create(properties.getSanitizedEndpoint()))
                 .credentialsProvider(StaticCredentialsProvider.create(credentials))
-                .region(Region.US_EAST_1) // 🔥 AWS SDK v2 requires US_EAST_1 for R2 custom endpoints
+                .region(Region.US_EAST_1)
                 .serviceConfiguration(serviceConfiguration)
                 .build();
     }

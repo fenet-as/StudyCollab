@@ -2,6 +2,7 @@ package com.studycollab.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -23,11 +24,14 @@ public class FileResource {
     @Column(nullable = false)
     private String size;
 
-    @Column(nullable = false)
-    private String fileType; // pdf, doc, sheet, slides, file
+    // Added to store the exact size in bytes for query aggregations (Quota check)
+    @Column(name = "size_bytes", nullable = false)
+    private Long sizeBytes;
 
-    // 🌟 CHANGED: Swapped massive byte[] data column for a clean S3/R2 pointer key
-    @Column(name = "storage_key", nullable = true) // Change to true temporarily
+    @Column(nullable = false)
+    private String fileType;
+
+    @Column(name = "storage_key")
     private String storageKey;
 
     @ManyToOne(fetch = FetchType.LAZY)

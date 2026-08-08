@@ -1,101 +1,160 @@
-// frontend/src/features/dashboard/pages/Dashboard.jsx
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import styles from './Dashboard.module.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import styles from "./Dashboard.module.css";
 
-import NotesPage from '../../notes/pages/NotesPage';
 
-import CreateGroupModal from '../../../components/interactive/CreateGroupModal/CreateGroupModal';
-import DeleteConfirmModal from '../../../components/interactive/DeleteConfirmModal/DeleteConfirmModal';
-import GroupOverview from '../components/GroupOverview';
-import TasksPage from '../../tasks/pages/TasksPage';
-import SettingsPane from '../components/SettingsPane'; // 👤 Imported user settings layout
-import GroupSettingsPane from '../components/GroupSettingsPane'; // 👥 Imported group settings panel
-import { groupApi } from '../../../api/groupApi';
-import { userApi } from '../../../api/userApi'; // 👤 Imported userApi for profile sync
+import { MessageSquare, ShieldAlert, Loader2 } from "lucide-react";
+
+import FilesPage from "../../files/pages/FilesPage";
+import NotesPage from "../../notes/pages/NotesPage";
+import TasksPage from "../../tasks/pages/TasksPage";
+
+import EmptyState from "../../../components/common/EmptyState/EmptyState";
+import CreateGroupModal from "../../../components/interactive/CreateGroupModal/CreateGroupModal";
+import JoinGroupModal from "../../../components/interactive/JoinGroupModal/JoinGroupModal";
+import DeleteConfirmModal from "../../../components/interactive/DeleteConfirmModal/DeleteConfirmModal";
+import GroupOverview from "../components/GroupOverview/GroupOverview";
+import SettingsPane from "../components/settings/SettingsPane";
+import GroupSettingsPane from "../components/GroupSettings/GroupSettingsPane";
+import AdminPanel from "../components/GroupSettings/GroupAdminPane";
+
+import MobileHeader from "../components/MobileHeader/MobileHeader";
+import Sidebar from "../components/Sidebar/Sidebar";
+import ContentHeader from "../components/ContentHeader/ContentHeader";
+import TabNavigation from "../components/TabNavigation/TabNavigation";
+
+import { groupApi } from "../../../api/groupApi";
+import { userApi } from "../../../api/userApi";
+
+import { useTheme } from "../../../context/ThemeContext";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  
-  // State
+  const { isDark, toggleTheme } = useTheme();
+
+  // Core Data State
   const [groups, setGroups] = useState([]);
-  const [activeGroup, setActiveGroup] = useState(null); 
+  const [activeGroup, setActiveGroup] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [activeTab, setActiveTab] = useState('Overview');
-  const [selectedNote, setSelectedNote] = useState('Week 4 Lecture Notes');
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Permission State from Backend
+  const [permissions, setPermissions] = useState({
+    role: null,
+    isAdmin: false,
+    isCreator: false,
+    isOwnerOrAdmin: false,
+  });
+  const [checkingPermissions, setCheckingPermissions] = useState(false);
+
+  // UI State
+  const [activeTab, setActiveTab] = useState("Overview");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  
-  // 👤 User State Configuration
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // User State
   const [userProfile, setUserProfile] = useState(null);
-  const [userEmail, setUserEmail] = useState('');
-  const [userInitials, setUserInitials] = useState('U');
+  const [userEmail, setUserEmail] = useState("");
+  const [userInitials, setUserInitials] = useState("U");
+
+  // Modal State
   const [isNewGroupModalOpen, setIsNewGroupModalOpen] = useState(false);
-  
-  // Deletion Overlay State 
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [groupToDelete, setGroupToDelete] = useState(null);
 
-  const [noteContent, setNoteContent] = useState(
-    "$$F = \\frac{d}{dt}(mv)$$\n\nThis formula represents the rate of change of momentum..."
-  );
-
-  // Sync profile details and pull workspaces on load
   useEffect(() => {
-    // 1. Grab local storage cache as a fast first-paint fallback
-    const cachedEmail = localStorage.getItem('email');
+    const cachedEmail = localStorage.getItem("email");
     if (cachedEmail) {
       setUserEmail(cachedEmail);
       setUserInitials(cachedEmail.charAt(0).toUpperCase());
     }
 
-    // 2. Fetch both DB profile credentials and group spaces
     fetchUserProfile();
     fetchGroups();
   }, []);
 
-  /**
-   * Fetches authentic authenticated user details from the DB
-   */
+  const fetchPermissions = async (groupId) => {
+    if (!groupId) return null;
+    setCheckingPermissions(true);
+    try {
+      const permissionData = await groupApi.getGroupPermissions(groupId);
+      const updatedPerms = {
+        role: permissionData.role || null,
+        isAdmin: permissionData.isAdmin ?? permissionData.admin ?? false,
+        isCreator: permissionData.isCreator ?? permissionData.creator ?? false,
+        isOwnerOrAdmin:
+          permissionData.isOwnerOrAdmin ?? permissionData.ownerOrAdmin ?? false,
+      };
+      setPermissions(updatedPerms);
+      return updatedPerms;
+    } catch (err) {
+      console.error("Could not fetch user permissions for group:", err);
+      const fallback = {
+        role: null,
+        isAdmin: false,
+        isCreator: false,
+        isOwnerOrAdmin: false,
+      };
+      setPermissions(fallback);
+      return fallback;
+    } finally {
+      setCheckingPermissions(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeGroup?.id) {
+      fetchPermissions(activeGroup.id);
+    } else {
+      setPermissions({
+        role: null,
+        isAdmin: false,
+        isCreator: false,
+        isOwnerOrAdmin: false,
+      });
+    }
+  }, [activeGroup?.id]);
+
   const fetchUserProfile = async () => {
     try {
       const data = await userApi.getCurrentUser();
       setUserProfile(data);
-      
-      // Update local credentials state with fresh DB information
+
       if (data.email) setUserEmail(data.email);
-      
+
       if (data.fullName) {
-        // Build initials from Full Name (e.g., "Jane Doe" -> "JD", "Jane" -> "J")
         const nameParts = data.fullName.trim().split(/\s+/);
         if (nameParts.length > 1) {
-          setUserInitials((nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase());
+          setUserInitials(
+            (
+              nameParts[0][0] + nameParts[nameParts.length - 1][0]
+            ).toUpperCase(),
+          );
         } else if (nameParts[0]) {
           setUserInitials(nameParts[0][0].toUpperCase());
         }
       }
     } catch (err) {
-      console.error("Could not fetch user info from DB, falling back to local cache:", err);
+      console.error(
+        "Could not fetch user info from DB, falling back to local cache:",
+        err,
+      );
     }
   };
 
-  /**
-   * Syncs active dynamic records down from the backend
-   */
   const fetchGroups = async (selectGroupId = null) => {
     try {
       setLoading(true);
       const data = await groupApi.getMyGroups();
       setGroups(data);
-      
+
       if (data.length > 0) {
         if (selectGroupId) {
-          const targetGroup = data.find(g => g.id === selectGroupId);
+          const targetGroup = data.find((g) => g.id === selectGroupId);
           setActiveGroup(targetGroup || data[0]);
         } else if (activeGroup) {
-          const currentActive = data.find(g => g.id === activeGroup.id);
+          const currentActive = data.find((g) => g.id === activeGroup.id);
           setActiveGroup(currentActive || data[0]);
         } else {
           setActiveGroup(data[0]);
@@ -104,7 +163,7 @@ export default function Dashboard() {
         setActiveGroup(null);
       }
     } catch (err) {
-      setError(err.message || 'Failed to load workspaces.');
+      setError(err.message || "Failed to load workspaces.");
       console.error(err);
     } finally {
       setLoading(false);
@@ -112,9 +171,10 @@ export default function Dashboard() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('email');
-    navigate('/login');
+    localStorage.removeItem("token");
+    localStorage.removeItem("email");
+    localStorage.removeItem("userId");
+    navigate("/login");
   };
 
   const handleCreateGroup = async (createdGroup) => {
@@ -122,7 +182,7 @@ export default function Dashboard() {
       setIsNewGroupModalOpen(false);
       if (createdGroup && createdGroup.id) {
         await fetchGroups(createdGroup.id);
-        setActiveTab('Overview');
+        setActiveTab("Overview");
       } else {
         await fetchGroups();
       }
@@ -131,275 +191,247 @@ export default function Dashboard() {
     }
   };
 
-  // Intercept list node dispatching to open safety modal
+  const handleJoinGroup = async (joinedGroup) => {
+    try {
+      setIsJoinModalOpen(false);
+      if (joinedGroup && joinedGroup.id) {
+        await fetchGroups(joinedGroup.id);
+      } else {
+        await fetchGroups();
+      }
+      setActiveTab("Overview");
+    } catch (err) {
+      console.error("Error updating group list after joining:", err);
+    }
+  };
+
+  const handleLeaveGroupSuccess = async (leftGroupId) => {
+    const updatedGroups = groups.filter((g) => g.id !== leftGroupId);
+    setGroups(updatedGroups);
+
+    if (updatedGroups.length > 0) {
+      setActiveGroup(updatedGroups[0]);
+    } else {
+      setActiveGroup(null);
+    }
+
+    setActiveTab("Overview");
+    await fetchGroups();
+  };
+
   const promptDeleteGroup = (e, group) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
     setGroupToDelete(group);
     setIsDeleteModalOpen(true);
   };
 
-  // Submit confirmed deletion process
   const handleDeleteConfirm = async () => {
     if (!groupToDelete) return;
-    
+    const deletedId = groupToDelete.id;
+
     try {
-      await groupApi.deleteGroup(groupToDelete.id);
-      
-      if (activeGroup?.id === groupToDelete.id) {
-        setActiveGroup(null);
-      }
-      
+      setGroups((prevGroups) => {
+        const remaining = prevGroups.filter((g) => g.id !== deletedId);
+        if (activeGroup?.id === deletedId) {
+          setActiveGroup(remaining.length > 0 ? remaining[0] : null);
+        }
+        return remaining;
+      });
+
       setIsDeleteModalOpen(false);
       setGroupToDelete(null);
-      await fetchGroups();
+
+      await groupApi.deleteGroup(deletedId);
     } catch (err) {
       console.error("Failed to delete group:", err);
+      await fetchGroups();
       throw err;
     }
   };
 
-  /**
-   * Updates the active group's metadata instantly and refreshes the list in the sidebar.
-   */
-  const handleGroupUpdated = (updatedGroup) => {
-    // 1. Instantly update active group state
-    setActiveGroup(updatedGroup);
-    
-    // 2. Map through current groups list in state to update sidebar item instantly
-    setGroups(prevGroups => 
-      prevGroups.map(g => g.id === updatedGroup.id ? updatedGroup : g)
-    );
+  // Synchronizes profile and fresh member lists across all headers
+  const handleGroupUpdated = async (updatedGroup) => {
+    if (updatedGroup) {
+      setActiveGroup(updatedGroup);
+      setGroups((prevGroups) =>
+        prevGroups.map((g) => (g.id === updatedGroup.id ? updatedGroup : g)),
+      );
+    }
+    await fetchGroups(activeGroup?.id);
   };
 
-  // 👤 Determine the displayed profile handle (Full Name from DB preferred)
-  const userDisplayName = userProfile?.fullName || (userEmail ? userEmail.split('@')[0] : 'User');
+  const handleNavigateToAdmin = async () => {
+    if (activeGroup?.id) {
+      await fetchPermissions(activeGroup.id);
+    }
+    setActiveTab("Admin Panel");
+  };
+
+  const userDisplayName =
+    userProfile?.fullName || (userEmail ? userEmail.split("@")[0] : "User");
 
   return (
-    <div className={styles.dashboardContainer} data-theme={isDarkMode ? 'dark' : 'light'}>
-      
-      {/* --- SIDEBAR CONTAINER --- */}
-      <aside className={`${styles.sidebar} ${isSidebarCollapsed ? styles.collapsed : ''}`}>
-        <div className={styles.sidebarTopRow}>
-          <div 
-            className={styles.sidebarLogo} 
-            onClick={() => {
-              if (groups.length > 0 && !activeGroup) {
-                setActiveGroup(groups[0]);
-              }
-              setActiveTab('Overview');
-            }} 
-            style={{ cursor: 'pointer' }}
-          >
-            <span className={styles.logoIcon}>🎓</span> 
-            <span className={styles.collapseHideText}>StudyCollab</span>
-          </div>
-          <button 
-            className={styles.collapseToggleBtn} 
-            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-          >
-            {isSidebarCollapsed ? '👉' : '👈'}
-          </button>
-        </div>
-        
-        <div className={styles.sectionLabel}>
-          <span className={styles.collapseHideText}>Study Groups</span>
-        </div>
-        
-        {loading && groups.length === 0 ? (
-          <p className={styles.collapseHideText} style={{ padding: '0 1rem', fontSize: '0.85rem', color: '#888' }}>
-            Loading workspaces...
-          </p>
-        ) : error ? (
-          <p className={styles.collapseHideText} style={{ padding: '0 1rem', fontSize: '0.85rem', color: '#ef4444' }}>
-            Error loading groups.
-          </p>
-        ) : (
-          <ul className={styles.groupList}>
-            {groups.map((group, index) => {
-              const fallbackEmojis = ['📘', '📙', '📗', '📓', '📕'];
-              const emoji = fallbackEmojis[index % fallbackEmojis.length];
+    <div className={styles.dashboardContainer}>
+      <MobileHeader
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+        setActiveTab={setActiveTab}
+        userInitials={userInitials}
+        userAvatarUrl={userProfile?.avatarUrl}
+      />
 
-              const currentMember = group.members?.find(
-                m => m.email?.toLowerCase() === userEmail?.toLowerCase()
-              );
+      <Sidebar
+        groups={groups}
+        activeGroup={activeGroup}
+        setActiveGroup={setActiveGroup}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        loading={loading}
+        error={error}
+        userEmail={userEmail}
+        userDisplayName={userDisplayName}
+        userInitials={userInitials}
+        userAvatarUrl={userProfile?.avatarUrl}
+        isSidebarCollapsed={isSidebarCollapsed}
+        setIsSidebarCollapsed={setIsSidebarCollapsed}
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+        isDarkMode={isDark}
+        setIsDarkMode={toggleTheme}
+        setIsNewGroupModalOpen={setIsNewGroupModalOpen}
+        setIsJoinModalOpen={setIsJoinModalOpen}
+        promptDeleteGroup={promptDeleteGroup}
+        handleLogout={handleLogout}
+      />
 
-              const roleStr = currentMember?.role ? currentMember.role.toString().toUpperCase() : '';
-              const hasManagementRights = roleStr === 'ADMIN' || roleStr === 'CREATOR' || roleStr === 'OWNER';
-              const showDelete = hasManagementRights && !isSidebarCollapsed;
-
-              return (
-                <li 
-                  key={group.id}
-                  className={`${activeGroup?.id === group.id && activeTab !== 'Settings' ? styles.activeGroupItem : styles.groupItem} ${styles.groupItemWithDelete}`} 
-                  onClick={() => {
-                    setActiveGroup(group);
-                    setActiveTab('Overview'); // 👈 Direct route back to dashboard overview metrics
-                  }}
-                  title={group.name}
-                >
-                  <div className={styles.groupMainInfo}>
-                    {group.avatarUrl ? (
-                      <img 
-                        src={`http://localhost:8080${group.avatarUrl}`} 
-                        alt="avatar" 
-                        className={styles.groupAvatarImg} 
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <span className={styles.groupIcon}>{emoji}</span>
-                    )}
-                    <span className={styles.collapseHideText}>{group.name}</span>
-                  </div>
-
-                  {/* Inline Delete Anchor Node */}
-                  {showDelete && (
-                    <button 
-                      className={styles.deleteSidebarGroupBtn}
-                      onClick={(e) => promptDeleteGroup(e, group)}
-                      title="Delete Group"
-                    >
-                      🗑️
-                    </button>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        )}
-
-        <button 
-          className={styles.newGroupBtn} 
-          title="New Group"
-          onClick={() => setIsNewGroupModalOpen(true)}
-        >
-          <span className={styles.btnIcon}>+</span>
-          <span className={styles.collapseHideText}> New Group</span>
-        </button>
-
-        <div className={styles.sidebarFooter}>
-          <div className={styles.footerAction} onClick={() => setIsDarkMode(!isDarkMode)} title="Toggle Theme">
-            <span className={styles.footerIcon}>{isDarkMode ? '☀️' : '🌙'}</span> 
-            <span className={styles.collapseHideText}>{isDarkMode ? ' Light Mode' : ' Dark Mode'}</span>
-          </div>
-
-          {/* 👤 Routes to the Settings screen when clicked */}
-          <div 
-            className={styles.userInfo} 
-            title="Account Settings" 
-            onClick={() => setActiveTab('Settings')}
-            style={{ cursor: 'pointer' }}
-          >
-            {/* Displaying dynamic initials */}
-            <div className={styles.userAvatar}>{userInitials}</div>
-            {/* Displaying full name from DB if available, falling back to clean email string */}
-            <span className={`${styles.userEmailText} ${styles.collapseHideText}`}>
-              {userDisplayName}
-            </span>
-          </div>
-          
-          <div className={styles.footerAction} onClick={handleLogout} style={{ color: '#ef4444', fontWeight: '600' }} title="Logout">
-            <span className={styles.footerIcon}>🚪</span> 
-            <span className={styles.collapseHideText}> Logout</span>
-          </div>
-        </div>
-      </aside>
-
-      {/* --- MAIN INTERIOR PLATFORM --- */}
       <main className={styles.contentArea}>
-        {activeTab === 'Settings' ? (
-          /* 👤 ISOLATED SETTINGS ROUTE */
-          <SettingsPane onProfileUpdated={fetchUserProfile} />
+        {activeTab === "Settings" ? (
+          <SettingsPane
+            onProfileUpdated={async () => {
+              await fetchUserProfile();
+              await fetchGroups(activeGroup?.id);
+            }}
+          />
         ) : activeGroup ? (
-          /* 👥 WORKSPACE CORE INTERACTION INTERFACE */
           <>
-            <header className={styles.contentHeader}>
-              <div className={styles.headerLeft}>
-                <h2>{activeGroup.name}</h2>
-              </div>
-              <div className={styles.headerRight}>
-                <div className={styles.avatarGroup}>
-                  {activeGroup.members?.slice(0, 4).map((member) => (
-                    <div 
-                      key={member.id} 
-                      className={styles.stackedAvatar} 
-                      title={`${member.fullName} (${member.role})`}
-                    >
-                      {member.fullName ? member.fullName.charAt(0).toUpperCase() : '?'}
-                    </div>
-                  ))}
-                  {activeGroup.members?.length > 4 && (
-                    <div className={styles.stackedAvatar} style={{ fontSize: '0.75rem', backgroundColor: '#e2e8f0', color: '#475569' }}>
-                      +{activeGroup.members.length - 4}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </header>
+            <ContentHeader
+              activeGroup={activeGroup}
+              setActiveTab={setActiveTab}
+            />
 
-            <nav className={styles.tabsNav}>
-              {/* Added Group Settings to the dynamic array map */}
-              {['Overview', 'Notes', 'Tasks', 'Files', 'Chat', 'Group Settings'].map((tab) => (
-                <span 
-                  key={tab}
-                  className={`${styles.tabLink} ${activeTab === tab ? styles.activeTab : ''}`}
-                  onClick={() => setActiveTab(tab)}
-                >
-                  {tab}
-                </span>
-              ))}
-            </nav>
+            <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
             <div className={styles.viewPortWrapper}>
-              {activeTab === 'Overview' && <GroupOverview setActiveTab={setActiveTab} group={activeGroup} />}
-              {activeTab === 'Tasks' && <TasksPage group={activeGroup} />}
-              
-              {/* 👥 Dynamic Group settings tab initialization */}
-              {activeTab === 'Group Settings' && (
-                <GroupSettingsPane 
-                  group={activeGroup} 
-                  onGroupUpdated={handleGroupUpdated} 
+              {activeTab === "Overview" && (
+                <GroupOverview
+                  groupId={activeGroup.id}
+                  group={activeGroup}
+                  setActiveTab={setActiveTab}
                 />
               )}
 
-              
-                
+              {activeTab === "Tasks" && <TasksPage group={activeGroup} />}
 
-{activeTab === 'Notes' && (
-  <NotesPage group={activeGroup} />
-)}
-           
-              {(activeTab === 'Files' || activeTab === 'Chat') && (
+              {activeTab === "Group Settings" && (
+                <GroupSettingsPane
+                  group={activeGroup}
+                  currentUser={userProfile}
+                  onGroupUpdated={handleGroupUpdated}
+                  onNavigateToAdmin={handleNavigateToAdmin}
+                  onLeaveSuccess={handleLeaveGroupSuccess}
+                />
+              )}
+
+              {activeTab === "Admin Panel" &&
+                (checkingPermissions ? (
+                  <div className={styles.placeholderTabContent}>
+                    <Loader2
+                      size={40}
+                      className="animate-spin"
+                      color="#6366f1"
+                    />
+                    <p style={{ marginTop: "1rem" }}>Checking permissions...</p>
+                  </div>
+                ) : permissions.isOwnerOrAdmin ? (
+                  <AdminPanel
+                    group={activeGroup}
+                    currentUser={userProfile}
+                    onGroupUpdated={handleGroupUpdated}
+                    onBack={() => setActiveTab("Group Settings")}
+                  />
+                ) : (
+                  <div className={styles.placeholderTabContent}>
+                    <div className={styles.emptyIllustration}>
+                      <ShieldAlert
+                        size={56}
+                        strokeWidth={1.5}
+                        color="#ef4444"
+                      />
+                    </div>
+                    <h3>Access Restricted</h3>
+                    <p>
+                      Only group administrators and owners can view the Admin
+                      Panel.
+                    </p>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      style={{ marginTop: "1rem" }}
+                      onClick={() => setActiveTab("Group Settings")}
+                    >
+                      Return to Settings
+                    </button>
+                  </div>
+                ))}
+
+              {activeTab === "Notes" && (
+                <NotesPage group={activeGroup} isDarkMode={isDark} />
+              )}
+
+              {activeTab === "Files" && (
+                <FilesPage group={activeGroup} isDarkMode={isDark} />
+              )}
+
+              {activeTab === "Chat" && (
                 <div className={styles.placeholderTabContent}>
-                  <div className={styles.emptyIllustration}>💬</div>
-                  <h3>{activeTab} Feature Space</h3>
+                  <div className={styles.emptyIllustration}>
+                    <MessageSquare
+                      size={48}
+                      strokeWidth={1.5}
+                      color="#94a3b8"
+                    />
+                  </div>
+                  <h3>Chat Feature Space</h3>
                   <p>Coming soon to the StudyCollab workspace.</p>
                 </div>
               )}
             </div>
           </>
         ) : (
-          /* FALLBACK GRAPHICS INTERFACE */
-          <div className={styles.placeholderTabContent} style={{ height: '80%' }}>
-            <div className={styles.emptyIllustration}>👥</div>
-            <h3>No Workspaces Yet</h3>
-            <p>Create a new study group using the sidebar button to get started!</p>
-          </div>
+          <EmptyState
+            onCreateGroup={() => setIsNewGroupModalOpen(true)}
+            onJoinGroup={() => setIsJoinModalOpen(true)}
+          />
         )}
       </main>
 
-      {/* --- FLOATING OVERLAY MODALS --- */}
+      {/* Modals */}
       {isNewGroupModalOpen && (
-        <CreateGroupModal 
-          onClose={() => setIsNewGroupModalOpen(false)} 
-          onSubmit={handleCreateGroup} 
+        <CreateGroupModal
+          onClose={() => setIsNewGroupModalOpen(false)}
+          onSubmit={handleCreateGroup}
+        />
+      )}
+
+      {isJoinModalOpen && (
+        <JoinGroupModal
+          onClose={() => setIsJoinModalOpen(false)}
+          onJoinSuccess={handleJoinGroup}
         />
       )}
 
       {isDeleteModalOpen && groupToDelete && (
-        <DeleteConfirmModal 
+        <DeleteConfirmModal
           isOpen={isDeleteModalOpen}
           groupName={groupToDelete.name}
           onConfirm={handleDeleteConfirm}

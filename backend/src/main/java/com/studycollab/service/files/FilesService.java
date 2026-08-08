@@ -3,70 +3,106 @@ package com.studycollab.service.files;
 import com.studycollab.dto.files.CategoryRequest;
 import com.studycollab.dto.files.CategoryResponse;
 import com.studycollab.dto.files.FileResponse;
-import com.studycollab.model.*;
+import com.studycollab.dto.files.PresignedUrlResponse;
+import com.studycollab.exception.InvalidRequestException;
+import com.studycollab.exception.ResourceNotFoundException;
+import com.studycollab.model.Category;
+import com.studycollab.model.FileResource;
+import com.studycollab.model.StudyGroup;
+import com.studycollab.model.User;
 import com.studycollab.repository.files.CategoryRepository;
 import com.studycollab.repository.files.FilesRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.studycollab.repository.group.GroupMemberRepository;
+import com.studycollab.repository.group.GroupRepository;
+import com.studycollab.storage.StorageService;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.tika.Tika;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-// 🌟 S3 & R2 Dependencies
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
-import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
-
 import java.io.IOException;
-import java.time.Duration;
+import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 public class FilesService {
 
-    @Autowired
-    private FilesRepository filesRepository;
+    private static final Logger log = LoggerFactory.getLogger(FilesService.class);
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private static final Set<String> ALLOWED_MIME_TYPES = Set.of(
+            "application/pdf",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.ms-excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/vnd.ms-powerpoint",
+            "application/vnd.openxmlformats-officedocument.presentationml.slideshow",
+            "text/plain",
+            "image/jpeg",
+            "image/png"
+    );
 
-    @Autowired
-    private S3Client s3Client;
+    @Value("${app.files.max-file-size-bytes:52428800}")
+    private long maxSizeBytes;
 
-    @Autowired
-    private S3Presigner s3Presigner;
 
-    @Value("${aws.s3.bucket-name}")
-    private String bucketName;
 
-    // --- CATEGORY ACTIONS (Keep Unchanged) ---
+    @Value("${app.files.group-quota-bytes:5368709120}")
+    private long groupQuotaBytes;
 
+    private final FilesRepository filesRepository;
+    private final CategoryRepository categoryRepository;
+    private final GroupRepository groupRepository;
+    private final GroupMemberRepository groupMemberRepository;
+    private final StorageService storageService;
+    private final Tika tika = new Tika();
+
+    public FilesService(
+            FilesRepository filesRepository,
+            CategoryRepository categoryRepository,
+            GroupRepository groupRepository,
+            GroupMemberRepository groupMemberRepository,
+            StorageService storageService) {
+        this.filesRepository = filesRepository;
+        this.categoryRepository = categoryRepository;
+        this.groupRepository = groupRepository;
+        this.groupMemberRepository = groupMemberRepository;
+        this.storageService = storageService;
+    }
+
+    @PreAuthorize("@groupSecurity.isMember(#groupId, principal.id)")
     public List<CategoryResponse> getCategoryTree(Long groupId) {
+        validateGroupExists(groupId);
         List<Category> rootCategories = categoryRepository.findByStudyGroupIdAndParentIsNull(groupId);
-        return rootCategories.stream().map(this::mapToCategoryResponse).collect(Collectors.toList());
+        return rootCategories.stream().map(this::mapToCategoryResponse).toList();
     }
 
     @Transactional
-    public CategoryResponse createCategory(Long groupId, CategoryRequest request, StudyGroup group) {
+    @PreAuthorize("@groupSecurity.isMember(#groupId, principal.id)")
+    public CategoryResponse createCategory(Long groupId, CategoryRequest request) {
+        StudyGroup group = fetchStudyGroup(groupId);
+
         Category category = Category.builder()
-                .name(request.getName())
+                .name(sanitizeString(request.getName()))
                 .studyGroup(group)
                 .build();
 
         if (request.getParentId() != null) {
             Category parent = categoryRepository.findById(request.getParentId())
-                    .orElseThrow(() -> new RuntimeException("Parent Category not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Category", "id", request.getParentId()));
 
             if (!parent.getStudyGroup().getId().equals(groupId)) {
-                throw new IllegalArgumentException("Parent category does not belong to this study group.");
+                throw new InvalidRequestException("Parent category does not belong to the target study group.");
             }
             category.setParent(parent);
         }
@@ -76,172 +112,168 @@ public class FilesService {
     }
 
     @Transactional
+    @PreAuthorize("@groupSecurity.isCategoryMember(#categoryId, principal.id)")
     public void deleteCategory(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
 
         if (category.getParent() != null) {
             category.getParent().getChildren().remove(category);
         }
 
-        // ⚠️ Note: If cascading deletion is enabled, you might want to manually loop and
-        // delete associated files from R2 first so you don't leave orphaned files in the cloud!
         for (FileResource file : category.getFiles()) {
-            try {
-                s3Client.deleteObject(DeleteObjectRequest.builder().bucket(bucketName).key(file.getStorageKey()).build());
-            } catch (Exception e) {
-                // Log and continue to ensure database transaction completes
+            if (file.getStorageKey() != null) {
+                storageService.deleteFile(file.getStorageKey());
             }
         }
 
         categoryRepository.delete(category);
     }
 
-    // --- FILE ACTIONS ---
-
+    @PreAuthorize("@groupSecurity.isMember(#groupId, principal.id)")
     public List<FileResponse> getFiles(Long groupId, Long categoryId, String query) {
+        validateGroupExists(groupId);
+
         List<FileResource> files;
-        if (query != null && !query.isEmpty()) {
-            files = filesRepository.searchFiles(groupId, query);
+        if (query != null && !query.trim().isEmpty()) {
+            files = filesRepository.searchFiles(groupId, query.trim());
         } else if (categoryId != null) {
             files = filesRepository.findByStudyGroupIdAndCategoryId(groupId, categoryId);
         } else {
             files = filesRepository.findByStudyGroupId(groupId);
         }
-        return files.stream().map(this::mapToFileResponse).collect(Collectors.toList());
+
+        return files.stream().map(this::mapToFileResponse).toList();
     }
 
     @Transactional
-    public FileResponse uploadFile(MultipartFile file, Long categoryId, StudyGroup group, User user) throws IOException {
-        if (categoryId == null) {
-            throw new IllegalArgumentException("A file must be uploaded to a specific category.");
+    @PreAuthorize("@groupSecurity.isMember(#groupId, principal.id)")
+    public FileResponse uploadFile(Long groupId, MultipartFile file, Long categoryId, User user) {
+        if (file.getSize() > maxSizeBytes) {
+            throw new InvalidRequestException("File size exceeds maximum allowed limit of " + formatBytes(maxSizeBytes));
         }
 
+        long currentGroupUsage = filesRepository.sumSizeBytesByGroupId(groupId);
+        if (currentGroupUsage + file.getSize() > groupQuotaBytes) {
+            throw new InvalidRequestException("Group storage quota exceeded. Max limit is " + formatBytes(groupQuotaBytes));
+        }
+
+        String detectedMimeType = detectMimeType(file);
+        if (!ALLOWED_MIME_TYPES.contains(detectedMimeType)) {
+            throw new InvalidRequestException("Unsupported or malicious file content type: " + detectedMimeType);
+        }
+
+        StudyGroup group = fetchStudyGroup(groupId);
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new RuntimeException("Target category folder not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
 
-        if (!category.getStudyGroup().getId().equals(group.getId())) {
-            throw new IllegalArgumentException("The selected category does not belong to this study group.");
+        if (!category.getStudyGroup().getId().equals(groupId)) {
+            throw new InvalidRequestException("Category does not belong to the target study group.");
         }
 
-        String originalFilename = file.getOriginalFilename();
+        String rawFilename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "file";
+        String cleanOriginalName = FilenameUtils.getName(rawFilename);
 
-        // Create an isolated storage key unique per study group
-        String uniqueId = System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(0, 6);
-        String storageKey = "groups/" + group.getId() + "/categories/" + categoryId + "/" + uniqueId + "_" + originalFilename;
+        String opaqueStorageKey = "groups/" + groupId + "/categories/" + categoryId + "/"
+                + UUID.randomUUID() + "." + FilenameUtils.getExtension(cleanOriginalName);
 
-        // Stream file contents up to Cloudflare R2
-        s3Client.putObject(PutObjectRequest.builder()
-                        .bucket(bucketName)
-                        .key(storageKey)
-                        .contentType(file.getContentType())
-                        .build(),
-                RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+        storageService.uploadFile(file, opaqueStorageKey, detectedMimeType);
 
-        String extension = originalFilename.contains(".")
-                ? originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase()
-                : "file";
-        String fileType = "file";
-        if (List.of("pdf").contains(extension)) fileType = "pdf";
-        else if (List.of("doc", "docx").contains(extension)) fileType = "doc";
-        else if (List.of("xls", "xlsx", "csv").contains(extension)) fileType = "sheet";
-        else if (List.of("ppt", "pptx").contains(extension)) fileType = "slides";
+        try {
+            FileResource fileResource = FileResource.builder()
+                    .name(cleanOriginalName)
+                    .size(formatBytes(file.getSize()))
+                    .sizeBytes(file.getSize())
+                    .fileType(resolveFileTypeFromMime(detectedMimeType))
+                    .storageKey(opaqueStorageKey)
+                    .studyGroup(group)
+                    .category(category)
+                    .uploader(user)
+                    .build();
 
-        FileResource fileResource = FileResource.builder()
-                .name(originalFilename)
-                .size(formatBytes(file.getSize()))
-                .fileType(fileType)
-                .storageKey(storageKey) // Save file cloud key path reference
-                .studyGroup(group)
-                .category(category)
-                .uploader(user)
-                .build();
-
-        FileResource saved = filesRepository.save(fileResource);
-        return mapToFileResponse(saved);
+            FileResource saved = filesRepository.save(fileResource);
+            return mapToFileResponse(saved);
+        } catch (Exception ex) {
+            log.error("Database save failed for file: {}. Cleaning up orphaned object in storage.", opaqueStorageKey, ex);
+            try {
+                storageService.deleteFile(opaqueStorageKey);
+            } catch (Exception cleanupEx) {
+                log.error("Failed to clean up object from cloud storage: {}", opaqueStorageKey, cleanupEx);
+            }
+            throw ex;
+        }
     }
 
-
-
-
-    // --- FILE ACTIONS ---
-
-//    /**
-//     * Generates secure, short-lived presigned URLs for users directly from Cloudflare R2.
-//     * @param fileId DB ID of the file
-//     * @param disposition "inline" (view in tab) or "attachment" (force save to disk)
-//     */
-
-
-
-    public String generatePresignedDownloadUrl(Long fileId, String disposition) {
+    @PreAuthorize("@groupSecurity.isFileMember(#fileId, principal.id)")
+    public PresignedUrlResponse generatePresignedDownloadUrl(Long fileId, String disposition) {
         FileResource fileResource = filesRepository.findById(fileId)
-                .orElseThrow(() -> new RuntimeException("File not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("File", "id", fileId));
 
-        // Sanitize disposition input
-        String mode = "attachment".equalsIgnoreCase(disposition) ? "attachment" : "inline";
-        String contentDisposition = mode + "; filename=\"" + fileResource.getName() + "\"";
-
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucketName)
-                .key(fileResource.getStorageKey())
-                .responseContentDisposition(contentDisposition)
-                .build();
-
-        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofSeconds(15))
-                .getObjectRequest(getObjectRequest)
-                .build();
-
-        // Check if s3Presigner is null or throwing an exception here!
-        PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
-        return presignedRequest.url().toString();
-    }
-
-    public FileResource getFileMetadata(Long fileId) {
-        return filesRepository.findById(fileId)
-                .orElseThrow(() -> new RuntimeException("File not found"));
+        String url = storageService.generatePresignedDownloadUrl(fileResource.getStorageKey(), fileResource.getName(), disposition);
+        return new PresignedUrlResponse(url);
     }
 
     @Transactional
+    @PreAuthorize("@groupSecurity.isFileMember(#fileId, principal.id)")
     public void deleteFile(Long fileId) {
         FileResource fileResource = filesRepository.findById(fileId)
-                .orElseThrow(() -> new RuntimeException("File Resource not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("File", "id", fileId));
 
-        // Delete structural asset block inside cloud infrastructure storage bucket
-        try {
-            s3Client.deleteObject(DeleteObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(fileResource.getStorageKey())
-                    .build());
-        } catch (Exception ex) {
-            throw new RuntimeException("Cloud storage deletion failed. Keeping database record intact.", ex);
-        }
-
+        storageService.deleteFile(fileResource.getStorageKey());
         filesRepository.delete(fileResource);
     }
 
-    // --- HELPER CONVERSIONS ---
+    private String detectMimeType(MultipartFile file) {
+        try (InputStream is = file.getInputStream()) {
+            return tika.detect(is, file.getOriginalFilename());
+        } catch (IOException e) {
+            throw new InvalidRequestException("Failed to inspect file bytes for validation.");
+        }
+    }
+
+    private String sanitizeString(String input) {
+        return input != null ? input.replaceAll("[^a-zA-Z0-9\\s._-]", "").trim() : "";
+    }
+
+    private StudyGroup fetchStudyGroup(Long groupId) {
+        return groupRepository.findById(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("StudyGroup", "id", groupId));
+    }
+
+    private void validateGroupExists(Long groupId) {
+        if (!groupRepository.existsById(groupId)) {
+            throw new ResourceNotFoundException("StudyGroup", "id", groupId);
+        }
+    }
 
     private CategoryResponse mapToCategoryResponse(Category category) {
         return CategoryResponse.builder()
                 .id(category.getId())
                 .name(category.getName())
-                .children(category.getChildren().stream().map(this::mapToCategoryResponse).collect(Collectors.toList()))
+                .children(category.getChildren().stream().map(this::mapToCategoryResponse).toList())
                 .build();
     }
 
     private FileResponse mapToFileResponse(FileResource file) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         return FileResponse.builder()
                 .id(file.getId())
                 .name(file.getName())
                 .size(file.getSize())
                 .type(file.getFileType())
                 .categoryId(file.getCategory() != null ? file.getCategory().getId() : null)
-                .uploader(file.getUploader().getFullName())
-                .date(file.getCreatedAt().format(formatter))
+                .uploader(file.getUploader() != null ? file.getUploader().getFullName() : "Unknown")
+                .date(file.getCreatedAt() != null ? file.getCreatedAt().format(DATE_FORMATTER) : null)
                 .build();
+    }
+
+    private String resolveFileTypeFromMime(String mimeType) {
+        return switch (mimeType) {
+            case "application/pdf" -> "pdf";
+            case "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> "doc";
+            case "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" -> "sheet";
+            case "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.slideshow" -> "slides";
+            default -> "file";
+        };
     }
 
     private String formatBytes(long bytes) {

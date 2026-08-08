@@ -30,12 +30,20 @@ public class GroupOverviewDto {
         private long totalMembers;
     }
 
+
+
+
+
+
     @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Builder
     public static class UpcomingTaskDto {
         private Long id;
         private String title;
         private LocalDate dueDate;
         private Task.Priority priority;
+
+        private Long assigneeId;
+        private String assigneeName;
     }
 
     @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Builder

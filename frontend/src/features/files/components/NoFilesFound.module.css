@@ -1,0 +1,23 @@
+/* src/features/files/components/NoFilesFound.module.css */
+.minimalContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 240px; /* Expands to fill the table area */
+  padding: 2rem 1rem;
+  color: var(--text-secondary, #718096);
+  font-size: 0.875rem;
+  box-sizing: border-box;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.75;
+}
+
+.text {
+  font-weight: 400;
+}

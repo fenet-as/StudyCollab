@@ -1,22 +1,17 @@
 package com.studycollab.dto.auth;
 
-import com.studycollab.model.User;
+public record UserResponseDto(
+// Decoupled response record used to transfer basic user data without exposing JPA entities.
 
-public class UserResponseDto {
-    private Long id;
-    private String fullName;
-    private String email;
-    private String avatarUrl;
+        Long id,
+        // Represents the unique primary key identifier of the user in the database.
 
-    public UserResponseDto(User user) {
-        this.id = user.getId();
-        this.fullName = user.getFullName();
-        this.email = user.getEmail();
-        this.avatarUrl = user.getAvatarUrl();
-    }
+        String fullName,
+        // Represents the display full name of the user.
 
-    public Long getId() { return id; }
-    public String getFullName() { return fullName; }
-    public String getEmail() { return email; }
-    public String getAvatarUrl() { return avatarUrl; }
-}
+        String email,
+        // Represents the user's registered email address.
+
+        String avatarUrl
+        // Represents the public URL location of the user's avatar image.
+) {}

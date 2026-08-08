@@ -1,0 +1,142 @@
+.settingsCard {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.cardIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--icon-bg);
+  color: var(--primary-color);
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.cardIcon svg {
+  display: block;
+  stroke: currentColor;
+}
+
+.settingsCard h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.cardSubtitle {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.settingsForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.inputGroup label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.inputGroup input {
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  background-color: var(--input-bg);
+  outline: none;
+  transition: border-color 0.15s ease, background-color 0.25s ease, color 0.25s ease;
+}
+
+.inputGroup input:focus {
+  border-color: var(--primary-color);
+}
+
+.emailDisplayContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+  padding: 0.25rem 0;
+}
+
+.emailLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.emailValue {
+  font-size: 0.95rem;
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+.saveBtn {
+  align-self: flex-start;
+  background-color: var(--primary-color);
+  color: #ffffff;
+  border: none;
+  padding: 0.65rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+  margin-top: 0.25rem;
+}
+
+.saveBtn:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+}
+
+.saveBtn:disabled {
+  background-color: var(--btn-secondary-bg);
+  color: var(--text-sub);
+  cursor: not-allowed;
+}
+
+.successMsg {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #16a34a;
+  background-color: rgba(22, 163, 74, 0.1);
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid rgba(22, 163, 74, 0.2);
+}
+
+.errorMsg {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--danger-text);
+  background-color: var(--danger-bg);
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--danger-border);
+}

@@ -1,17 +1,19 @@
 import React from 'react';
 import AppRoutes from './routes/AppRoutes';
 import { AuthProvider } from './context/AuthContext';
-import { GroupProvider } from './context/GroupContext'; // 👈 Import it here
+import { GroupProvider } from './context/GroupContext';
+import { ThemeProvider } from './context/ThemeContext'; // 👈 Import ThemeProvider
 import './App.css';
 
 function App() {
   return (
-    <AuthProvider>
-      {/* GroupProvider wraps AppRoutes so everything inside can use group data */}
-      <GroupProvider>
-        <AppRoutes />
-      </GroupProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <GroupProvider>
+          <AppRoutes />
+        </GroupProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
