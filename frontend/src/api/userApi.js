@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // 💡 1. Create a dedicated Axios instance pointing straight to your Spring Boot backend
 const API = axios.create({
-  baseURL: 'http://localhost:8080'
+  baseURL: ''
 });
 
 // Helper to extract the token safely from browser storage

@@ -1,6 +1,6 @@
 // frontend/src/api/groupApi.js
 
-const BASE_URL = "http://localhost:8080/api/groups";
+const BASE_URL = "/api/groups";
 
 // Reusable helper to generate security headers
 const getAuthHeaders = () => {

@@ -1,7 +1,7 @@
 // src/api/groupOverviewApi.js
 
 // ⚠️ Explicitly target Spring Boot backend port
-const BASE_URL = 'http://localhost:8080/api/groups';
+const BASE_URL = '/api/groups';
 
 export async function fetchGroupOverview(groupId) {
   if (!groupId) {
