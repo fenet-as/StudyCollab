@@ -1,6 +1,6 @@
 // frontend/src/api/groupApi.js
 
-const BASE_URL = `${import.meta.env.VITE_API_URL}/api/groups`;
+const BASE_URL = `https://studycollab-l3p2.onrender.com/api/groups`;
 
 // Reusable helper to generate security headers
 const getAuthHeaders = () => {

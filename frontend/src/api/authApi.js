@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/api/auth`,
+  baseURL: `https://studycollab-l3p2.onrender.com/api/auth`,
   headers: {
     'Content-Type': 'application/json',
   },

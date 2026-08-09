@@ -1,7 +1,7 @@
 // src/api/groupOverviewApi.js
 
 // ⚠️ Explicitly target Spring Boot backend port
-const BASE_URL = `${import.meta.env.VITE_API_URL}/api/groups`;
+const BASE_URL = `https://studycollab-l3p2.onrender.com/api/groups`;
 
 export async function fetchGroupOverview(groupId) {
   if (!groupId) {

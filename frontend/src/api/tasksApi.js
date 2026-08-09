@@ -1,5 +1,5 @@
 // frontend/src/api/tasksApi.js
-const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api/tasks`;
+const API_BASE_URL = `https://studycollab-l3p2.onrender.com/api/tasks`;
 
 // Reusable helper to generate security headers matching groupApi.js
 const getAuthHeaders = () => {
