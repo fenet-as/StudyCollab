@@ -25,15 +25,19 @@ public class GroupService {
     private final GroupMemberRepository groupMemberRepository;
     private final UserRepository userRepository;
     private final Path rootLocation = Paths.get("uploads/avatars");
+    private final GroupAvatarService groupAvatarService;
 
     // Constructor injection for all repositories
     public GroupService(GroupRepository groupRepository,
                         GroupMemberRepository groupMemberRepository,
-                        UserRepository userRepository) {
+                        UserRepository userRepository,GroupAvatarService groupAvatarService) {
         this.groupRepository = groupRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.userRepository = userRepository;
+        this.groupAvatarService = groupAvatarService;
     }
+
+
 
     @Transactional
     public StudyGroup createGroup(GroupCreateDto dto, MultipartFile file, User creator) {
@@ -44,19 +48,7 @@ public class GroupService {
         String uniqueCode = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         group.setInviteCode(uniqueCode);
 
-        if (file != null && !file.isEmpty()) {
-            try {
-                if (!Files.exists(rootLocation)) {
-                    Files.createDirectories(rootLocation);
-                }
-                String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-                Files.copy(file.getInputStream(), this.rootLocation.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
-                group.setAvatarUrl("/uploads/avatars/" + filename);
-            } catch (IOException e) {
-                throw new RuntimeException("Could not store avatar image file. Error: " + e.getMessage());
-            }
-        }
-
+        // Set up creator membership relationship
         GroupMember membership = new GroupMember();
         membership.setStudyGroup(group);
         membership.setUser(creator);
@@ -64,8 +56,18 @@ public class GroupService {
 
         group.getMembers().add(membership);
 
-        return groupRepository.save(group);
+        // 1. Save group first so Hibernate assigns a generated primary key (groupId)
+        StudyGroup savedGroup = groupRepository.save(group);
+
+        // 2. If an avatar file was provided, upload to Cloudflare R2 via GroupAvatarService
+        if (file != null && !file.isEmpty()) {
+            groupAvatarService.uploadGroupAvatar(savedGroup.getId(), file);
+        }
+
+        return savedGroup;
     }
+
+
 
     @Transactional(readOnly = true)
     public List<GroupResponseDto> getUserGroups(Long userId) {
