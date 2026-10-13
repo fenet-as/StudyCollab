@@ -1,6 +1,7 @@
 
 
 .env
+/issues
 */target/
 */node_modules/
 */dist/
@@ -85,6 +86,7 @@ application-dev.properties
 # Environment variables
 .env
 .env.*
+!.env*.example
 
 # Keystore files
 *.jks
