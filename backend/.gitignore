@@ -6,6 +6,8 @@ src/main/resources/application-*.yml
 
 # Environment variables
 .env
+.env.*
+!.env*.example
 
 # Build files
 target/

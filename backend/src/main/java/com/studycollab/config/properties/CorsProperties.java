@@ -5,14 +5,31 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.List;
 
 @ConfigurationProperties(prefix = "app.cors")
-// Binds external application settings under the "app.cors" prefix to this record.
 public record CorsProperties(
         List<String> allowedOrigins,
-        // Stores the list of external domains allowed to make cross-origin requests.
         List<String> allowedMethods,
-        // Stores the list of HTTP methods permitted for CORS (e.g., GET, POST, DELETE).
         List<String> allowedHeaders,
-        // Stores the list of allowed HTTP headers sent in cross-origin client requests.
-        boolean allowCredentials
-        // Flags whether browser requests can include cookies or authorization credentials.
-) {}
+        Boolean allowCredentials
+) {
+    public List<String> getAllowedOrigins() {
+        return (allowedOrigins != null && !allowedOrigins.isEmpty())
+                ? allowedOrigins
+                : List.of("http://localhost:5173", "http://localhost:5174", "http://localhost:3000");
+    }
+
+    public List<String> getAllowedMethods() {
+        return (allowedMethods != null && !allowedMethods.isEmpty())
+                ? allowedMethods
+                : List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS");
+    }
+
+    public List<String> getAllowedHeaders() {
+        return (allowedHeaders != null && !allowedHeaders.isEmpty())
+                ? allowedHeaders
+                : List.of("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin");
+    }
+
+    public boolean isAllowCredentials() {
+        return allowCredentials != null ? allowCredentials : true;
+    }
+}
