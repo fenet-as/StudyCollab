@@ -28,4 +28,7 @@ public interface FilesRepository extends JpaRepository<FileResource, Long> {
     long countByStudyGroupId(Long groupId);
 
     List<FileResource> findTop5ByStudyGroupIdOrderByCreatedAtDesc(Long groupId);
+
+    @Query("SELECT f.studyGroup.id FROM FileResource f WHERE f.id = :fileId")
+    java.util.Optional<Long> findGroupIdByFileId(@Param("fileId") Long fileId);
 }
