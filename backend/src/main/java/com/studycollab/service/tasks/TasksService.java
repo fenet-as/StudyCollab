@@ -9,6 +9,7 @@ import com.studycollab.model.StudyGroup;
 import com.studycollab.model.Task;
 import com.studycollab.model.User;
 import com.studycollab.repository.auth.UserRepository;
+import com.studycollab.repository.group.GroupMemberRepository;
 import com.studycollab.repository.group.GroupRepository;
 import com.studycollab.repository.tasks.TasksRepository;
 import org.springframework.stereotype.Service;
@@ -24,13 +25,16 @@ public class TasksService {
     private final TasksRepository tasksRepository;
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
+    private final GroupMemberRepository groupMemberRepository;
 
     public TasksService(TasksRepository tasksRepository,
                         UserRepository userRepository,
-                        GroupRepository groupRepository) {
+                        GroupRepository groupRepository,
+                        GroupMemberRepository groupMemberRepository) {
         this.tasksRepository = tasksRepository;
         this.userRepository = userRepository;
         this.groupRepository = groupRepository;
+        this.groupMemberRepository = groupMemberRepository;
     }
 
     @Transactional(readOnly = true)
@@ -124,9 +128,7 @@ public class TasksService {
             throw new BadRequestException("Study group is required for membership validation.");
         }
 
-        boolean isMember = group.getMembers() != null && group.getMembers().stream()
-                .anyMatch(member -> member.getUser() != null
-                        && member.getUser().getId().equals(user.getId()));
+        boolean isMember = groupMemberRepository.findByGroupIdAndUserId(group.getId(), user.getId()).isPresent();
 
         if (!isMember) {
             throw new BadRequestException("User " + user.getId() + " is not a member of group " + group.getId());

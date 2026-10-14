@@ -9,6 +9,7 @@ import com.studycollab.model.StudyGroup;
 import com.studycollab.model.Task;
 import com.studycollab.model.User;
 import com.studycollab.repository.auth.UserRepository;
+import com.studycollab.repository.group.GroupMemberRepository;
 import com.studycollab.repository.group.GroupRepository;
 import com.studycollab.repository.tasks.TasksRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -94,7 +95,28 @@ class TasksServiceTest {
                 }
         );
 
-        tasksService = new TasksService(tasksRepository, userRepository, groupRepository);
+        GroupMemberRepository groupMemberRepository = (GroupMemberRepository) Proxy.newProxyInstance(
+                GroupMemberRepository.class.getClassLoader(),
+                new Class<?>[]{GroupMemberRepository.class},
+                (proxy, method, args) -> {
+                    if ("findByGroupIdAndUserId".equals(method.getName())) {
+                        Long groupId = (Long) args[0];
+                        Long userId = (Long) args[1];
+                        StudyGroup g = groupMap.get(groupId);
+                        if (g != null && g.getMembers() != null) {
+                            for (GroupMember member : g.getMembers()) {
+                                if (member.getUser() != null && userId.equals(member.getUser().getId())) {
+                                    return Optional.of(member);
+                                }
+                            }
+                        }
+                        return Optional.empty();
+                    }
+                    return null;
+                }
+        );
+
+        tasksService = new TasksService(tasksRepository, userRepository, groupRepository, groupMemberRepository);
     }
 
     private User createUser(Long id, String email) {
