@@ -9,6 +9,8 @@ import com.studycollab.repository.group.GroupRepository;
 import com.studycollab.repository.notes.NotesRepository;
 import com.studycollab.repository.tasks.TasksRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,9 +27,20 @@ public class GroupOverviewService {
     private final FilesRepository filesRepository;
 
     @Transactional(readOnly = true)
+    @PreAuthorize("@groupSecurity.isMember(#groupId, principal.id)")
     public GroupOverviewDto getGroupOverview(Long groupId) {
+        return getGroupOverview(groupId, (Long) null);
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@groupSecurity.isMember(#groupId, principal.id)")
+    public GroupOverviewDto getGroupOverview(Long groupId, Long userId) {
         if (!groupRepository.existsById(groupId)) {
             throw new ResourceNotFoundException("Group not found with id: " + groupId);
+        }
+
+        if (userId != null && !groupMemberRepository.findByGroupIdAndUserId(groupId, userId).isPresent()) {
+            throw new AccessDeniedException("User " + userId + " is not a member of group " + groupId);
         }
 
         // 1. Fetch Aggregated Counts
