@@ -48,16 +48,17 @@ public class GroupService {
         String uniqueCode = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         group.setInviteCode(uniqueCode);
 
+        // 1. Save group first so Hibernate assigns a generated primary key (groupId)
+        StudyGroup savedGroup = groupRepository.save(group);
+
         // Set up creator membership relationship
         GroupMember membership = new GroupMember();
-        membership.setStudyGroup(group);
+        membership.setStudyGroup(savedGroup);
         membership.setUser(creator);
         membership.setRole(GroupRole.CREATOR);
 
-        group.getMembers().add(membership);
-
-        // 1. Save group first so Hibernate assigns a generated primary key (groupId)
-        StudyGroup savedGroup = groupRepository.save(group);
+        groupMemberRepository.save(membership);
+        savedGroup.getMembers().add(membership);
 
         // 2. If an avatar file was provided, upload to Cloudflare R2 via GroupAvatarService
         if (file != null && !file.isEmpty()) {
@@ -125,9 +126,9 @@ public class GroupService {
 
                     boolean emailMatches = currentUserEmail.equalsIgnoreCase(member.getUser().getEmail());
                     GroupRole role = member.getRole();
-                    boolean isCreatorOrOwner = (role == GroupRole.CREATOR) || "OWNER".equalsIgnoreCase(role.name());
+                    boolean isCreator = role == GroupRole.CREATOR;
 
-                    return emailMatches && isCreatorOrOwner;
+                    return emailMatches && isCreator;
                 });
 
         if (!isOwner) {
@@ -369,10 +370,11 @@ public class GroupService {
 
         // Guard: Owners / Creators cannot leave — they must delete the group instead
         GroupRole role = membership.getRole();
-        if (role == GroupRole.CREATOR || "OWNER".equalsIgnoreCase(role.name())) {
+        if (role == GroupRole.CREATOR) {
             throw new CustomExceptions.BadRequestException("Group owners cannot leave the group. You must delete the group if you no longer wish to maintain it.");
         }
 
+        group.getMembers().remove(membership);
         groupMemberRepository.delete(membership);
     }
 
@@ -494,7 +496,7 @@ public class GroupService {
 
     private void validateMembership(User user, StudyGroup group) {
         if (user == null) {
-            return;
+            throw new CustomExceptions.UnauthorizedException("User details must be provided to access group members.");
         }
 
         boolean isMember = group.getMembers() != null && group.getMembers().stream()
