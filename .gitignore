@@ -88,6 +88,8 @@ application-dev.properties
 .env.*
 !.env*.example
 
+/scripts
+
 # Keystore files
 *.jks
 *.keystore
@@ -202,4 +204,5 @@ firebase-debug.log
 
 uploads/
 storage/
+!**/src/**/storage/
 media/

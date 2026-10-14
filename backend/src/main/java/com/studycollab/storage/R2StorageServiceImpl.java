@@ -2,6 +2,7 @@ package com.studycollab.storage;
 
 import com.studycollab.config.properties.CloudflareR2Properties;
 import com.studycollab.exception.FileStorageException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -23,11 +24,17 @@ public class R2StorageServiceImpl implements StorageService {
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
     private final CloudflareR2Properties r2Properties;
+    private final long presignedUrlExpirySeconds;
 
-    public R2StorageServiceImpl(S3Client s3Client, S3Presigner s3Presigner, CloudflareR2Properties r2Properties) {
+    public R2StorageServiceImpl(
+            S3Client s3Client,
+            S3Presigner s3Presigner,
+            CloudflareR2Properties r2Properties,
+            @Value("${app.files.presigned-url-expiry-seconds:900}") long presignedUrlExpirySeconds) {
         this.s3Client = s3Client;
         this.s3Presigner = s3Presigner;
         this.r2Properties = r2Properties;
+        this.presignedUrlExpirySeconds = presignedUrlExpirySeconds;
     }
 
     @Override
@@ -83,7 +90,7 @@ public class R2StorageServiceImpl implements StorageService {
                     .build();
 
             GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                    .signatureDuration(Duration.ofSeconds(15))
+                    .signatureDuration(Duration.ofSeconds(presignedUrlExpirySeconds))
                     .getObjectRequest(getObjectRequest)
                     .build();
 
