@@ -117,8 +117,11 @@ public class TasksService {
     }
 
     private void validateMembership(User user, StudyGroup group) {
-        if (user == null) {
-            return;
+        if (user == null || user.getId() == null) {
+            throw new BadRequestException("Authenticated user is required for membership validation.");
+        }
+        if (group == null || group.getId() == null) {
+            throw new BadRequestException("Study group is required for membership validation.");
         }
 
         boolean isMember = group.getMembers() != null && group.getMembers().stream()
