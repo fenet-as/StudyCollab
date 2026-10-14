@@ -2,14 +2,13 @@ package com.studycollab.controller.group;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 import com.studycollab.dto.group.*;
-import com.studycollab.exception.CustomExceptions;
 import com.studycollab.model.StudyGroup;
 import com.studycollab.security.CustomUserDetails;
 import com.studycollab.service.group.GroupService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -44,88 +43,52 @@ public class GroupController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteGroup(
+    public ResponseEntity<Void> deleteGroup(
             @PathVariable("id") Long groupId,
             Principal principal) {
-        try {
-            String currentUserEmail = principal.getName();
-            groupService.deleteGroup(groupId, currentUserEmail);
-            return ResponseEntity.noContent().build();
-        } catch (CustomExceptions.UnauthorizedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        } catch (CustomExceptions.ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+
+        groupService.deleteGroup(groupId, principal.getName());
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{groupId}/details")
-    public ResponseEntity<?> updateGroupDetails(
+    public ResponseEntity<GroupResponseDto> updateGroupDetails(
             @PathVariable Long groupId,
             @Valid @RequestBody GroupUpdateRequest request,
             Principal principal) {
-        try {
-            String currentUserEmail = principal.getName();
-            GroupResponseDto updatedGroup = groupService.updateGroupDetails(groupId, request, currentUserEmail);
-            return ResponseEntity.ok(updatedGroup);
-        } catch (CustomExceptions.UnauthorizedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        } catch (CustomExceptions.ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+
+        GroupResponseDto updatedGroup = groupService.updateGroupDetails(groupId, request, principal.getName());
+        return ResponseEntity.ok(updatedGroup);
     }
 
     @PostMapping("/{groupId}/members")
-    public ResponseEntity<?> addMemberByEmail(
+    public ResponseEntity<GroupResponseDto> addMemberByEmail(
             @PathVariable Long groupId,
             @Valid @RequestBody AddMemberRequest request,
             Principal principal) {
-        try {
-            String currentUserEmail = principal.getName();
-            GroupResponseDto updatedGroup = groupService.addMemberByEmail(groupId, request, currentUserEmail);
-            return ResponseEntity.ok(updatedGroup);
-        } catch (CustomExceptions.UnauthorizedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        } catch (CustomExceptions.BadRequestException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (CustomExceptions.ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+
+        GroupResponseDto updatedGroup = groupService.addMemberByEmail(groupId, request, principal.getName());
+        return ResponseEntity.ok(updatedGroup);
     }
 
     @PutMapping("/{groupId}/members/{memberUserId}/promote")
-    public ResponseEntity<?> promoteMemberToAdmin(
+    public ResponseEntity<GroupResponseDto> promoteMemberToAdmin(
             @PathVariable Long groupId,
             @PathVariable Long memberUserId,
             Principal principal) {
-        try {
-            String currentUserEmail = principal.getName();
-            GroupResponseDto updatedGroup = groupService.promoteMemberToAdmin(groupId, memberUserId, currentUserEmail);
-            return ResponseEntity.ok(updatedGroup);
-        } catch (CustomExceptions.UnauthorizedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        } catch (CustomExceptions.BadRequestException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (CustomExceptions.ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+
+        GroupResponseDto updatedGroup = groupService.promoteMemberToAdmin(groupId, memberUserId, principal.getName());
+        return ResponseEntity.ok(updatedGroup);
     }
 
     @DeleteMapping("/{groupId}/members/{memberUserId}")
-    public ResponseEntity<?> removeGroupMember(
+    public ResponseEntity<GroupResponseDto> removeGroupMember(
             @PathVariable Long groupId,
             @PathVariable Long memberUserId,
             Principal principal) {
-        try {
-            String currentUserEmail = principal.getName();
-            GroupResponseDto updatedGroup = groupService.removeMember(groupId, memberUserId, currentUserEmail);
-            return ResponseEntity.ok(updatedGroup);
-        } catch (CustomExceptions.UnauthorizedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        } catch (CustomExceptions.BadRequestException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (CustomExceptions.ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+
+        GroupResponseDto updatedGroup = groupService.removeMember(groupId, memberUserId, principal.getName());
+        return ResponseEntity.ok(updatedGroup);
     }
 
     @PutMapping("/{groupId}/members/{memberUserId}/demote")
@@ -134,71 +97,44 @@ public class GroupController {
             @PathVariable Long memberUserId,
             Principal principal) {
 
-        String currentUserEmail = principal.getName();
-        GroupResponseDto updatedGroup = groupService.demoteAdminToMember(groupId, memberUserId, currentUserEmail);
+        GroupResponseDto updatedGroup = groupService.demoteAdminToMember(groupId, memberUserId, principal.getName());
         return ResponseEntity.ok(updatedGroup);
     }
 
     @PostMapping("/{groupId}/leave")
-    public ResponseEntity<?> leaveGroup(
+    public ResponseEntity<Map<String, String>> leaveGroup(
             @PathVariable Long groupId,
             Principal principal) {
-        try {
-            String currentUserEmail = principal.getName();
-            groupService.leaveGroup(groupId, currentUserEmail);
-            return ResponseEntity.ok().body("{\"message\": \"Successfully left the study group.\"}");
-        } catch (CustomExceptions.UnauthorizedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        } catch (CustomExceptions.BadRequestException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (CustomExceptions.ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+
+        groupService.leaveGroup(groupId, principal.getName());
+        return ResponseEntity.ok(Map.of("message", "Successfully left the study group."));
     }
 
     @PostMapping("/join")
-    public ResponseEntity<?> joinGroup(
+    public ResponseEntity<GroupResponseDto> joinGroup(
             @Valid @RequestBody JoinGroupRequest request,
             Principal principal) {
-        try {
-            String currentUserEmail = principal.getName();
-            GroupResponseDto joinedGroup = groupService.joinGroupByInviteCode(request, currentUserEmail);
-            return ResponseEntity.ok(joinedGroup);
-        } catch (CustomExceptions.BadRequestException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (CustomExceptions.ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+
+        GroupResponseDto joinedGroup = groupService.joinGroupByInviteCode(request, principal.getName());
+        return ResponseEntity.ok(joinedGroup);
     }
 
     @PostMapping("/{groupId}/invite-code/regenerate")
-    public ResponseEntity<?> regenerateInviteCode(
+    public ResponseEntity<InviteLinkResponseDto> regenerateInviteCode(
             @PathVariable Long groupId,
             Principal principal) {
-        try {
-            String currentUserEmail = principal.getName();
-            InviteLinkResponseDto response = groupService.regenerateInviteCode(groupId, currentUserEmail);
-            return ResponseEntity.ok(response);
-        } catch (CustomExceptions.UnauthorizedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        } catch (CustomExceptions.ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+
+        InviteLinkResponseDto response = groupService.regenerateInviteCode(groupId, principal.getName());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{groupId}/permissions")
-    public ResponseEntity<?> getUserGroupPermissions(
+    public ResponseEntity<GroupPermissionResponseDto> getUserGroupPermissions(
             @PathVariable Long groupId,
             Principal principal) {
-        try {
-            String currentUserEmail = principal.getName();
-            GroupPermissionResponseDto permissions = groupService.getUserGroupPermissions(groupId, currentUserEmail);
-            return ResponseEntity.ok(permissions);
-        } catch (CustomExceptions.UnauthorizedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        } catch (CustomExceptions.ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+
+        GroupPermissionResponseDto permissions = groupService.getUserGroupPermissions(groupId, principal.getName());
+        return ResponseEntity.ok(permissions);
     }
 
     @GetMapping("/{groupId}/members")
