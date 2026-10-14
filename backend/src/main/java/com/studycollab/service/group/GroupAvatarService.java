@@ -1,8 +1,10 @@
 package com.studycollab.service.group;
 
 import com.studycollab.exception.CustomExceptions;
+import com.studycollab.exception.InvalidFileException;
 import com.studycollab.model.StudyGroup;
 import com.studycollab.repository.group.GroupRepository;
+import org.apache.tika.Tika;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,16 +16,23 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import java.io.InputStream;
+import java.util.Set;
 
 @Service
 public class GroupAvatarService {
 
     private static final Logger log = LoggerFactory.getLogger(GroupAvatarService.class);
 
+    private static final Set<String> ALLOWED_MIME_TYPES = Set.of(
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+    );
+
     private final S3Client s3Client;
     private final GroupRepository groupRepository;
+    private final Tika tika = new Tika();
 
     @Value("${cloudflare.r2.bucket-name:${cloudflare.r2.bucketName:}}")
     private String bucketName;
@@ -31,21 +40,13 @@ public class GroupAvatarService {
     @Value("${cloudflare.r2.public-url:${cloudflare.r2.publicUrl:}}")
     private String publicUrl;
 
-    private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList("image/jpeg", "image/png", "image/webp");
-
     public GroupAvatarService(S3Client s3Client, GroupRepository groupRepository) {
         this.s3Client = s3Client;
         this.groupRepository = groupRepository;
     }
 
     public String uploadGroupAvatar(Long groupId, MultipartFile file) {
-        if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("File cannot be empty");
-        }
-
-        if (file.getContentType() == null || !ALLOWED_EXTENSIONS.contains(file.getContentType().toLowerCase())) {
-            throw new IllegalArgumentException("Only JPEG, PNG, and WEBP formats are allowed");
-        }
+        String detectedMimeType = validateImageFile(file);
 
         if (bucketName == null || bucketName.isBlank()) {
             throw new IllegalStateException("CRITICAL CONFIG ERROR: 'cloudflare.r2.bucketName' is missing in properties!");
@@ -54,9 +55,9 @@ public class GroupAvatarService {
         StudyGroup group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new CustomExceptions.ResourceNotFoundException("Group not found with id: " + groupId));
 
-        String extension = getFileExtension(file.getOriginalFilename());
+        String extension = getFileExtension(file.getOriginalFilename(), detectedMimeType);
 
-        // 🔥 Option 1: Deterministic key per group (e.g. group-avatars/group-1.png)
+        // Deterministic key per group (e.g. group-avatars/group-1.png)
         String newObjectKey = "group-avatars/group-" + groupId + extension;
 
         // Clean up previous image if extension changed (e.g., .jpg -> .png)
@@ -68,10 +69,14 @@ public class GroupAvatarService {
         }
 
         try {
+            String storageContentType = (file.getContentType() != null && !file.getContentType().isBlank())
+                    ? file.getContentType()
+                    : detectedMimeType;
+
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
                     .key(newObjectKey)
-                    .contentType(file.getContentType())
+                    .contentType(storageContentType)
                     .contentLength(file.getSize())
                     .build();
 
@@ -94,6 +99,27 @@ public class GroupAvatarService {
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload group avatar to Cloudflare R2", e);
+        }
+    }
+
+    String validateImageFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new InvalidFileException("File cannot be empty");
+        }
+
+        String detectedMimeType = detectMimeType(file);
+
+        if (!ALLOWED_MIME_TYPES.contains(detectedMimeType.toLowerCase())) {
+            throw new InvalidFileException("Only JPEG, PNG, and WEBP formats are allowed");
+        }
+        return detectedMimeType;
+    }
+
+    private String detectMimeType(MultipartFile file) {
+        try (InputStream is = file.getInputStream()) {
+            return tika.detect(is);
+        } catch (IOException e) {
+            throw new InvalidFileException("Failed to inspect file bytes for validation.");
         }
     }
 
@@ -146,10 +172,18 @@ public class GroupAvatarService {
         return null;
     }
 
-    private String getFileExtension(String filename) {
+    private String getFileExtension(String filename, String detectedMimeType) {
         if (filename != null && filename.contains(".")) {
-            return filename.substring(filename.lastIndexOf("."));
+            String ext = filename.substring(filename.lastIndexOf(".")).toLowerCase();
+            if (ext.equals(".jpg") || ext.equals(".jpeg") || ext.equals(".png") || ext.equals(".webp")) {
+                return ext;
+            }
         }
-        return ".png";
+        return switch (detectedMimeType.toLowerCase()) {
+            case "image/jpeg" -> ".jpg";
+            case "image/png" -> ".png";
+            case "image/webp" -> ".webp";
+            default -> ".png";
+        };
     }
 }
