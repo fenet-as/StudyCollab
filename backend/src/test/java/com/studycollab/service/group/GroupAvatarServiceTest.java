@@ -1,18 +1,16 @@
 package com.studycollab.service.group;
 
+import com.studycollab.exception.CustomExceptions;
 import com.studycollab.exception.InvalidFileException;
 import com.studycollab.model.StudyGroup;
 import com.studycollab.repository.group.GroupRepository;
+import com.studycollab.storage.StorageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
@@ -33,33 +31,39 @@ class GroupAvatarServiceTest {
             (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52
     };
 
-    private S3Client s3Client;
+    private StorageService storageService;
     private GroupRepository groupRepository;
     private GroupAvatarService groupAvatarService;
 
-    private AtomicBoolean s3PutCalled;
+    private AtomicBoolean storageUploadCalled;
     private AtomicReference<String> uploadedKey;
+    private AtomicReference<String> deletedKey;
     private StudyGroup testGroup;
 
     @BeforeEach
     void setUp() {
-        s3PutCalled = new AtomicBoolean(false);
+        storageUploadCalled = new AtomicBoolean(false);
         uploadedKey = new AtomicReference<>(null);
+        deletedKey = new AtomicReference<>(null);
 
         testGroup = new StudyGroup();
         testGroup.setId(10L);
         testGroup.setName("Test Study Group");
 
-        s3Client = (S3Client) Proxy.newProxyInstance(
-                S3Client.class.getClassLoader(),
-                new Class<?>[]{S3Client.class},
+        storageService = (StorageService) Proxy.newProxyInstance(
+                StorageService.class.getClassLoader(),
+                new Class<?>[]{StorageService.class},
                 (proxy, method, args) -> {
-                    if ("putObject".equals(method.getName())) {
-                        s3PutCalled.set(true);
-                        if (args.length > 0 && args[0] instanceof PutObjectRequest req) {
-                            uploadedKey.set(req.key());
-                        }
-                        return PutObjectResponse.builder().build();
+                    String methodName = method.getName();
+                    if ("uploadFile".equals(methodName)) {
+                        storageUploadCalled.set(true);
+                        String key = (String) args[1];
+                        uploadedKey.set(key);
+                        return "https://cdn.example.com/" + key;
+                    } else if ("deleteFile".equals(methodName)) {
+                        String key = (String) args[0];
+                        deletedKey.set(key);
+                        return null;
                     }
                     return null;
                 }
@@ -83,9 +87,7 @@ class GroupAvatarServiceTest {
                 }
         );
 
-        groupAvatarService = new GroupAvatarService(s3Client, groupRepository);
-        ReflectionTestUtils.setField(groupAvatarService, "bucketName", "test-bucket");
-        ReflectionTestUtils.setField(groupAvatarService, "publicUrl", "https://cdn.example.com");
+        groupAvatarService = new GroupAvatarService(storageService, groupRepository);
     }
 
     @Nested
@@ -153,8 +155,8 @@ class GroupAvatarServiceTest {
     class UploadGroupAvatarTests {
 
         @Test
-        @DisplayName("Spoofed file is rejected before S3 upload is invoked")
-        void spoofedFile_rejectedWithoutS3Upload() {
+        @DisplayName("Spoofed file is rejected before StorageService upload is invoked")
+        void spoofedFile_rejectedWithoutStorageUpload() {
             byte[] textBytes = "Just some text file pretending to be image".getBytes(StandardCharsets.UTF_8);
             MultipartFile spoofedFile = new MockMultipartFile(
                     "file", "group.jpg", "image/jpeg", textBytes
@@ -163,12 +165,12 @@ class GroupAvatarServiceTest {
             assertThatThrownBy(() -> groupAvatarService.uploadGroupAvatar(10L, spoofedFile))
                     .isInstanceOf(InvalidFileException.class);
 
-            assertThat(s3PutCalled.get()).isFalse();
+            assertThat(storageUploadCalled.get()).isFalse();
             assertThat(testGroup.getAvatarUrl()).isNull();
         }
 
         @Test
-        @DisplayName("Valid image uploads successfully and updates group avatar URL")
+        @DisplayName("Valid image uploads successfully via StorageService and updates group avatar URL")
         void validImage_uploadsSuccessfullyAndUpdatesGroup() {
             MultipartFile validFile = new MockMultipartFile(
                     "file", "group-avatar.jpg", "image/jpeg", JPEG_BYTES
@@ -178,7 +180,7 @@ class GroupAvatarServiceTest {
 
             assertThat(avatarUrl).isNotNull();
             assertThat(avatarUrl).contains("https://cdn.example.com/group-avatars/group-10.jpg");
-            assertThat(s3PutCalled.get()).isTrue();
+            assertThat(storageUploadCalled.get()).isTrue();
             assertThat(uploadedKey.get()).isEqualTo("group-avatars/group-10.jpg");
             assertThat(testGroup.getAvatarUrl()).contains("https://cdn.example.com/group-avatars/group-10.jpg");
         }
@@ -194,6 +196,79 @@ class GroupAvatarServiceTest {
 
             assertThat(avatarUrl).isNotNull();
             assertThat(uploadedKey.get()).isEqualTo("group-avatars/group-10.jpg");
+        }
+
+        @Test
+        @DisplayName("Uploading avatar with new extension deletes old avatar file from StorageService")
+        void uploadAvatar_newExtension_deletesOldFile() {
+            testGroup.setAvatarUrl("https://cdn.example.com/group-avatars/group-10.jpg?t=12345678");
+
+            MultipartFile pngFile = new MockMultipartFile(
+                    "file", "new-avatar.png", "image/png", PNG_BYTES
+            );
+
+            groupAvatarService.uploadGroupAvatar(10L, pngFile);
+
+            assertThat(deletedKey.get()).isEqualTo("group-avatars/group-10.jpg");
+            assertThat(uploadedKey.get()).isEqualTo("group-avatars/group-10.png");
+        }
+    }
+
+    @Nested
+    @DisplayName("deleteGroupAvatar Tests")
+    class DeleteGroupAvatarTests {
+
+        @Test
+        @DisplayName("Deletes existing avatar file via StorageService and sets avatarUrl to null")
+        void deleteGroupAvatar_existingAvatar_deletesFromStorage() {
+            testGroup.setAvatarUrl("https://cdn.example.com/group-avatars/group-10.png?t=999");
+
+            groupAvatarService.deleteGroupAvatar(10L);
+
+            assertThat(deletedKey.get()).isEqualTo("group-avatars/group-10.png");
+            assertThat(testGroup.getAvatarUrl()).isNull();
+        }
+
+        @Test
+        @DisplayName("Does nothing when group has no avatar")
+        void deleteGroupAvatar_noAvatar_doesNotCallStorage() {
+            testGroup.setAvatarUrl(null);
+
+            groupAvatarService.deleteGroupAvatar(10L);
+
+            assertThat(deletedKey.get()).isNull();
+            assertThat(testGroup.getAvatarUrl()).isNull();
+        }
+
+        @Test
+        @DisplayName("Throws ResourceNotFoundException when group does not exist")
+        void deleteGroupAvatar_groupNotFound_throwsResourceNotFoundException() {
+            assertThatThrownBy(() -> groupAvatarService.deleteGroupAvatar(999L))
+                    .isInstanceOf(CustomExceptions.ResourceNotFoundException.class)
+                    .hasMessageContaining("Group not found with id: 999");
+        }
+    }
+
+    @Nested
+    @DisplayName("getGroupAvatarUrl Tests")
+    class GetGroupAvatarUrlTests {
+
+        @Test
+        @DisplayName("Returns avatar URL for existing group")
+        void getGroupAvatarUrl_found_returnsUrl() {
+            testGroup.setAvatarUrl("https://cdn.example.com/group-avatars/group-10.jpg");
+
+            String url = groupAvatarService.getGroupAvatarUrl(10L);
+
+            assertThat(url).isEqualTo("https://cdn.example.com/group-avatars/group-10.jpg");
+        }
+
+        @Test
+        @DisplayName("Throws ResourceNotFoundException when group does not exist")
+        void getGroupAvatarUrl_notFound_throwsResourceNotFoundException() {
+            assertThatThrownBy(() -> groupAvatarService.getGroupAvatarUrl(999L))
+                    .isInstanceOf(CustomExceptions.ResourceNotFoundException.class)
+                    .hasMessageContaining("Group not found with id: 999");
         }
     }
 }
