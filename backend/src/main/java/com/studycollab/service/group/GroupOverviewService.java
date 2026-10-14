@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class GroupOverviewService {
 
     private final GroupRepository groupRepository;
@@ -25,6 +24,20 @@ public class GroupOverviewService {
     private final NotesRepository notesRepository;
     private final TasksRepository tasksRepository;
     private final FilesRepository filesRepository;
+
+    public GroupOverviewService(
+            GroupRepository groupRepository,
+            GroupMemberRepository groupMemberRepository,
+            NotesRepository notesRepository,
+            TasksRepository tasksRepository,
+            FilesRepository filesRepository
+    ) {
+        this.groupRepository = groupRepository;
+        this.groupMemberRepository = groupMemberRepository;
+        this.notesRepository = notesRepository;
+        this.tasksRepository = tasksRepository;
+        this.filesRepository = filesRepository;
+    }
 
     @Transactional(readOnly = true)
     @PreAuthorize("@groupSecurity.isMember(#groupId, principal.id)")

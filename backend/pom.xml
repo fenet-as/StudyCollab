@@ -48,6 +48,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <version>42.7.7</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -66,30 +67,6 @@
         </dependency>
 
 
-        <!-- JWT API -->
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-api</artifactId>
-            <version>0.11.5</version>
-        </dependency>
-
-
-        <!-- JWT Implementation -->
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-impl</artifactId>
-            <version>0.11.5</version>
-            <scope>runtime</scope>
-        </dependency>
-
-
-        <!-- JWT Jackson JSON Support -->
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-jackson</artifactId>
-            <version>0.11.5</version>
-            <scope>runtime</scope>
-        </dependency>
 
 
         <!-- Lombok -->
@@ -156,11 +133,6 @@
 
 
 
-        <!-- Jakarta Validation -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
-        </dependency>
 
         <!-- Jackson Databind -->
         <dependency>
@@ -178,12 +150,6 @@
 
 
 
-        <dependency>
-    <groupId>org.postgresql</groupId>
-    <artifactId>postgresql</artifactId>
-    <version>42.7.7</version>
-    <scope>runtime</scope>
-</dependency>
 
 
         <dependency>
