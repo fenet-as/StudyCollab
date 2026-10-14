@@ -9,6 +9,7 @@ import com.studycollab.model.Note;
 import com.studycollab.model.StudyGroup;
 import com.studycollab.model.User;
 import com.studycollab.repository.auth.UserRepository;
+import com.studycollab.repository.group.GroupMemberRepository;
 import com.studycollab.repository.group.GroupRepository;
 import com.studycollab.repository.notes.NotesRepository;
 import org.springframework.stereotype.Service;
@@ -25,13 +26,16 @@ public class NotesService {
     private final NotesRepository notesRepository;
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
+    private final GroupMemberRepository groupMemberRepository;
 
     public NotesService(NotesRepository notesRepository,
                         UserRepository userRepository,
-                        GroupRepository groupRepository) {
+                        GroupRepository groupRepository,
+                        GroupMemberRepository groupMemberRepository) {
         this.notesRepository = notesRepository;
         this.userRepository = userRepository;
         this.groupRepository = groupRepository;
+        this.groupMemberRepository = groupMemberRepository;
     }
 
     @Transactional(readOnly = true)
@@ -115,9 +119,8 @@ public class NotesService {
             return;
         }
 
-        boolean isMember = group.getMembers() != null && group.getMembers().stream()
-                .anyMatch(member -> member.getUser() != null
-                        && member.getUser().getId().equals(user.getId()));
+        boolean isMember = group.getId() != null && user.getId() != null
+                && groupMemberRepository.findByGroupIdAndUserId(group.getId(), user.getId()).isPresent();
 
         if (!isMember) {
             throw new BadRequestException("User " + user.getId() + " is not a member of group " + group.getId());

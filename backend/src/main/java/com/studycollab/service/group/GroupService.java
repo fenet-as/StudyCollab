@@ -116,20 +116,13 @@ public class GroupService {
                 .orElseThrow(() -> new CustomExceptions.ResourceNotFoundException("Study group not found with id: " + groupId));
 
         // 2. Security Check: Ensure current user is the OWNER/CREATOR of this group
-        boolean isOwner = group.getMembers().stream()
-                .anyMatch(member -> {
-                    if (member.getUser() == null || member.getRole() == null) {
-                        return false;
-                    }
+        User currentUser = userRepository.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new CustomExceptions.UnauthorizedException("Only the group owner is authorized to delete this study group."));
 
-                    boolean emailMatches = currentUserEmail.equalsIgnoreCase(member.getUser().getEmail());
-                    GroupRole role = member.getRole();
-                    boolean isCreator = role == GroupRole.CREATOR;
+        GroupMember membership = groupMemberRepository.findByGroupIdAndUserId(groupId, currentUser.getId())
+                .orElseThrow(() -> new CustomExceptions.UnauthorizedException("Only the group owner is authorized to delete this study group."));
 
-                    return emailMatches && isCreator;
-                });
-
-        if (!isOwner) {
+        if (membership.getRole() != GroupRole.CREATOR) {
             throw new CustomExceptions.UnauthorizedException("Only the group owner is authorized to delete this study group.");
         }
 
@@ -497,12 +490,11 @@ public class GroupService {
             throw new CustomExceptions.UnauthorizedException("User details must be provided to access group members.");
         }
 
-        boolean isMember = group.getMembers() != null && group.getMembers().stream()
-                .anyMatch(member -> member.getUser() != null
-                        && member.getUser().getId().equals(user.getId()));
+        boolean isMember = group != null && group.getId() != null && user.getId() != null
+                && groupMemberRepository.findByGroupIdAndUserId(group.getId(), user.getId()).isPresent();
 
         if (!isMember) {
-            throw new CustomExceptions.BadRequestException("User " + user.getId() + " is not a member of group " + group.getId());
+            throw new CustomExceptions.BadRequestException("User " + user.getId() + " is not a member of group " + (group != null ? group.getId() : "null"));
         }
     }
 

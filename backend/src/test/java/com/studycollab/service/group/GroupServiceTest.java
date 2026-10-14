@@ -1,6 +1,7 @@
 package com.studycollab.service.group;
 
 import com.studycollab.dto.group.GroupCreateDto;
+import com.studycollab.dto.group.GroupMemberSummaryDto;
 import com.studycollab.dto.group.GroupResponseDto;
 import com.studycollab.dto.group.InviteLinkResponseDto;
 import com.studycollab.dto.group.JoinGroupRequest;
@@ -452,6 +453,49 @@ class GroupServiceTest {
             assertThatThrownBy(() -> groupService.leaveGroup(999L, "user@example.com"))
                     .isInstanceOf(CustomExceptions.ResourceNotFoundException.class)
                     .hasMessageContaining("Study group not found with id: 999");
+        }
+    }
+
+    @Nested
+    @DisplayName("getGroupMembersSummary Tests")
+    class GetGroupMembersSummaryTests {
+
+        @Test
+        @DisplayName("Member can view group member summary successfully")
+        void getGroupMembersSummary_asMember_returnsList() {
+            StudyGroup group = createGroup(1L, "Algorithms Group");
+            User member = createUser(10L, "member@example.com", "Alice Member");
+            createMembership(group, member, GroupRole.MEMBER);
+
+            List<GroupMemberSummaryDto> summaries = groupService.getGroupMembersSummary(1L, member);
+
+            assertThat(summaries).hasSize(1);
+            assertThat(summaries.get(0).getId()).isEqualTo(10L);
+            assertThat(summaries.get(0).getEmail()).isEqualTo("member@example.com");
+        }
+
+        @Test
+        @DisplayName("Non-member throws BadRequestException")
+        void getGroupMembersSummary_asNonMember_throwsBadRequestException() {
+            StudyGroup group = createGroup(1L, "Algorithms Group");
+            User member = createUser(10L, "member@example.com", "Alice Member");
+            createMembership(group, member, GroupRole.MEMBER);
+
+            User nonMember = createUser(99L, "nonmember@example.com", "Bob NonMember");
+
+            assertThatThrownBy(() -> groupService.getGroupMembersSummary(1L, nonMember))
+                    .isInstanceOf(CustomExceptions.BadRequestException.class)
+                    .hasMessageContaining("is not a member of group");
+        }
+
+        @Test
+        @DisplayName("Null user throws UnauthorizedException")
+        void getGroupMembersSummary_nullUser_throwsUnauthorizedException() {
+            createGroup(1L, "Algorithms Group");
+
+            assertThatThrownBy(() -> groupService.getGroupMembersSummary(1L, null))
+                    .isInstanceOf(CustomExceptions.UnauthorizedException.class)
+                    .hasMessageContaining("User details must be provided");
         }
     }
 }

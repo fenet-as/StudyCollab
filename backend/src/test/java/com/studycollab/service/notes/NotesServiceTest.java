@@ -11,6 +11,7 @@ import com.studycollab.model.Note;
 import com.studycollab.model.StudyGroup;
 import com.studycollab.model.User;
 import com.studycollab.repository.auth.UserRepository;
+import com.studycollab.repository.group.GroupMemberRepository;
 import com.studycollab.repository.group.GroupRepository;
 import com.studycollab.repository.notes.NotesRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,6 +46,9 @@ class NotesServiceTest {
     @Mock
     private GroupRepository groupRepository;
 
+    @Mock
+    private GroupMemberRepository groupMemberRepository;
+
     @InjectMocks
     private NotesService notesService;
 
@@ -76,6 +80,9 @@ class NotesServiceTest {
         membership.setUser(ownerUser);
         membership.setRole(GroupRole.MEMBER);
         group.getMembers().add(membership);
+
+        lenient().when(groupMemberRepository.findByGroupIdAndUserId(10L, 1L)).thenReturn(Optional.of(membership));
+        lenient().when(groupMemberRepository.findByGroupIdAndUserId(10L, 2L)).thenReturn(Optional.empty());
     }
 
     private NoteRequest createRequest(String title, String content, Long groupId) {
@@ -256,6 +263,7 @@ class NotesServiceTest {
             otherMember.setStudyGroup(group);
             otherMember.setUser(otherUser);
             group.getMembers().add(otherMember);
+            when(groupMemberRepository.findByGroupIdAndUserId(10L, 2L)).thenReturn(Optional.of(otherMember));
 
             NoteRequest request = createRequest("Tampered Title", "Tampered Content", null);
 
@@ -272,6 +280,7 @@ class NotesServiceTest {
         @DisplayName("Throws BadRequestException when note owner is no longer a member of group")
         void updateNote_OwnerNoLongerMember_ThrowsBadRequestException() {
             group.getMembers().clear(); // owner removed from group
+            when(groupMemberRepository.findByGroupIdAndUserId(10L, 1L)).thenReturn(Optional.empty());
 
             Note note = Note.builder()
                     .id(60L)
@@ -330,6 +339,7 @@ class NotesServiceTest {
             otherMember.setStudyGroup(group);
             otherMember.setUser(otherUser);
             group.getMembers().add(otherMember);
+            when(groupMemberRepository.findByGroupIdAndUserId(10L, 2L)).thenReturn(Optional.of(otherMember));
 
             when(notesRepository.findById(70L)).thenReturn(Optional.of(note));
 
