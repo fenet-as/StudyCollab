@@ -1,22 +1,19 @@
 package com.studycollab.controller.group;
 
-
 import java.security.Principal;
+import java.util.List;
 
 import com.studycollab.dto.group.*;
 import com.studycollab.exception.CustomExceptions;
-import com.studycollab.model.GroupMember;
 import com.studycollab.model.StudyGroup;
-import com.studycollab.model.User;
+import com.studycollab.security.CustomUserDetails;
 import com.studycollab.service.group.GroupService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/groups")
@@ -30,39 +27,29 @@ public class GroupController {
 
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<GroupResponseDto> createGroup(
-            @RequestPart("groupData") GroupCreateDto groupData,
+            @Valid @RequestPart("groupData") GroupCreateDto groupData,
             @RequestPart(value = "avatarFile", required = false) MultipartFile avatarFile,
-            @AuthenticationPrincipal User currentUser) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        StudyGroup dynamicGroup = groupService.createGroup(groupData, avatarFile, currentUser);
-
-        // Convert to DTO before returning
+        StudyGroup dynamicGroup = groupService.createGroup(groupData, avatarFile, userDetails.getUser());
         return ResponseEntity.ok(groupService.convertToDto(dynamicGroup));
     }
 
     @GetMapping("/my-groups")
     public ResponseEntity<List<GroupResponseDto>> getCurrentUserGroups(
-            @AuthenticationPrincipal User currentUser) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        List<GroupResponseDto> groups = groupService.getUserGroups(currentUser.getId());
+        List<GroupResponseDto> groups = groupService.getUserGroups(userDetails.getId());
         return ResponseEntity.ok(groups);
     }
-
-
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteGroup(
             @PathVariable("id") Long groupId,
-            Principal principal) { // Use Principal principal consistently across endpoints
+            Principal principal) {
         try {
-            // Extract email of current logged-in user safely
             String currentUserEmail = principal.getName();
-
-            // Process deletion
             groupService.deleteGroup(groupId, currentUserEmail);
-
-            // Return 204 No Content on successful deletion
             return ResponseEntity.noContent().build();
         } catch (CustomExceptions.UnauthorizedException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
@@ -71,18 +58,13 @@ public class GroupController {
         }
     }
 
-
-
-
     @PutMapping("/{groupId}/details")
     public ResponseEntity<?> updateGroupDetails(
             @PathVariable Long groupId,
-            @RequestBody GroupUpdateRequest request,
-            Principal principal) { // 1. Inject the Principal object here
+            @Valid @RequestBody GroupUpdateRequest request,
+            Principal principal) {
         try {
-            // 2. Extract the email from principal and pass it as the third argument
             String currentUserEmail = principal.getName();
-
             GroupResponseDto updatedGroup = groupService.updateGroupDetails(groupId, request, currentUserEmail);
             return ResponseEntity.ok(updatedGroup);
         } catch (CustomExceptions.UnauthorizedException e) {
@@ -92,17 +74,13 @@ public class GroupController {
         }
     }
 
-    // 2. Invite Member (Creator/Admin)
-
     @PostMapping("/{groupId}/members")
     public ResponseEntity<?> addMemberByEmail(
             @PathVariable Long groupId,
-            @RequestBody AddMemberRequest request,
+            @Valid @RequestBody AddMemberRequest request,
             Principal principal) {
         try {
             String currentUserEmail = principal.getName();
-
-            // The service now takes care of adding the member and returning the full GroupResponseDto!
             GroupResponseDto updatedGroup = groupService.addMemberByEmail(groupId, request, currentUserEmail);
             return ResponseEntity.ok(updatedGroup);
         } catch (CustomExceptions.UnauthorizedException e) {
@@ -114,7 +92,6 @@ public class GroupController {
         }
     }
 
-    // 3. Promote Member (Creator/Admin)
     @PutMapping("/{groupId}/members/{memberUserId}/promote")
     public ResponseEntity<?> promoteMemberToAdmin(
             @PathVariable Long groupId,
@@ -122,8 +99,6 @@ public class GroupController {
             Principal principal) {
         try {
             String currentUserEmail = principal.getName();
-
-            // The service now returns the updated GroupResponseDto!
             GroupResponseDto updatedGroup = groupService.promoteMemberToAdmin(groupId, memberUserId, currentUserEmail);
             return ResponseEntity.ok(updatedGroup);
         } catch (CustomExceptions.UnauthorizedException e) {
@@ -134,9 +109,6 @@ public class GroupController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
-
-
-
 
     @DeleteMapping("/{groupId}/members/{memberUserId}")
     public ResponseEntity<?> removeGroupMember(
@@ -156,22 +128,16 @@ public class GroupController {
         }
     }
 
-
-
     @PutMapping("/{groupId}/members/{memberUserId}/demote")
     public ResponseEntity<GroupResponseDto> demoteAdminToMember(
             @PathVariable Long groupId,
             @PathVariable Long memberUserId,
             Principal principal) {
 
-        // Retrieve the authenticated user's email
         String currentUserEmail = principal.getName();
-
         GroupResponseDto updatedGroup = groupService.demoteAdminToMember(groupId, memberUserId, currentUserEmail);
         return ResponseEntity.ok(updatedGroup);
     }
-
-
 
     @PostMapping("/{groupId}/leave")
     public ResponseEntity<?> leaveGroup(
@@ -190,30 +156,13 @@ public class GroupController {
         }
     }
 
-
-
-
-
-
-    // -------------------------------------------------------------------------
-    // INVITE CODE & JOINING ENDPOINTS
-    // -------------------------------------------------------------------------
-
-    /**
-     * Join a group using an invite code or full invite URL string.
-     */
-
-
     @PostMapping("/join")
     public ResponseEntity<?> joinGroup(
-            @RequestBody JoinGroupRequest request,
+            @Valid @RequestBody JoinGroupRequest request,
             Principal principal) {
         try {
             String currentUserEmail = principal.getName();
-
-            // Pass 'request' (JoinGroupRequest object) directly to the service:
             GroupResponseDto joinedGroup = groupService.joinGroupByInviteCode(request, currentUserEmail);
-
             return ResponseEntity.ok(joinedGroup);
         } catch (CustomExceptions.BadRequestException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -222,9 +171,6 @@ public class GroupController {
         }
     }
 
-    /**
-     * Regenerate an invite code for a group (Admins/Creators only).
-     */
     @PostMapping("/{groupId}/invite-code/regenerate")
     public ResponseEntity<?> regenerateInviteCode(
             @PathVariable Long groupId,
@@ -239,9 +185,6 @@ public class GroupController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
-
-
-
 
     @GetMapping("/{groupId}/permissions")
     public ResponseEntity<?> getUserGroupPermissions(
@@ -258,23 +201,12 @@ public class GroupController {
         }
     }
 
-
-
-
     @GetMapping("/{groupId}/members")
     public ResponseEntity<List<GroupMemberSummaryDto>> getGroupMembers(
             @PathVariable Long groupId,
-            @AuthenticationPrincipal User currentUser) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        List<GroupMemberSummaryDto> members = groupService.getGroupMembersSummary(groupId, currentUser);
+        List<GroupMemberSummaryDto> members = groupService.getGroupMembersSummary(groupId, userDetails.getUser());
         return ResponseEntity.ok(members);
     }
-
-
-
-
 }
-
-
-
-
