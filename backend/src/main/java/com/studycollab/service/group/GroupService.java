@@ -12,8 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
-import java.io.IOException;
-import java.nio.file.*;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -24,13 +22,13 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final UserRepository userRepository;
-    private final Path rootLocation = Paths.get("uploads/avatars");
     private final GroupAvatarService groupAvatarService;
 
     // Constructor injection for all repositories
     public GroupService(GroupRepository groupRepository,
                         GroupMemberRepository groupMemberRepository,
-                        UserRepository userRepository,GroupAvatarService groupAvatarService) {
+                        UserRepository userRepository,
+                        GroupAvatarService groupAvatarService) {
         this.groupRepository = groupRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.userRepository = userRepository;
