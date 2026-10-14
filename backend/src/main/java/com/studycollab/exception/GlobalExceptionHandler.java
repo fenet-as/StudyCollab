@@ -1,7 +1,9 @@
 package com.studycollab.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -18,6 +20,49 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(RefreshTokenExpiredException.class)
+    public ResponseEntity<ErrorResponse> handleRefreshTokenExpiredException(RefreshTokenExpiredException ex, HttpServletRequest request) {
+        ResponseCookie cleanCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/api/auth")
+                .maxAge(0)
+                .sameSite("Strict")
+                .build();
+
+        ErrorResponse response = ErrorResponse.of(
+                ex.getStatus().value(),
+                ex.getStatus().getReasonPhrase(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(ex.getStatus())
+                .header(HttpHeaders.SET_COOKIE, cleanCookie.toString())
+                .body(response);
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidTokenException(InvalidTokenException ex, HttpServletRequest request) {
+        ErrorResponse response = ErrorResponse.of(
+                ex.getStatus().value(),
+                ex.getStatus().getReasonPhrase(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        ResponseEntity.BodyBuilder builder = ResponseEntity.status(ex.getStatus());
+        if (request.getRequestURI() != null && request.getRequestURI().contains("/api/auth/refresh")) {
+            ResponseCookie cleanCookie = ResponseCookie.from("refreshToken", "")
+                    .httpOnly(true)
+                    .secure(true)
+                    .path("/api/auth")
+                    .maxAge(0)
+                    .sameSite("Strict")
+                    .build();
+            builder.header(HttpHeaders.SET_COOKIE, cleanCookie.toString());
+        }
+        return builder.body(response);
+    }
 
     @ExceptionHandler(BaseBusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(BaseBusinessException ex, HttpServletRequest request) {
