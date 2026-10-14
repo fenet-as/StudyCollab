@@ -1,6 +1,9 @@
 package com.studycollab.dto.group;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class JoinGroupRequest {
+    @NotBlank(message = "Invite code is required")
     private String inviteCode;
 
     public JoinGroupRequest() {}
