@@ -16,7 +16,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/tasks")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class TasksController {
 
     private final TasksService tasksService;
