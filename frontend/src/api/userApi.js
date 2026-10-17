@@ -1,54 +1,23 @@
-// frontend/src/api/userApi.js
-import axios from 'axios';
+// userApi.js
 
-// 💡 1. Create a dedicated Axios instance pointing straight to your Spring Boot backend
-const API = axios.create({
-  baseURL: ''
-});
-
-// Helper to extract the token safely from browser storage
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('token');
-  return {
-    headers: { 
-      Authorization: token ? `Bearer ${token}` : '' 
-    }
-  };
-};
+import { api } from './config.js';
 
 export const userApi = {
-  // Fetch current authenticated user metrics
-  getCurrentUser: async () => {
-    // 💡 2. Swapped "axios.get" for "API.get" to apply the backend baseURL
-    const response = await API.get('/api/users/me', getAuthHeaders());
-    return response.data;
-  },
-
-  // Update profile full name text field
-  updateProfileName: async (fullName) => {
-    const response = await API.put('/api/users/profile', { fullName }, getAuthHeaders());
-    return response.data;
-  },
-
-  // Process dynamic multipart form image file streams
+  getCurrentUser: async () => (await api.get('/users/me')).data,
+  
+  updateProfileName: async (fullName) => 
+    (await api.put('/users/profile', { fullName })).data,
+  
   updateAvatar: async (file) => {
     const formData = new FormData();
-    formData.append('avatar', file); // 'avatar' matches @RequestParam("avatar") in AvatarController
-
-    const config = getAuthHeaders();
-    config.headers['Content-Type'] = 'multipart/form-data';
-
-    const response = await API.post('/api/avatars/upload', formData, config);
-    return response.data;
+    formData.append('avatar', file); // Changed from 'file' to 'avatar'
+    
+    // Changed route to '/avatars/upload' and method to POST
+    return (await api.post('/avatars/upload', formData, { 
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })).data;
   },
-
-  // Change account password safety signatures
-  changePassword: async (currentPassword, newPassword) => {
-    const response = await API.put(
-      '/api/users/change-password', 
-      { currentPassword, newPassword }, 
-      getAuthHeaders()
-    );
-    return response.data;
-  }
+  
+  changePassword: async (currentPassword, newPassword) => 
+    (await api.put('/users/change-password', { currentPassword, newPassword })).data,
 };

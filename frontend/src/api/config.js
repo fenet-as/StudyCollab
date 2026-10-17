@@ -1,14 +1,15 @@
 import axios from 'axios';
-import { setupAuthInterceptors } from './authInterceptor';
+import { setupAuthInterceptors } from './authInterceptor.js';
 
 // 1. Resolve API Base URL:
 // - Uses import.meta.env.VITE_API_BASE_URL if explicitly provided
 // - Otherwise automatically falls back based on Vite environment mode:
 //     * Development (npm run dev): http://localhost:8080/api
 //     * Production  (npm run build): https://studycollab-l3p2.onrender.com/api
+const env = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env : {};
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  (import.meta.env.DEV
+  env.VITE_API_BASE_URL ||
+  (env.DEV
     ? 'http://localhost:8080/api'
     : 'https://studycollab-l3p2.onrender.com/api');
 
