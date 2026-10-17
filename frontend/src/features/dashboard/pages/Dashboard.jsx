@@ -28,17 +28,23 @@ import { userApi } from "../../../api/userApi";
 
 import { useTheme } from "../../../context/ThemeContext";
 import { useAuthContext } from "../../../context/useAuthContext";
+import { useGroupsContext } from "../../../context/useGroupsContext";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
   const { logout } = useAuthContext();
-
-  // Core Data State
-  const [groups, setGroups] = useState([]);
-  const [activeGroup, setActiveGroup] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const {
+    groups,
+    activeGroup,
+    setActiveGroup,
+    loading: groupsLoading,
+    error: groupsError,
+    fetchGroups,
+    deleteGroup,
+    updateGroup,
+    leaveGroup,
+  } = useGroupsContext();
 
   // Permission State from Backend
   const [permissions, setPermissions] = useState({
@@ -73,7 +79,6 @@ export default function Dashboard() {
     }
 
     fetchUserProfile();
-    fetchGroups();
   }, []);
 
   const fetchPermissions = async (groupId) => {
@@ -145,33 +150,6 @@ export default function Dashboard() {
     }
   };
 
-  const fetchGroups = async (selectGroupId = null) => {
-    try {
-      setLoading(true);
-      const data = await groupApi.getMyGroups();
-      setGroups(data);
-
-      if (data.length > 0) {
-        if (selectGroupId) {
-          const targetGroup = data.find((g) => g.id === selectGroupId);
-          setActiveGroup(targetGroup || data[0]);
-        } else if (activeGroup) {
-          const currentActive = data.find((g) => g.id === activeGroup.id);
-          setActiveGroup(currentActive || data[0]);
-        } else {
-          setActiveGroup(data[0]);
-        }
-      } else {
-        setActiveGroup(null);
-      }
-    } catch (err) {
-      setError(err.message || "Failed to load workspaces.");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleLogout = async () => {
     try {
       await logout();
@@ -181,24 +159,15 @@ export default function Dashboard() {
     navigate("/login");
   };
 
-  const handleCreateGroup = async (createdGroup) => {
-    try {
-      setIsNewGroupModalOpen(false);
-      if (createdGroup && createdGroup.id) {
-        await fetchGroups(createdGroup.id);
-        setActiveTab("Overview");
-      } else {
-        await fetchGroups();
-      }
-    } catch (err) {
-      console.error("Error refreshing dashboard state:", err);
-    }
+  const handleCreateGroup = () => {
+    setIsNewGroupModalOpen(false);
+    setActiveTab("Overview");
   };
 
   const handleJoinGroup = async (joinedGroup) => {
     try {
       setIsJoinModalOpen(false);
-      if (joinedGroup && joinedGroup.id) {
+      if (joinedGroup?.id) {
         await fetchGroups(joinedGroup.id);
       } else {
         await fetchGroups();
@@ -209,18 +178,9 @@ export default function Dashboard() {
     }
   };
 
-  const handleLeaveGroupSuccess = async (leftGroupId) => {
-    const updatedGroups = groups.filter((g) => g.id !== leftGroupId);
-    setGroups(updatedGroups);
-
-    if (updatedGroups.length > 0) {
-      setActiveGroup(updatedGroups[0]);
-    } else {
-      setActiveGroup(null);
-    }
-
+  const handleLeaveGroupSuccess = (leftGroupId) => {
+    leaveGroup(leftGroupId);
     setActiveTab("Overview");
-    await fetchGroups();
   };
 
   const promptDeleteGroup = (e, group) => {
@@ -234,18 +194,9 @@ export default function Dashboard() {
     const deletedId = groupToDelete.id;
 
     try {
-      setGroups((prevGroups) => {
-        const remaining = prevGroups.filter((g) => g.id !== deletedId);
-        if (activeGroup?.id === deletedId) {
-          setActiveGroup(remaining.length > 0 ? remaining[0] : null);
-        }
-        return remaining;
-      });
-
       setIsDeleteModalOpen(false);
       setGroupToDelete(null);
-
-      await groupApi.deleteGroup(deletedId);
+      await deleteGroup(deletedId);
     } catch (err) {
       console.error("Failed to delete group:", err);
       await fetchGroups();
@@ -254,14 +205,10 @@ export default function Dashboard() {
   };
 
   // Synchronizes profile and fresh member lists across all headers
-  const handleGroupUpdated = async (updatedGroup) => {
+  const handleGroupUpdated = (updatedGroup) => {
     if (updatedGroup) {
-      setActiveGroup(updatedGroup);
-      setGroups((prevGroups) =>
-        prevGroups.map((g) => (g.id === updatedGroup.id ? updatedGroup : g)),
-      );
+      updateGroup(updatedGroup);
     }
-    await fetchGroups(activeGroup?.id);
   };
 
   const handleNavigateToAdmin = async () => {
@@ -290,8 +237,8 @@ export default function Dashboard() {
         setActiveGroup={setActiveGroup}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        loading={loading}
-        error={error}
+        loading={groupsLoading}
+        error={groupsError}
         userEmail={userEmail}
         userDisplayName={userDisplayName}
         userInitials={userInitials}

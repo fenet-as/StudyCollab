@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import styles from './TasksPage.module.css';
 import AddTaskModal from '../../../components/interactive/AddTaskModal/AddTaskModal';
 import { useTasks } from '../hooks/useTasks';
-import { useGroupsContext } from '../../../context/GroupContext';
+import { useGroupsContext } from '../../../context/useGroupsContext';
 
 export default function TasksPage({ group }) {
   const { groups, activeGroup: contextGroup, selectedGroup, loading: groupsLoading } = useGroupsContext();

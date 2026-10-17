@@ -1,9 +1,9 @@
 // frontend/src/features/notes/pages/NotesPage.jsx
-import React, { useState, useMemo, useEffect, useContext } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { AlertCircle, X } from 'lucide-react';
 import styles from './NotesPage.module.css';
 import editorStyles from '../components/NotesEditor.module.css';
-import { GroupContext } from '../../../context/GroupContext';
+import { useGroupsContext } from '../../../context/useGroupsContext';
 import { useNotes } from '../hooks/useNotes';
 import { useNotesEditor } from '../hooks/useNotesEditor';
 
@@ -15,7 +15,7 @@ import DeleteModal from '../components/DeleteModal';
 import SaveModal from '../components/SaveModal';
 
 export default function NotesPage({ group, isDarkMode }) {
-  const { activeGroup } = useContext(GroupContext);
+  const { activeGroup } = useGroupsContext();
   const groupId = group?.id || activeGroup?.id || null;
   const { notes, loading, createNote, updateNote, deleteNote } = useNotes(groupId);
 
