@@ -27,10 +27,12 @@ import { groupApi } from "../../../api/groupApi";
 import { userApi } from "../../../api/userApi";
 
 import { useTheme } from "../../../context/ThemeContext";
+import { useAuthContext } from "../../../context/useAuthContext";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
+  const { logout } = useAuthContext();
 
   // Core Data State
   const [groups, setGroups] = useState([]);
@@ -170,10 +172,12 @@ export default function Dashboard() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("email");
-    localStorage.removeItem("userId");
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (err) {
+      console.warn("Logout error:", err);
+    }
     navigate("/login");
   };
 
@@ -306,12 +310,25 @@ export default function Dashboard() {
 
       <main className={styles.contentArea}>
         {activeTab === "Settings" ? (
+          // <SettingsPane
+          //   onProfileUpdated={async () => {
+          //     await fetchUserProfile();
+          //     await fetchGroups(activeGroup?.id);
+          //   }}
+          // />
+
           <SettingsPane
-            onProfileUpdated={async () => {
-              await fetchUserProfile();
-              await fetchGroups(activeGroup?.id);
-            }}
-          />
+    onProfileUpdated={async () => {
+      await fetchUserProfile();
+      if (activeGroup?.id) {
+        await fetchGroups(activeGroup.id);
+      }
+    }}
+  />
+
+
+
+
         ) : activeGroup ? (
           <>
             <ContentHeader
