@@ -4,7 +4,7 @@ import { userApi } from '../../../../../api/userApi'
 import { getFriendlyErrorMessage } from '../utils/errorHelpers';
 import styles from './ProfileDetailsCard.module.css';
 
-export default function ProfileDetailsCard({ initialFullName, email, onProfileUpdated }) {
+export default function ProfileDetailsCard({ initialFullName, onProfileUpdated }) {
   const [fullName, setFullName] = useState(initialFullName || '');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', isError: false });

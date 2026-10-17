@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { GraduationCap, Sun, Moon, AlertTriangle, ArrowRight, Loader2, Send } from 'lucide-react';
 import { loginUser, resendVerificationEmail } from '../../../api/authApi';
-import { useTheme } from '../../../context/ThemeContext';
+import { useTheme } from '../../../context/useTheme';
 import { useAuthContext } from '../../../context/useAuthContext';
 import styles from './Auth.module.css';
 
@@ -67,7 +67,7 @@ export default function Login() {
         success: true,
         message: 'A new verification link has been sent to your email.'
       });
-    } catch (err) {
+    } catch {
       setResendStatus({
         loading: false,
         success: false,

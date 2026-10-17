@@ -9,7 +9,7 @@ export const parseMarkdownAndLaTeX = (text, styles) => {
   html = html.replace(/\$\$(.*?)\$\$/gs, (match, formula) => {
     try {
       return `<div class="${styles.latexBlock}">${katex.renderToString(formula.trim(), { displayMode: true, throwOnError: false })}</div>`;
-    } catch (err) {
+    } catch {
       return `<span style="color: red;">${match}</span>`;
     }
   });
@@ -18,7 +18,7 @@ export const parseMarkdownAndLaTeX = (text, styles) => {
   html = html.replace(/\$(.*?)\$/g, (match, formula) => {
     try {
       return `<span class="${styles.latexInline}">${katex.renderToString(formula.trim(), { displayMode: false, throwOnError: false })}</span>`;
-    } catch (err) {
+    } catch {
       return `<span style="color: red;">${match}</span>`;
     }
   });

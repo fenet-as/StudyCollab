@@ -1,5 +1,5 @@
 // frontend/src/components/interactive/DeleteConfirmModal/DeleteConfirmModal.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { AlertTriangle, X, Loader2 } from 'lucide-react';
 import styles from './DeleteConfirmModal.module.css';
 
@@ -9,15 +9,17 @@ export default function DeleteConfirmModal({ isOpen, groupName, onConfirm, onClo
   const [isDeleting, setIsDeleting] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
 
-  // Sync internal state with visibility
-  useEffect(() => {
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
       setConfirmName('');
       setError('');
       setIsDeleting(false);
       setIsClosing(false);
     }
-  }, [isOpen]);
+  }
 
   if (!isOpen && !isClosing) return null;
 

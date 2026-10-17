@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { GraduationCap, Sun, Moon, CheckCircle2, AlertTriangle, Loader2, ArrowRight, Send } from 'lucide-react';
 import { verifyEmailToken, resendVerificationEmail } from '../../../api/authApi';
-import { useTheme } from '../../../context/ThemeContext';
+import { useTheme } from '../../../context/useTheme';
 import { useAuthContext } from '../../../context/useAuthContext';
 import styles from './Auth.module.css';
 
@@ -13,15 +13,15 @@ export default function VerifyEmail() {
   const { isDark, toggleTheme } = useTheme();
   const { login } = useAuthContext();
 
-  const [status, setStatus] = useState('verifying'); // 'verifying' | 'success' | 'error'
-  const [message, setMessage] = useState('');
+  const [status, setStatus] = useState(() => (!token ? 'error' : 'verifying'));
+  const [message, setMessage] = useState(() =>
+    !token ? 'Invalid verification link. Missing token parameter.' : ''
+  );
   const [resendEmail, setResendEmail] = useState('');
   const [resendStatus, setResendStatus] = useState({ loading: false, success: false, message: '' });
 
   useEffect(() => {
     if (!token) {
-      setStatus('error');
-      setMessage('Invalid verification link. Missing token parameter.');
       return;
     }
 
@@ -38,7 +38,7 @@ export default function VerifyEmail() {
         setStatus('error');
         setMessage(err.response?.data?.message || 'Verification link is invalid or has expired.');
       });
-  }, [token]);
+  }, [token, login]);
 
   const handleResendSubmit = async (e) => {
     e.preventDefault();
@@ -52,7 +52,7 @@ export default function VerifyEmail() {
         success: true,
         message: 'A new verification link has been sent if an account exists for that email.'
       });
-    } catch (err) {
+    } catch {
       setResendStatus({
         loading: false,
         success: false,
