@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import styles from "./Dashboard.module.css";
 
 
-import { MessageSquare, ShieldAlert, Loader2 } from "lucide-react";
+import { ShieldAlert, Loader2 } from "lucide-react";
 
 import FilesPage from "../../files/pages/FilesPage";
 import NotesPage from "../../notes/pages/NotesPage";
 import TasksPage from "../../tasks/pages/TasksPage";
+import ChatPage from "../../chat/pages/ChatPage";
 
 import EmptyState from "../../../components/common/EmptyState/EmptyState";
 import CreateGroupModal from "../../../components/interactive/CreateGroupModal/CreateGroupModal";
@@ -358,15 +359,7 @@ export default function Dashboard() {
 
               {activeTab === "Chat" && (
                 <div className={styles.placeholderTabContent}>
-                  <div className={styles.emptyIllustration}>
-                    <MessageSquare
-                      size={48}
-                      strokeWidth={1.5}
-                      color="#94a3b8"
-                    />
-                  </div>
-                  <h3>Chat Feature Space</h3>
-                  <p>Coming soon to the StudyCollab workspace.</p>
+                  <ChatPage />
                 </div>
               )}
             </div>
