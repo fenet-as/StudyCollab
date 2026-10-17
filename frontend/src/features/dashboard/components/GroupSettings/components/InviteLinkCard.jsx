@@ -1,5 +1,5 @@
-// InviteLinkCard.jsx
 import React, { useState } from 'react';
+import { groupApi } from '../../../../../api/groupApi';
 import styles from './InviteLinkCard.module.css';
 
 export default function InviteLinkCard({ 
@@ -37,22 +37,13 @@ export default function InviteLinkCard({
     setErrorMsg(null);
 
     try {
-      const response = await fetch(`/api/groups/${groupId}/invite-code/regenerate`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // Ensure your auth header is included here if needed by your API client layer
-          'Authorization': `Bearer ${localStorage.getItem('token')}` 
-        }
-      });
+      const data = await groupApi.regenerateInviteCode(groupId);
+      // Expected backend response DTO format: { inviteCode: "..." }
+      const newCode = data?.inviteCode || data?.inviteLink || (typeof data === 'string' ? data : '');
 
-      if (!response.ok) {
-        throw new Error('Failed to regenerate invite link.');
+      if (!newCode) {
+        throw new Error('Server returned an invalid invite code format.');
       }
-
-      const data = await response.json(); 
-      // Expected backend response DTO format: { inviteCode: "..." } or { inviteLink: "..." }
-      const newCode = data.inviteCode || data.inviteLink || data;
 
       setCurrentInviteCode(newCode);
 
@@ -61,7 +52,9 @@ export default function InviteLinkCard({
         onRegenerate(newCode);
       }
     } catch (err) {
-      setErrorMsg(err.message || 'Error regenerating link');
+      setErrorMsg(
+        err.response?.data?.message || err.message || 'Error regenerating invite code.'
+      );
     } finally {
       setIsRegenerating(false);
     }

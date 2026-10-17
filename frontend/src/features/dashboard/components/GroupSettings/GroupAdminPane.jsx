@@ -194,7 +194,15 @@ export default function GroupAdminPane({
         />
 
         {/* Invite Link */}
-        <InviteLinkCard inviteCode={group?.inviteCode} />
+        <InviteLinkCard
+          groupId={group?.id}
+          inviteCode={group?.inviteCode}
+          onRegenerate={(newCode) => {
+            if (onGroupUpdated) {
+              onGroupUpdated({ ...group, inviteCode: newCode });
+            }
+          }}
+        />
 
         {/* Add Member */}
         <AddMemberCard
