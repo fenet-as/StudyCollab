@@ -1,0 +1,143 @@
+.inputContainer {
+  padding: 0.75rem 1rem;
+  background-color: var(--card-bg);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.contextBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-highlight);
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  color: var(--text-main);
+  border-left: 3px solid var(--primary-color);
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.contextText {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.bannerMessage {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.editIcon {
+  color: var(--primary-color);
+  flex-shrink: 0;
+}
+
+.cancelBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-height: 32px;
+  min-width: 32px;
+}
+
+.cancelBtn:hover {
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.inputForm {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.textInput {
+  flex: 1;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem; /* 16px threshold prevents iOS zoom on focus */
+  outline: none;
+  transition: border-color 0.15s ease;
+  min-height: 44px; /* Touch target */
+}
+
+.textInput:focus {
+  border-color: var(--primary-color);
+}
+
+.inputControls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.charCounter {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #64748b);
+  user-select: none;
+}
+
+.nearLimit {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.sendBtn {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  border: none;
+  padding: 0.65rem 0.95rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s ease;
+  min-height: 44px; /* Tap target height */
+  min-width: 44px;
+}
+
+.sendBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.sendBtn:not(:disabled):hover {
+  opacity: 0.9;
+}
+
+/* ==========================================================================
+   Mobile Responsive Tweaks (< 480px)
+   ========================================================================== */
+@media (max-width: 480px) {
+  .inputContainer {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .charCounter {
+    display: none; /* Hide counter on tiny screens unless nearing limit */
+  }
+
+  .nearLimit {
+    display: inline; /* Re-appear when approaching limit */
+  }
+}

@@ -1,0 +1,68 @@
+.chatContainer {
+  display: flex;
+  height: 100vh;
+  height: 100dvh; /* Dynamic viewport units for mobile browsers */
+  width: 100%;
+  min-height: 0; /* Prevents flex items from overflowing screen bounds */
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  position: relative;
+}
+
+.channelDrawer {
+  display: flex;
+  height: 100%;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 70;
+}
+
+.channelBackdrop {
+  display: none;
+}
+
+.chatMain {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Crucial so MessageFeed can scroll without expanding parent */
+  min-width: 0; /* Prevents long text/code snippets from blowing out column width */
+  background-color: var(--card-bg);
+  position: relative;
+}
+
+/* ==========================================================================
+   Responsive Breakpoints (< 768px)
+   ========================================================================== */
+@media (max-width: 767px) {
+  .chatContainer {
+    border-radius: 0;
+    border: none;
+  }
+
+  .channelBackdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 60;
+  }
+
+  .channelDrawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 260px;
+    background-color: var(--card-bg);
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .channelDrawer.channelDrawerOpen {
+    transform: translateX(0);
+  }
+}

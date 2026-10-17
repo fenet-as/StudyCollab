@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_BASE_URL } from '../api/config';
 
 export default function CloudflareTestPage() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -21,7 +22,7 @@ export default function CloudflareTestPage() {
     formData.append('file', selectedFile);
 
     try {
-      const response = await fetch('http://localhost:8080/api/test/upload', {
+      const response = await fetch(`${API_BASE_URL}/test/upload`, {
         method: 'POST',
         body: formData,
       });
@@ -42,7 +43,7 @@ export default function CloudflareTestPage() {
   const handleFetchDownloadUrl = async () => {
     if (!savedKey.trim()) return alert("Enter an object path key!");
     try {
-      const response = await fetch(`http://localhost:8080/api/test/download?key=${encodeURIComponent(savedKey.trim())}`);
+      const response = await fetch(`${API_BASE_URL}/test/download?key=${encodeURIComponent(savedKey.trim())}`);
       const data = await response.json();
       
       if (response.ok) {

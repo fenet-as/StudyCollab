@@ -1,0 +1,417 @@
+.messageWrapper {
+  display: flex;
+  gap: 0.65rem;
+  max-width: 80%;
+  transition: background-color 0.4s ease;
+  padding: 0.2rem 0.4rem;
+  border-radius: var(--radius-md);
+  position: relative;
+}
+
+:global(.highlight-msg) {
+  animation: highlightFlash 2s ease-out;
+}
+
+@keyframes highlightFlash {
+  0% {
+    background-color: rgba(99, 102, 241, 0.35);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.myMessage {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.theirMessage {
+  align-self: flex-start;
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
+  background-color: var(--primary-color);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.messageBubbleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.messageMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.senderName {
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
+.timestamp {
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.editedLabel {
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.roleBadge {
+  padding: 0.1rem 0.35rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.65rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.role_admin {
+  background-color: var(--badge-admin-bg);
+  color: var(--badge-admin-text);
+}
+
+.role_owner {
+  background-color: var(--badge-owner-bg);
+  color: var(--badge-owner-text);
+}
+
+.role_member {
+  background-color: var(--badge-member-bg);
+  color: var(--badge-member-text);
+}
+
+.messageBubbleContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.myMessage .messageBubbleContainer {
+  flex-direction: row-reverse;
+}
+
+.messageBubble {
+  position: relative;
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--radius-lg);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  box-shadow: var(--shadow-sm);
+  word-break: break-word;
+  cursor: pointer;
+}
+
+.theirMessage .messageBubble {
+  background-color: var(--row-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  border-top-left-radius: 2px;
+}
+
+.myMessage .messageBubble {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  border-top-right-radius: 2px;
+}
+
+.messageBubble p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.mobileMoreBtn {
+  display: none; /* Desktop default: hidden */
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: var(--radius-full);
+}
+
+/* Hover & Focus Action Menu */
+.hoverActions {
+  position: absolute;
+  top: -18px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  display: none;
+  gap: 2px;
+  padding: 2px 4px;
+  box-shadow: var(--shadow-md);
+  z-index: 10;
+}
+
+.myMessage .hoverActions {
+  left: 10px;
+}
+
+.theirMessage .hoverActions {
+  right: 10px;
+}
+
+.messageBubbleContainer:hover .hoverActions,
+.messageWrapper:focus-within .hoverActions,
+.mobileActionsVisible {
+  display: flex !important;
+}
+
+.actionBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.35rem;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.actionBtn:hover {
+  background-color: var(--bg-highlight);
+  color: var(--text-main);
+}
+
+.deleteBtn:hover {
+  color: #ef4444;
+}
+
+.reactionPickerContainer {
+  position: relative;
+}
+
+.emojiPickerPopover {
+  position: absolute;
+  bottom: 100%;
+  margin-bottom: 8px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 8px;
+  width: 220px;
+  box-shadow: var(--shadow-lg);
+  z-index: 30;
+  animation: popoverFade 0.15s ease;
+}
+
+.popoverLeft {
+  left: 0;
+}
+
+.popoverRight {
+  right: 0;
+}
+
+@keyframes popoverFade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.categoryTabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 4px;
+  margin-bottom: 6px;
+  overflow-x: auto;
+}
+
+.tabBtn {
+  background: transparent;
+  border: none;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  padding: 3px 6px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.activeTab {
+  color: var(--primary-color);
+  font-weight: 600;
+  background-color: var(--bg-highlight);
+}
+
+.emojiGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+.emojiGrid button {
+  background: transparent;
+  border: none;
+  font-size: 1.15rem;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+}
+
+.emojiGrid button:hover {
+  background-color: var(--bg-highlight);
+}
+
+.reactionsList {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 0.2rem;
+  flex-wrap: wrap;
+}
+
+.reactionPill {
+  background-color: var(--bg-highlight);
+  border: 1px solid var(--border-color);
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  font-family: inherit;
+}
+
+.reactionPill:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.reactionPill:hover {
+  border-color: var(--primary-color);
+}
+
+.activeReactionPill {
+  background-color: rgba(99, 102, 241, 0.15);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.repliedContext {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  background-color: var(--bg-highlight);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.2rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  max-width: 100%;
+  border: none;
+  font-family: inherit;
+  text-align: left;
+}
+
+.repliedContext:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.repliedText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.repliedContext:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.pinnedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.65rem;
+  color: var(--primary-color);
+  background-color: var(--bg-highlight);
+  padding: 0.1rem 0.35rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+.pinnedActionBtn {
+  color: var(--primary-color) !important;
+}
+
+/* ==========================================================================
+   Responsive & Touch Screen Optimizations (< 640px / hover: none)
+   ========================================================================== */
+@media (max-width: 639px) {
+  .messageWrapper {
+    max-width: 92%;
+    gap: 0.5rem;
+  }
+
+  .avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+
+  .senderName {
+    max-width: 100px;
+  }
+
+  .emojiPickerPopover {
+    width: 200px;
+  }
+
+  .mobileMoreBtn {
+    display: inline-flex; /* Show quick tap trigger icon next to bubbles */
+    align-items: center;
+    justify-content: center;
+  }
+}

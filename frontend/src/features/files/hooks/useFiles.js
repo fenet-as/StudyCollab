@@ -1,5 +1,3 @@
-// frontend/src/features/files/hooks/useFiles.js
-
 import { useState, useEffect, useCallback } from 'react';
 import { filesApi } from '../../../api/filesApi';
 
@@ -21,7 +19,7 @@ export function useFiles(groupId) {
       setCategories(catsData);
       setFiles(filesData);
     } catch (err) {
-      setError(err.message || 'Something went wrong fetching group files.');
+      setError(err.response?.data?.message || err.message || 'Something went wrong fetching group files.');
     } finally {
       setLoading(false);
     }
@@ -38,8 +36,9 @@ export function useFiles(groupId) {
       await fetchAllData();
       return newCat;
     } catch (err) {
-      setError(err.message || 'Failed to create folder');
-      throw err;
+      const msg = err.response?.data?.message || err.message || 'Failed to create folder';
+      setError(msg);
+      throw new Error(msg);
     }
   };
 
@@ -49,29 +48,30 @@ export function useFiles(groupId) {
       await filesApi.deleteCategory(groupId, categoryId);
       await fetchAllData();
     } catch (err) {
-      setError(err.message || 'Failed to delete folder');
-      throw err;
+      const msg = err.response?.data?.message || err.message || 'Failed to delete folder';
+      setError(msg);
+      throw new Error(msg);
     }
   };
 
   const uploadFile = async (fileObj, categoryId) => {
     if (!groupId) return;
     try {
-      const formData = new FormData();
-      formData.append('file', fileObj);
-      
-      if (categoryId !== undefined && categoryId !== null && categoryId !== '') {
-        formData.append('categoryId', categoryId.toString());
-      } else {
+      if (categoryId === undefined || categoryId === null || categoryId === '') {
         throw new Error('A specific category selection is required to upload files.');
       }
+
+      const formData = new FormData();
+      formData.append('file', fileObj);
+      formData.append('categoryId', Number(categoryId));
 
       const uploadedFile = await filesApi.uploadFile(groupId, formData);
       await fetchAllData();
       return uploadedFile;
     } catch (err) {
-      setError(err.message || 'Failed to upload file');
-      throw err;
+      const msg = err.response?.data?.message || err.message || 'Failed to upload file';
+      setError(msg);
+      throw new Error(msg);
     }
   };
 
@@ -81,19 +81,20 @@ export function useFiles(groupId) {
       await filesApi.deleteFile(groupId, fileId);
       setFiles(prev => prev.filter(f => f.id !== fileId));
     } catch (err) {
-      setError(err.message || 'Failed to delete file');
-      throw err;
+      const msg = err.response?.data?.message || err.message || 'Failed to delete file';
+      setError(msg);
+      throw new Error(msg);
     }
   };
 
-  // Helper 1: Forces a local file download directly from Cloudflare R2
   const downloadFile = async (fileId) => {
     if (!groupId || !fileId) return;
     try {
-      const { downloadUrl } = await filesApi.getFileDownloadUrl(groupId, fileId, 'attachment');
+      const res = await filesApi.getFileDownloadUrl(groupId, fileId, 'attachment');
+      const url = res.url || res.downloadUrl;
       
       const link = document.createElement('a');
-      link.href = downloadUrl;
+      link.href = url;
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -103,20 +104,17 @@ export function useFiles(groupId) {
     }
   };
 
-  // Helper 2: Opens file directly in a new tab for browser rendering (PDFs, images, etc.)
   const openFileInNewTab = async (fileId) => {
-  if (!groupId || !fileId) return;
-  try {
-    // 1. Fetch presigned URL using authenticated fetch (includes JWT)
-    const { downloadUrl } = await filesApi.getFileDownloadUrl(groupId, fileId, 'inline');
-    
-    // 2. Open the Cloudflare R2 presigned URL in a new tab (no auth header needed for R2)
-    window.open(downloadUrl, '_blank', 'noopener,noreferrer');
-  } catch (err) {
-    console.error('Open file failed:', err);
-    setError('Failed to open file preview.');
-  }
-};
+    if (!groupId || !fileId) return;
+    try {
+      const res = await filesApi.getFileDownloadUrl(groupId, fileId, 'inline');
+      const url = res.url || res.downloadUrl;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (err) {
+      console.error('Open file failed:', err);
+      setError('Failed to open file preview.');
+    }
+  };
 
   return {
     categories,
