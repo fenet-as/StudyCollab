@@ -235,44 +235,59 @@ export default function Dashboard() {
       <Sidebar
         groups={groups}
         activeGroup={activeGroup}
-        setActiveGroup={setActiveGroup}
+        onSelectGroup={setActiveGroup}
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        onSelectTab={setActiveTab}
         loading={groupsLoading}
         error={groupsError}
-        userEmail={userEmail}
-        userDisplayName={userDisplayName}
-        userInitials={userInitials}
-        userAvatarUrl={userProfile?.avatarUrl}
-        isSidebarCollapsed={isSidebarCollapsed}
-        setIsSidebarCollapsed={setIsSidebarCollapsed}
-        isMobileMenuOpen={isMobileMenuOpen}
-        setIsMobileMenuOpen={setIsMobileMenuOpen}
+        currentUser={{
+          email: userEmail,
+          displayName: userDisplayName,
+          initials: userInitials,
+          avatarUrl: userProfile?.avatarUrl,
+        }}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
+        isMobileOpen={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
         isDarkMode={isDark}
-        setIsDarkMode={toggleTheme}
-        setIsNewGroupModalOpen={setIsNewGroupModalOpen}
-        setIsJoinModalOpen={setIsJoinModalOpen}
-        promptDeleteGroup={promptDeleteGroup}
-        handleLogout={handleLogout}
+        onToggleTheme={toggleTheme}
+        onNewGroup={() => {
+          setIsNewGroupModalOpen(true);
+          setIsMobileMenuOpen(false);
+        }}
+        onJoinGroup={() => {
+          setIsJoinModalOpen(true);
+          setIsMobileMenuOpen(false);
+        }}
+        onDeleteGroup={promptDeleteGroup}
+        onLogout={handleLogout}
       />
 
       <main className={styles.contentArea}>
         {activeTab === "Settings" ? (
-          // <SettingsPane
-          //   onProfileUpdated={async () => {
-          //     await fetchUserProfile();
-          //     await fetchGroups(activeGroup?.id);
-          //   }}
-          // />
-
           <SettingsPane
-    onProfileUpdated={async () => {
-      await fetchUserProfile();
-      if (activeGroup?.id) {
-        await fetchGroups(activeGroup.id);
-      }
-    }}
-  />
+            onProfileUpdated={async (updatedProfile) => {
+              if (updatedProfile?.avatarUrl) {
+                setUserProfile((prev) =>
+                  prev
+                    ? { ...prev, avatarUrl: updatedProfile.avatarUrl }
+                    : { avatarUrl: updatedProfile.avatarUrl }
+                );
+              }
+              if (updatedProfile?.fullName) {
+                setUserProfile((prev) =>
+                  prev
+                    ? { ...prev, fullName: updatedProfile.fullName }
+                    : { fullName: updatedProfile.fullName }
+                );
+              }
+              await fetchUserProfile();
+              if (activeGroup?.id) {
+                await fetchGroups(activeGroup.id);
+              }
+            }}
+          />
 
 
 

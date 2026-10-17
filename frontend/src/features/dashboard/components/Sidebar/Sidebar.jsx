@@ -13,37 +13,148 @@ import {
 } from "lucide-react";
 import styles from "./Sidebar.module.css";
 
+
+
+
 export default function Sidebar({
-  groups,
-  activeGroup,
-  setActiveGroup,
-  activeTab,
-  setActiveTab,
-  loading,
-  error,
+  // Groups & Navigation
+  groups = [],
+  activeGroup = null,
+  onSelectGroup,
+  setActiveGroup = onSelectGroup,
+  activeTab = "Overview",
+  onSelectTab,
+  setActiveTab = onSelectTab,
+  loading = false,
+  error = null,
+
+  // User Profile
+  currentUser,
+  user = currentUser,
   userEmail,
   userDisplayName,
   userInitials,
-  userAvatarUrl, // 👈 1. Pass the user's avatar URL here
-  isSidebarCollapsed,
-  setIsSidebarCollapsed,
-  isMobileMenuOpen,
-  setIsMobileMenuOpen,
-  isDarkMode,
-  setIsDarkMode,
+  userAvatarUrl,
+
+  // Sidebar Layout & Responsive State
+  isCollapsed,
+  isSidebarCollapsed = isCollapsed,
+  onToggleCollapse,
+  setIsSidebarCollapsed = onToggleCollapse,
+  isMobileOpen,
+  isMobileMenuOpen = isMobileOpen,
+  onCloseMobile,
+  setIsMobileMenuOpen = onCloseMobile,
+
+  // Theme & Actions
+  isDarkMode = false,
+  onToggleTheme,
+  setIsDarkMode = onToggleTheme,
+  onNewGroup,
   setIsNewGroupModalOpen,
+  onJoinGroup,
   setIsJoinModalOpen,
-  promptDeleteGroup,
-  handleLogout,
+  onDeleteGroup,
+  promptDeleteGroup = onDeleteGroup,
+  onLogout,
+  handleLogout = onLogout,
 }) {
+  const resolvedEmail = user?.email || currentUser?.email || userEmail || "";
+  const resolvedDisplayName =
+    user?.displayName ||
+    currentUser?.displayName ||
+    user?.fullName ||
+    currentUser?.fullName ||
+    userDisplayName ||
+    (resolvedEmail ? resolvedEmail.split("@")[0] : "User");
+  const resolvedInitials =
+    user?.initials ||
+    currentUser?.initials ||
+    userInitials ||
+    (resolvedDisplayName ? resolvedDisplayName.charAt(0).toUpperCase() : "U");
+  const resolvedAvatarUrl =
+    user?.avatarUrl || currentUser?.avatarUrl || userAvatarUrl || null;
+
   const [avatarError, setAvatarError] = useState(false);
+  const [prevAvatarUrl, setPrevAvatarUrl] = useState(resolvedAvatarUrl);
+
+  if (resolvedAvatarUrl !== prevAvatarUrl) {
+    setPrevAvatarUrl(resolvedAvatarUrl);
+    setAvatarError(false);
+  }
+
+  const handleGroupSelect = (group) => {
+    if (typeof setActiveGroup === "function") {
+      setActiveGroup(group);
+    }
+    if (typeof setActiveTab === "function") {
+      setActiveTab("Overview");
+    }
+    if (typeof setIsMobileMenuOpen === "function") {
+      setIsMobileMenuOpen(false);
+    }
+  };
+
+  const handleToggleCollapse = () => {
+    if (typeof onToggleCollapse === "function") {
+      onToggleCollapse();
+    } else if (typeof setIsSidebarCollapsed === "function") {
+      setIsSidebarCollapsed(!isSidebarCollapsed);
+    }
+  };
+
+  const handleOpenNewGroup = () => {
+    if (typeof onNewGroup === "function") {
+      onNewGroup();
+    } else if (typeof setIsNewGroupModalOpen === "function") {
+      setIsNewGroupModalOpen(true);
+      if (typeof setIsMobileMenuOpen === "function") {
+        setIsMobileMenuOpen(false);
+      }
+    }
+  };
+
+  const handleOpenJoinGroup = () => {
+    if (typeof onJoinGroup === "function") {
+      onJoinGroup();
+    } else if (typeof setIsJoinModalOpen === "function") {
+      setIsJoinModalOpen(true);
+      if (typeof setIsMobileMenuOpen === "function") {
+        setIsMobileMenuOpen(false);
+      }
+    }
+  };
+
+  const handleThemeToggle = () => {
+    if (typeof onToggleTheme === "function") {
+      onToggleTheme();
+    } else if (typeof setIsDarkMode === "function") {
+      setIsDarkMode(!isDarkMode);
+    }
+  };
+
+  const handleCloseMobileMenu = () => {
+    if (typeof onCloseMobile === "function") {
+      onCloseMobile();
+    } else if (typeof setIsMobileMenuOpen === "function") {
+      setIsMobileMenuOpen(false);
+    }
+  };
+
+  const handleUserLogout = () => {
+    if (typeof onLogout === "function") {
+      onLogout();
+    } else if (typeof handleLogout === "function") {
+      handleLogout();
+    }
+  };
 
   return (
     <>
       {isMobileMenuOpen && (
         <div
           className={styles.drawerBackdrop}
-          onClick={() => setIsMobileMenuOpen(false)}
+          onClick={handleCloseMobileMenu}
         />
       )}
 
@@ -59,10 +170,13 @@ export default function Sidebar({
             className={styles.sidebarLogo}
             onClick={() => {
               if (groups.length > 0 && !activeGroup) {
-                setActiveGroup(groups[0]);
+                handleGroupSelect(groups[0]);
+              } else {
+                if (typeof setActiveTab === "function") {
+                  setActiveTab("Overview");
+                }
+                handleCloseMobileMenu();
               }
-              setActiveTab("Overview");
-              setIsMobileMenuOpen(false);
             }}
           >
             <GraduationCap className={styles.logoIcon} size={22} />
@@ -71,7 +185,7 @@ export default function Sidebar({
 
           <button
             className={styles.collapseToggleBtn}
-            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            onClick={handleToggleCollapse}
             title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
           >
             {isSidebarCollapsed ? (
@@ -98,7 +212,7 @@ export default function Sidebar({
           <ul className={styles.groupList}>
             {groups.map((group) => {
               const currentMember = group.members?.find(
-                (m) => m.email?.toLowerCase() === userEmail?.toLowerCase()
+                (m) => m.email?.toLowerCase() === resolvedEmail?.toLowerCase()
               );
 
               const roleStr = currentMember?.role
@@ -121,11 +235,7 @@ export default function Sidebar({
                         : ""
                     }
                   `}
-                  onClick={() => {
-                    setActiveGroup(group);
-                    setActiveTab("Overview");
-                    setIsMobileMenuOpen(false);
-                  }}
+                  onClick={() => handleGroupSelect(group)}
                   title={group.name}
                 >
                   <div className={styles.groupMainInfo}>
@@ -149,7 +259,11 @@ export default function Sidebar({
                   {showDelete && (
                     <button
                       className={styles.deleteSidebarGroupBtn}
-                      onClick={(e) => promptDeleteGroup(e, group)}
+                      onClick={(e) => {
+                        if (typeof promptDeleteGroup === "function") {
+                          promptDeleteGroup(e, group);
+                        }
+                      }}
                       title="Delete Group"
                     >
                       <Trash2 size={16} />
@@ -166,10 +280,7 @@ export default function Sidebar({
           <button
             className={styles.newGroupBtn}
             title="New Group"
-            onClick={() => {
-              setIsNewGroupModalOpen(true);
-              setIsMobileMenuOpen(false);
-            }}
+            onClick={handleOpenNewGroup}
           >
             <Plus className={styles.btnIcon} size={18} />
             <span className={styles.collapseHideText}> New Group</span>
@@ -178,10 +289,7 @@ export default function Sidebar({
           <button
             className={`${styles.newGroupBtn} ${styles.joinGroupBtn || ""}`}
             title="Join via Link"
-            onClick={() => {
-              setIsJoinModalOpen(true);
-              setIsMobileMenuOpen(false);
-            }}
+            onClick={handleOpenJoinGroup}
           >
             <LinkIcon className={styles.btnIcon} size={18} />
             <span className={styles.collapseHideText}> Join Group</span>
@@ -191,7 +299,7 @@ export default function Sidebar({
         <div className={styles.sidebarFooter}>
           <div
             className={styles.footerAction}
-            onClick={() => setIsDarkMode(!isDarkMode)}
+            onClick={handleThemeToggle}
             title="Toggle Theme"
           >
             {isDarkMode ? (
@@ -204,37 +312,38 @@ export default function Sidebar({
             </span>
           </div>
 
-          {/* 👈 2. Updated User Info Profile Card */}
           <div
             className={styles.userInfo}
             title="Account Settings"
             onClick={() => {
-              setActiveTab("Settings");
-              setIsMobileMenuOpen(false);
+              if (typeof setActiveTab === "function") {
+                setActiveTab("Settings");
+              }
+              handleCloseMobileMenu();
             }}
           >
             <div className={styles.userAvatar}>
-              {userAvatarUrl && !avatarError ? (
+              {resolvedAvatarUrl && !avatarError ? (
                 <img
-                  src={userAvatarUrl}
-                  alt={userDisplayName || "User Avatar"}
+                  src={resolvedAvatarUrl}
+                  alt={resolvedDisplayName || "User Avatar"}
                   className={styles.userAvatarImg}
                   onError={() => setAvatarError(true)}
                 />
               ) : (
-                <span>{userInitials}</span>
+                <span>{resolvedInitials}</span>
               )}
             </div>
             <span
               className={`${styles.userEmailText} ${styles.collapseHideText}`}
             >
-              {userDisplayName}
+              {resolvedDisplayName}
             </span>
           </div>
 
           <div
             className={`${styles.footerAction} ${styles.logoutAction}`}
-            onClick={handleLogout}
+            onClick={handleUserLogout}
             title="Logout"
           >
             <LogOut className={styles.footerIcon} size={18} />

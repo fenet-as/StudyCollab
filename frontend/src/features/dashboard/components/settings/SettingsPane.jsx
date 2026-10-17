@@ -36,14 +36,14 @@ export default function SettingsPane({ onProfileUpdated }) {
   const handleAvatarUpdated = (newAvatarUrl) => {
     setUserData((prev) => ({ ...prev, avatarUrl: newAvatarUrl }));
     if (typeof onProfileUpdated === 'function') {
-      onProfileUpdated();
+      onProfileUpdated({ avatarUrl: newAvatarUrl });
     }
   };
 
   const handleProfileNameUpdated = (newFullName) => {
     setUserData((prev) => ({ ...prev, fullName: newFullName }));
     if (typeof onProfileUpdated === 'function') {
-      onProfileUpdated();
+      onProfileUpdated({ fullName: newFullName });
     }
   };
 

@@ -23,35 +23,36 @@ export default function AvatarCard({ avatarUrl, fullName, onAvatarUpdated }) {
 
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
-    if (!file) return;
+  if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      setMessage({ text: 'The photo must be smaller than 2MB.', isError: true });
-      setTimeout(() => setMessage({ text: '', isError: false }), 5000);
-      return;
+  if (file.size > 2 * 1024 * 1024) {
+    setMessage({ text: 'The photo must be smaller than 2MB.', isError: true });
+    setTimeout(() => setMessage({ text: '', isError: false }), 5000);
+    return;
+  }
+
+  setLoading(true);
+  setMessage({ text: '', isError: false });
+
+  try {
+    const data = await userApi.updateAvatar(file);
+    const freshAvatarUrl = `${data.avatarUrl}?t=${Date.now()}`;
+
+    localStorage.setItem('avatarUrl', freshAvatarUrl);
+    setMessage({ text: 'Profile picture updated successfully!', isError: false });
+
+    // Trigger parent callback directly with the fresh avatar URL
+    if (typeof onAvatarUpdated === 'function') {
+      onAvatarUpdated(freshAvatarUrl);
     }
-
-    setLoading(true);
-    setMessage({ text: '', isError: false });
-
-    try {
-      const data = await userApi.updateAvatar(file);
-      localStorage.setItem('avatarUrl', data.avatarUrl);
-      setMessage({ text: 'Profile picture updated successfully!', isError: false });
-
-      if (typeof onAvatarUpdated === 'function') {
-        onAvatarUpdated(data.avatarUrl);
-      }
-    } catch (err) {
-      const errorText = getFriendlyErrorMessage(err, 'Failed to upload photo. Please try a different file.');
-      setMessage({ text: errorText, isError: true });
-    } finally {
-      setLoading(false);
-      setTimeout(() => {
-        setMessage({ text: '', isError: false });
-      }, 5000);
-    }
-  };
+  } catch (err) {
+    const errorText = getFriendlyErrorMessage(err, 'Failed to upload photo. Please try a different file.');
+    setMessage({ text: errorText, isError: true });
+  } finally {
+    setLoading(false);
+    setTimeout(() => setMessage({ text: '', isError: false }), 5000);
+  }
+};
 
   return (
     <>
@@ -93,7 +94,7 @@ export default function AvatarCard({ avatarUrl, fullName, onAvatarUpdated }) {
             <input
               id="isolated-avatar-input"
               type="file"
-              accept="image/png, image/jpeg"
+              accept="image/png, image/jpeg, image/webp"
               onChange={handleAvatarChange}
               disabled={loading}
               style={{ display: 'none' }}
@@ -117,7 +118,7 @@ export default function AvatarCard({ avatarUrl, fullName, onAvatarUpdated }) {
         >
           <div
             className={styles.modalContent}
-            onClick={(e) => e.stopPropagation()} // Prevent clicking modal content from closing backdrop
+            onClick={(e) => e.stopPropagation()}
           >
             <button
               type="button"
