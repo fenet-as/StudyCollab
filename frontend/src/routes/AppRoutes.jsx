@@ -47,7 +47,7 @@ export const RouteLoadingFallback = () => (
         size={36}
         className="animate-spin"
         style={{
-          color: '#6366f1',
+          color: 'var(--primary-color, #2563EB)',
           animation: 'spin 1s linear infinite',
         }}
       />
