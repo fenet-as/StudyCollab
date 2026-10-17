@@ -6,13 +6,19 @@ import Dashboard from '../features/dashboard/pages/Dashboard';
 import LandingPage from '../features/landing/pages/LandingPage';
 import CloudflareTestPage from './CloudflareTestPage';
 import GroupAvatarTestPage from '../../tests/GroupAvatarTestPage';
-
-
+import VerifyEmail from '../features/auth/pages/VerifyEmail';
+import { useAuthContext } from '../context/useAuthContext';
 
 // Simple check to safeguard secure UI containers
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem('token');
-  
+  const { user, loading } = useAuthContext();
+
+  if (loading) {
+    return null;
+  }
+
+  const token = user?.token || (typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null);
+
   if (!token) {
     return <Navigate to="/login" replace />;
   }
@@ -28,6 +34,8 @@ export default function AppRoutes() {
       
 
     <Route path="/test" element={<GroupAvatarTestPage />} />
+
+    <Route path="/verify-email" element={<VerifyEmail />} />
 
 
       <Route 
