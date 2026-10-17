@@ -14,18 +14,20 @@ export default function StatsGrid({ stats, handleTabChange }) {
   return (
     <div className={styles.statsGrid}>
       {statsCards.map((stat, i) => (
-        <div 
+        <button 
           key={i} 
+          type="button"
           className={styles.statCard} 
           onClick={() => handleTabChange(stat.tab)}
           title={`Go to ${stat.tab}`}
+          aria-label={`${stat.label}: ${stat.value}. Go to ${stat.tab}`}
         >
           <div className={styles.statHeader}>
             <span className={styles.statLabel}>{stat.label}</span>
             <span className={styles.statIcon}>{stat.icon}</span>
           </div>
           <div className={styles.statValue}>{stat.value}</div>
-        </div>
+        </button>
       ))}
     </div>
   );

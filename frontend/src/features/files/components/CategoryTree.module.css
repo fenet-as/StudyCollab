@@ -16,6 +16,17 @@
   transition: background-color 0.15s ease, color 0.15s ease;
   user-select: none;
   position: relative;
+  background: transparent;
+  border: 1px solid transparent;
+  width: 100%;
+  font-family: inherit;
+  font-size: inherit;
+  text-align: left;
+}
+
+.categoryItem:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
 }
 
 .categoryItem:hover {

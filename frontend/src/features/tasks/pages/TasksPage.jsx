@@ -192,12 +192,25 @@ export default function TasksPage({ group }) {
                 const taskDueDate = formatDueDate(task.dueDate || task.due);
 
                 return (
-                  <div key={task.id} className={styles.taskCard} onClick={() => handleCardClick(task)}>
+                  <div
+                    key={task.id}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Task: ${task.title}. Priority ${task.priority || 'medium'}. Press Enter to edit.`}
+                    className={styles.taskCard}
+                    onClick={() => handleCardClick(task)}
+                    onKeyDown={(e) => {
+                      if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
+                        e.preventDefault();
+                        handleCardClick(task);
+                      }
+                    }}
+                  >
                     <div className={styles.cardTopRow}>
                       <span className={`${styles.prioBadge} ${styles[task.priority?.toLowerCase()]}`}>{task.priority}</span>
                       <div className={styles.cardActions}>
-                        <button onClick={(e) => moveTask(e, task.id, 'DONE')} title="Mark complete" className={styles.actionIconButton}>✓</button>
-                        <button onClick={(e) => handleDeleteTask(e, task.id)} title="Delete" className={styles.actionIconButton}>✕</button>
+                        <button onClick={(e) => moveTask(e, task.id, 'DONE')} title="Mark complete" aria-label="Mark task complete" className={styles.actionIconButton}>✓</button>
+                        <button onClick={(e) => handleDeleteTask(e, task.id)} title="Delete" aria-label="Delete task" className={styles.actionIconButton}>✕</button>
                       </div>
                     </div>
 
@@ -258,12 +271,25 @@ export default function TasksPage({ group }) {
                 const descriptionText = task.description || task.desc || '';
 
                 return (
-                  <div key={task.id} className={`${styles.taskCard} ${styles.completedTaskCard}`} onClick={() => handleCardClick(task)}>
+                  <div
+                    key={task.id}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Completed task: ${task.title}. Press Enter to edit.`}
+                    className={`${styles.taskCard} ${styles.completedTaskCard}`}
+                    onClick={() => handleCardClick(task)}
+                    onKeyDown={(e) => {
+                      if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
+                        e.preventDefault();
+                        handleCardClick(task);
+                      }
+                    }}
+                  >
                     <div className={styles.cardTopRow}>
                       <span className={`${styles.prioBadge} ${styles.donePrio}`}>DONE</span>
                       <div className={styles.cardActions}>
-                        <button onClick={(e) => moveTask(e, task.id, 'TODO')} title="Revert back to Todo" className={styles.actionIconButton}>↺</button>
-                        <button onClick={(e) => handleDeleteTask(e, task.id)} title="Delete" className={styles.actionIconButton}>✕</button>
+                        <button onClick={(e) => moveTask(e, task.id, 'TODO')} title="Revert back to Todo" aria-label="Revert task back to Todo" className={styles.actionIconButton}>↺</button>
+                        <button onClick={(e) => handleDeleteTask(e, task.id)} title="Delete" aria-label="Delete task" className={styles.actionIconButton}>✕</button>
                       </div>
                     </div>
 

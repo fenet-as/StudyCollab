@@ -17,10 +17,12 @@ export default function RecentFiles({ recentFiles, handleTabChange }) {
           <p className={styles.emptyState}>No files uploaded yet</p>
         ) : (
           recentFiles.map((file) => (
-            <div 
+            <button 
               key={file.id} 
+              type="button"
               className={styles.listRow}
               onClick={() => handleTabChange('Files')}
+              aria-label={`View file ${file.name} in Files`}
             >
               <div className={styles.rowLeft}>
                 <span className={styles.rowIcon}>
@@ -34,7 +36,7 @@ export default function RecentFiles({ recentFiles, handleTabChange }) {
                 </div>
               </div>
               <ChevronRight size={18} className={styles.arrowIcon} />
-            </div>
+            </button>
           ))
         )}
       </div>

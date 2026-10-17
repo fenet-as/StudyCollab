@@ -87,10 +87,15 @@ export default function Login() {
       </button>
 
       <div className={styles.authCard}>
-        <div className={styles.logo} onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+        <button
+          type="button"
+          className={styles.logo}
+          onClick={() => navigate('/')}
+          aria-label="StudyCollab home"
+        >
           <GraduationCap size={28} className={styles.logoIcon} />
           <span>StudyCollab</span>
-        </div>
+        </button>
         
         <h1 className={styles.authTitle}>Welcome Back</h1>
 

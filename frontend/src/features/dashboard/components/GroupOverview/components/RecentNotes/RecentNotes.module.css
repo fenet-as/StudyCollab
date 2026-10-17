@@ -64,6 +64,15 @@
   border: 1px solid var(--border-color);
   cursor: pointer;
   transition: all 0.2s ease;
+  width: 100%;
+  font-family: inherit;
+  font-size: inherit;
+  text-align: left;
+}
+
+.listRow:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
 }
 
 .listRow:hover {

@@ -94,6 +94,11 @@
   background-color: var(--bg-highlight, #F1F5F9);
 }
 
+.noteCard:focus-visible {
+  outline: 2px solid var(--primary-color, #2563EB);
+  outline-offset: 2px;
+}
+
 .activeCard {
   background-color: var(--bg-highlight, #F1F5F9);
   border-left: 4px solid var(--primary-color, #2563EB);
@@ -146,6 +151,12 @@
 .inlineDeleteBtn:hover {
   background-color: var(--danger-bg, rgba(239, 68, 68, 0.12));
   color: var(--danger-text, #DC2626);
+  opacity: 1;
+}
+
+.inlineDeleteBtn:focus-visible {
+  outline: 2px solid var(--danger-text, #DC2626);
+  outline-offset: 2px;
   opacity: 1;
 }
 

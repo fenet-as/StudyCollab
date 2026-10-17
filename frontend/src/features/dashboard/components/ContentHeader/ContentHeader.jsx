@@ -16,10 +16,12 @@ export default function ContentHeader({ activeGroup, setActiveTab }) {
       </div>
 
       <div className={styles.headerRight}>
-        <div
+        <button
+          type="button"
           className={styles.avatarGroup}
           onClick={() => setActiveTab && setActiveTab("Group Settings")}
           title="Manage Group Members in Group Settings"
+          aria-label="Manage Group Members in Group Settings"
         >
           {visibleMembers.map((member, index) => (
             <MemberAvatar
@@ -33,7 +35,7 @@ export default function ContentHeader({ activeGroup, setActiveTab }) {
               +{remainingCount}
             </div>
           )}
-        </div>
+        </button>
       </div>
     </header>
   );

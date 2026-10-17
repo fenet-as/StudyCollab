@@ -18,23 +18,27 @@ export default function MobileHeader({
         {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
       </button>
 
-      <div
+      <button
+        type="button"
         className={styles.mobileLogo}
         onClick={() => setActiveTab("Overview")}
+        aria-label="Go to Overview"
       >
         <GraduationCap size={20} />
         <span>StudyCollab</span>
-      </div>
+      </button>
 
-      <div
+      <button
+        type="button"
         className={styles.userAvatar}
         onClick={() => {
           setActiveTab("Settings");
           setIsMobileMenuOpen(false);
         }}
+        aria-label="Open Account Settings"
       >
         {userInitials}
-      </div>
+      </button>
     </div>
   );
 }

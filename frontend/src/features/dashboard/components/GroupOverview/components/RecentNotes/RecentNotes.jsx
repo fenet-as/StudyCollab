@@ -17,10 +17,12 @@ export default function RecentNotes({ recentNotes, handleTabChange }) {
           <p className={styles.emptyState}>No notes created yet</p>
         ) : (
           recentNotes.map((note) => (
-            <div 
+            <button 
               key={note.id} 
+              type="button"
               className={styles.listRow}
               onClick={() => handleTabChange('Notes')}
+              aria-label={`View note ${note.title} in Notes`}
             >
               <div className={styles.rowLeft}>
                 <span className={styles.rowIcon}>
@@ -34,7 +36,7 @@ export default function RecentNotes({ recentNotes, handleTabChange }) {
                 </div>
               </div>
               <ChevronRight size={18} className={styles.arrowIcon} />
-            </div>
+            </button>
           ))
         )}
       </div>

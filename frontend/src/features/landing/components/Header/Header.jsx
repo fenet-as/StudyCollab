@@ -9,12 +9,17 @@ export default function Header({ isDark, onToggleTheme }) {
 
   return (
     <header className={styles.header}>
-      <div className={styles.logoContainer} onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+      <button
+        type="button"
+        className={styles.logoContainer}
+        onClick={() => navigate('/')}
+        aria-label="StudyCollab home"
+      >
         <span className={styles.logoIcon}>
           <GraduationCap size={28} />
         </span>
         <span className={styles.logoText}>StudyCollab</span>
-      </div>
+      </button>
       <nav className={styles.navLinks}>
         <a href="#features">Features</a>
         <a href="#testimonials">Testimonials</a>

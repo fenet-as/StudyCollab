@@ -181,6 +181,11 @@
   border-color: var(--border-subtle);
 }
 
+.taskCard:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
 .completedTaskCard {
   border-left: 4px solid var(--badge-owner-text);
 }
@@ -189,6 +194,38 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.actionIconButton {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.15s ease;
+}
+
+.actionIconButton:hover {
+  background-color: var(--bg-highlight);
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
+.actionIconButton:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
 }
 
 /* Priority Micro-badges */
