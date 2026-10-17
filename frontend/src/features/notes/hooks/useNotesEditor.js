@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { parseMarkdownAndLaTeX } from '../utils/markdownParser';
+import { generatePrintHtml } from '../utils/htmlUtils';
 
 export function useNotesEditor(selectedNote, styles) {
   const textareaRef = useRef(null);
@@ -68,38 +69,38 @@ export function useNotesEditor(selectedNote, styles) {
   };
 
   const handleDownloadPdf = () => {
-    const printWindow = window.open('', '_blank', 'width=800,height=900');
-    const parsedHTML = parseMarkdownAndLaTeX(editorContent, styles);
+    if (typeof window === 'undefined' || typeof window.open !== 'function') {
+      return null;
+    }
 
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>${editorTitle || 'Untitled Note'}</title>
-          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-          <style>
-            body { font-family: system-ui, sans-serif; padding: 40px; color: #334155; }
-            h1 { font-size: 28px; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; }
-            h2 { font-size: 20px; color: #1e293b; margin-top: 24px; }
-            h3 { font-size: 16px; color: #475569; margin-top: 18px; }
-            ul { padding-left: 20px; }
-            li { margin-bottom: 8px; }
-            .${styles.latexBlock} { margin: 16px 0; text-align: center; }
-            .${styles.latexInline} { padding: 0 4px; }
-          </style>
-        </head>
-        <body>
-          <h1>${editorTitle || 'Untitled Note'}</h1>
-          <div>${parsedHTML}</div>
-          <script>
-            window.onload = function() { 
-              window.print(); 
-              setTimeout(() => { window.close(); }, 500);
-            };
-          </script>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
+    let printWindow = null;
+    try {
+      printWindow = window.open('', '_blank', 'width=800,height=900');
+    } catch (err) {
+      console.warn('Failed to open print window:', err);
+      return null;
+    }
+
+    if (!printWindow || !printWindow.document) {
+      console.warn('Popup blocked or failed to open print window.');
+      return null;
+    }
+
+    try {
+      const parsedHTML = parseMarkdownAndLaTeX(editorContent, styles);
+      const htmlContent = generatePrintHtml(editorTitle, parsedHTML, styles);
+
+      printWindow.document.open();
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+      if (typeof printWindow.focus === 'function') {
+        printWindow.focus();
+      }
+      return printWindow;
+    } catch (err) {
+      console.error('Error generating or printing PDF document:', err);
+      return null;
+    }
   };
 
   return {
