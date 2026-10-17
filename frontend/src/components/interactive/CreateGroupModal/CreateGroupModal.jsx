@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useGroupsContext } from '../../../context/GroupContext';
+import { useGroupsContext } from '../../../context/useGroupsContext';
 import styles from './CreateGroupModal.module.css';
 
 // 1. Destructure the onSubmit prop passed from Dashboard
