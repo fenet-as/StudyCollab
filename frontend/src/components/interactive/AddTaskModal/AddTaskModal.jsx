@@ -1,5 +1,5 @@
 // frontend/src/components/interactive/AddTaskModal/AddTaskModal.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { X, Calendar, Plus, Check } from 'lucide-react';
 import styles from './AddTaskModal.module.css';
 
@@ -27,13 +27,15 @@ export default function AddTaskModal({ onClose, onSubmit, groupMembers = [], tas
     assigneeId: '' 
   });
 
-  // Hydrate form on mount or when taskToEdit/groupMembers change
-  useEffect(() => {
+  const [prevTaskToEdit, setPrevTaskToEdit] = useState(taskToEdit);
+  const [prevMembersLength, setPrevMembersLength] = useState(groupMembers.length);
+
+  if (taskToEdit !== prevTaskToEdit) {
+    setPrevTaskToEdit(taskToEdit);
     if (taskToEdit) {
       const matchedMember = groupMembers.find(
-        m => Number(m.userId || m.id) === Number(taskToEdit.assigneeId) || m.fullName === taskToEdit.assigneeName
+        (m) => Number(m.userId || m.id) === Number(taskToEdit.assigneeId) || m.fullName === taskToEdit.assigneeName
       );
-      
       setFormData({
         title: taskToEdit.title || '',
         description: taskToEdit.description || taskToEdit.desc || '',
@@ -47,27 +49,16 @@ export default function AddTaskModal({ onClose, onSubmit, groupMembers = [], tas
         description: '',
         priority: 'MEDIUM',
         dueDate: '',
-        assigneeId: getCurrentUserId() || '' // Default to current user's numeric ID
+        assigneeId: getCurrentUserId() || (groupMembers[0] ? Number(groupMembers[0].userId || groupMembers[0].id) : '')
       });
     }
-  }, [taskToEdit, groupMembers]);
-
-  // SAFE VALIDATION: Ensure comparison compares numeric values to avoid string/number mismatch bugs
-  useEffect(() => {
-    if (groupMembers.length > 0 && formData.assigneeId) {
-      const isValid = groupMembers.some(
-        (m) => Number(m.userId || m.id) === Number(formData.assigneeId)
-      );
-      if (!isValid) {
-        const firstMember = groupMembers[0];
-        const fallbackId = Number(firstMember.userId || firstMember.id);
-        setFormData((prev) => ({ ...prev, assigneeId: fallbackId }));
-      }
-    } else if (groupMembers.length > 0 && !formData.assigneeId) {
+  } else if (groupMembers.length !== prevMembersLength) {
+    setPrevMembersLength(groupMembers.length);
+    if (groupMembers.length > 0 && !formData.assigneeId) {
       const defaultId = getCurrentUserId() || Number(groupMembers[0].userId || groupMembers[0].id);
       setFormData((prev) => ({ ...prev, assigneeId: defaultId }));
     }
-  }, [groupMembers]);
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();

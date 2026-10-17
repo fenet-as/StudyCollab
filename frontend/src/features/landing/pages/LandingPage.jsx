@@ -4,7 +4,7 @@ import Hero from '../components/Hero/Hero';
 import Features from '../components/Features/Features';
 import Testimonials from '../components/Testimonials/Testimonials';
 import Footer from '../components/Footer/Footer';
-import { useTheme } from '../../../context/ThemeContext';
+import { useTheme } from '../../../context/useTheme';
 import styles from './LandingPage.module.css';
 
 export default function LandingPage() {

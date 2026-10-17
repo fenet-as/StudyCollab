@@ -11,7 +11,6 @@ import styles from './GroupSettingsPane.module.css';
 
 export default function GroupSettingsPane({ 
   group, 
-  currentUser, 
   onGroupUpdated, 
   onNavigateToAdmin,
   onLeaveSuccess

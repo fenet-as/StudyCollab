@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './DangerZoneCard.module.css';
 
-export default function DangerZoneCard({ isOwner, onLeaveGroup, onDeleteGroup }) {
+export default function DangerZoneCard({ onLeaveGroup, onDeleteGroup }) {
   return (
     <div className={styles.card}>
       <div className={styles.cardHeader}>

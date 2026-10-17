@@ -27,7 +27,7 @@ import TabNavigation from "../components/TabNavigation/TabNavigation";
 import { groupApi } from "../../../api/groupApi";
 import { userApi } from "../../../api/userApi";
 
-import { useTheme } from "../../../context/ThemeContext";
+import { useTheme } from "../../../context/useTheme";
 import { useAuthContext } from "../../../context/useAuthContext";
 import { useGroupsContext } from "../../../context/useGroupsContext";
 

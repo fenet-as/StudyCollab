@@ -13,18 +13,28 @@ import styles from './GroupOverview.module.css';
 
 export default function GroupOverview({ groupId, setActiveTab, onOpenModal }) {
   const [overview, setOverview] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => Boolean(groupId));
   const [error, setError] = useState(null);
+  const [prevGroupId, setPrevGroupId] = useState(groupId);
+
+  if (groupId !== prevGroupId) {
+    setPrevGroupId(groupId);
+    if (!groupId) {
+      setLoading(false);
+      setOverview(null);
+      setError(null);
+    } else {
+      setLoading(true);
+      setError(null);
+    }
+  }
 
   useEffect(() => {
     if (!groupId) {
-      setLoading(false);
       return;
     }
 
     let isMounted = true;
-    setLoading(true);
-    setError(null);
 
     fetchGroupOverview(groupId)
       .then((data) => {

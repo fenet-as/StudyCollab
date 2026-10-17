@@ -13,8 +13,7 @@ export default function NotesSidebar({
   onPromptDelete,
   isSidebarOpen,
   onCloseSidebar,
-  isCollapsed,
-  onToggleCollapse
+  isCollapsed
 }) {
   if (isCollapsed) return null;
 

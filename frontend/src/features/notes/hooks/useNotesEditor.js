@@ -1,15 +1,17 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { parseMarkdownAndLaTeX } from '../utils/markdownParser';
 import { generatePrintHtml } from '../utils/htmlUtils';
 
 export function useNotesEditor(selectedNote, styles) {
   const textareaRef = useRef(null);
-  const [editorContent, setEditorContent] = useState('');
-  const [editorTitle, setEditorTitle] = useState('');
-  const [history, setHistory] = useState([]);
+  const [editorContent, setEditorContent] = useState(() => selectedNote?.content || '');
+  const [editorTitle, setEditorTitle] = useState(() => selectedNote?.title || '');
+  const [history, setHistory] = useState(() => (selectedNote?.content ? [selectedNote.content] : []));
   const [redoStack, setRedoStack] = useState([]);
+  const [prevNoteId, setPrevNoteId] = useState(selectedNote?.id);
 
-  useEffect(() => {
+  if (selectedNote?.id !== prevNoteId) {
+    setPrevNoteId(selectedNote?.id);
     if (selectedNote) {
       setEditorContent(selectedNote.content || '');
       setEditorTitle(selectedNote.title || '');
@@ -21,7 +23,7 @@ export function useNotesEditor(selectedNote, styles) {
       setHistory([]);
       setRedoStack([]);
     }
-  }, [selectedNote]);
+  }
 
   const handleContentChange = (newVal) => {
     setEditorContent(newVal);
