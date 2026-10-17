@@ -1,0 +1,182 @@
+.chatHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--card-bg);
+  min-height: 56px;
+  gap: 0.75rem;
+}
+
+.channelTitleMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.mobileNavGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.mobileMenuBtn {
+  display: none;
+}
+
+.mobileAddBtn {
+  display: none;
+}
+
+.channelTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-main);
+  min-width: 0;
+}
+
+.hashIcon {
+  flex-shrink: 0;
+}
+
+.channelTitle h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.channelDesc {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 280px;
+  border-left: 1px solid var(--border-color);
+  padding-left: 0.5rem;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.searchBox:focus-within {
+  border-color: var(--primary-color);
+}
+
+.searchIcon {
+  flex-shrink: 0;
+}
+
+.searchBox input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  width: 130px;
+  transition: width 0.2s ease;
+}
+
+.searchBox input:focus {
+  width: 170px;
+}
+
+.mobileSearchTrigger {
+  display: none;
+}
+
+.closeSearchBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: 0.5rem;
+  border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 38px;
+  min-width: 38px;
+}
+
+.iconBtn:hover,
+.activeBtn {
+  background-color: var(--bg-highlight);
+  color: var(--primary-color);
+}
+
+/* ==========================================================================
+   Responsive Breakpoints (< 768px)
+   ========================================================================== */
+@media (max-width: 767px) {
+  .mobileMenuBtn,
+  .mobileAddBtn {
+    display: inline-flex;
+  }
+
+  .channelDesc {
+    display: none;
+  }
+
+  .searchBox {
+    display: none;
+  }
+
+  .mobileSearchTrigger {
+    display: inline-flex;
+  }
+
+  .searchBoxMobileActive {
+    display: flex;
+    position: absolute;
+    left: 0.75rem;
+    right: 0.75rem;
+    z-index: 10;
+    background-color: var(--card-bg);
+  }
+
+  .searchBoxMobileActive input {
+    width: 100% !important;
+    font-size: 0.95rem;
+  }
+
+  .hideOnMobileSearch {
+    display: none !important;
+  }
+}

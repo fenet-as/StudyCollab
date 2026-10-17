@@ -4,7 +4,7 @@ import com.studycollab.dto.files.CategoryRequest;
 import com.studycollab.dto.files.CategoryResponse;
 import com.studycollab.dto.files.FileResponse;
 import com.studycollab.dto.files.PresignedUrlResponse;
-import com.studycollab.model.User;
+import com.studycollab.security.CustomUserDetails;
 import com.studycollab.service.files.FilesService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -59,9 +59,9 @@ public class FilesController {
             @PathVariable Long groupId,
             @RequestParam("file") MultipartFile file,
             @RequestParam("categoryId") Long categoryId,
-            @AuthenticationPrincipal User currentUser) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(filesService.uploadFile(groupId, file, categoryId, currentUser));
+                .body(filesService.uploadFile(groupId, file, categoryId, userDetails.getId()));
     }
 
     @DeleteMapping("/files/{fileId}")

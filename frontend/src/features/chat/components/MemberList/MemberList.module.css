@@ -1,0 +1,163 @@
+.membersSidebar {
+  width: 220px;
+  background-color: var(--row-bg);
+  border-left: 1px solid var(--border-color);
+  padding: 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobileBackdrop {
+  display: none;
+}
+
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.membersSidebar h4 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.closeDrawerBtn {
+  display: none; /* Desktop default */
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: var(--radius-sm);
+  min-height: 36px;
+  min-width: 36px;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeDrawerBtn:hover {
+  background-color: var(--bg-highlight);
+  color: var(--text-main);
+}
+
+.memberList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  overflow-y: auto;
+}
+
+.memberCard {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem;
+  border-radius: var(--radius-md);
+  transition: background-color 0.15s ease;
+}
+
+.memberCard:hover {
+  background-color: var(--bg-highlight);
+}
+
+.memberAvatar {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
+  background-color: var(--bg-highlight);
+  color: var(--text-main);
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.online::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 9px;
+  height: 9px;
+  background-color: #22c55e;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--card-bg);
+}
+
+.offline::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 9px;
+  height: 9px;
+  background-color: #94a3b8;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--card-bg);
+}
+
+.memberInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Truncation container */
+}
+
+.memberName {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.memberRole {
+  font-size: 0.725rem;
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   Responsive Breakpoints (Tablet & Mobile Off-Canvas < 768px)
+   ========================================================================== */
+@media (max-width: 767px) {
+  .mobileBackdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 80;
+  }
+
+  .membersSidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 260px;
+    z-index: 90;
+    background-color: var(--card-bg);
+    transform: translateX(100%);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .membersSidebar.drawerOpen {
+    transform: translateX(0);
+  }
+
+  .closeDrawerBtn {
+    display: flex;
+  }
+}
