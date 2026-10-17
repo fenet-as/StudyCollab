@@ -19,7 +19,7 @@ export default function NotesPage({ group, isDarkMode }) {
   const groupId = group?.id || activeGroup?.id || null;
   const { notes, loading, createNote, updateNote, deleteNote } = useNotes(groupId);
 
-  const [selectedNoteId, setSelectedNoteId] = useState(null);
+  const [selectedNoteId, setSelectedNoteId] = useState(() => (notes && notes.length > 0 ? notes[0].id : null));
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState('split');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -43,8 +43,28 @@ export default function NotesPage({ group, isDarkMode }) {
   const [noteToDelete, setNoteToDelete] = useState(null);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
 
+  const [prevNotes, setPrevNotes] = useState(notes);
+
+  // Separate note selection from background list updates
+  if (notes !== prevNotes) {
+    setPrevNotes(notes);
+    if (selectedNoteId === null && notes.length > 0) {
+      setSelectedNoteId(notes[0].id);
+    } else if (selectedNoteId !== null && notes.length > 0 && !notes.some(n => n.id === selectedNoteId)) {
+      // Selected note was removed/deleted from list
+      setSelectedNoteId(notes[0].id);
+    } else if (notes.length === 0 && selectedNoteId !== null) {
+      setSelectedNoteId(null);
+    }
+  }
+
   const selectedNote = useMemo(() => {
-    return notes.find(n => n.id === selectedNoteId) || notes[0] || null;
+    if (!notes || notes.length === 0) return null;
+    if (selectedNoteId != null) {
+      const match = notes.find(n => n.id === selectedNoteId);
+      if (match) return match;
+    }
+    return notes[0] || null;
   }, [notes, selectedNoteId]);
 
   const {
@@ -58,7 +78,11 @@ export default function NotesPage({ group, isDarkMode }) {
     handleRedo,
     history,
     redoStack,
-    handleDownloadPdf
+    handleDownloadPdf,
+    isDirty,
+    markSaved,
+    discardDraft,
+    hasDraft
   } = useNotesEditor(selectedNote, editorStyles);
 
   useEffect(() => {
@@ -81,6 +105,7 @@ export default function NotesPage({ group, isDarkMode }) {
   const confirmDeleteNote = async () => {
     if (!noteToDelete) return;
     try {
+      discardDraft(noteToDelete.id);
       await deleteNote(noteToDelete.id);
       setIsDeleteModalOpen(false);
       setNoteToDelete(null);
@@ -96,9 +121,16 @@ export default function NotesPage({ group, isDarkMode }) {
         title: editorTitle,
         content: editorContent
       });
+      markSaved(selectedNote.id);
       setIsSaveModalOpen(true);
     } catch (err) {
       showErrorToast(err.message);
+    }
+  };
+
+  const handleDiscardDraft = () => {
+    if (window.confirm('Discard unsaved changes on this note?')) {
+      discardDraft(selectedNote?.id);
     }
   };
 
@@ -183,6 +215,7 @@ export default function NotesPage({ group, isDarkMode }) {
           onCloseSidebar={() => setIsSidebarOpen(false)}
           isCollapsed={isNotesListCollapsed}
           onToggleCollapse={() => setIsNotesListCollapsed(!isNotesListCollapsed)}
+          hasDraft={hasDraft}
         />
 
         <main className={styles.editorPane}>
@@ -213,6 +246,8 @@ export default function NotesPage({ group, isDarkMode }) {
                 onToggleExpand={() => setIsExpanded(!isExpanded)}
                 isNotesListCollapsed={isNotesListCollapsed}
                 onToggleNotesList={() => setIsNotesListCollapsed(!isNotesListCollapsed)}
+                isDirty={isDirty}
+                onDiscardDraft={handleDiscardDraft}
               />
             </>
           ) : (
