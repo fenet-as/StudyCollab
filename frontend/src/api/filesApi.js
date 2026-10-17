@@ -1,92 +1,44 @@
-// frontend/src/api/filesApi.js
-
-const API_BASE_URL = `https://studycollab-l3p2.onrender.com/api`;
-
-const getHeaders = () => {
-  const token = localStorage.getItem('token'); 
-  const headers = {};
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-  return headers;
-};
+import { api } from './config.js';
 
 export const filesApi = {
-  // --- CATEGORIES / FOLDERS ---
-  
   getCategories: async (groupId) => {
-    const res = await fetch(`${API_BASE_URL}/groups/${groupId}/categories`, {
-      headers: getHeaders(),
-    });
-    if (!res.ok) throw new Error('Failed to fetch categories');
-    return res.json();
+    const res = await api.get(`/groups/${groupId}/categories`);
+    return res.data;
   },
 
   createCategory: async (groupId, categoryData) => {
-    const res = await fetch(`${API_BASE_URL}/groups/${groupId}/categories`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getHeaders(),
-      },
-      body: JSON.stringify({
-        name: categoryData.name,
-        parentId: categoryData.parentId
-      }),
+    const res = await api.post(`/groups/${groupId}/categories`, {
+      name: categoryData.name,
+      parentId: categoryData.parentId,
     });
-    if (!res.ok) throw new Error('Failed to create category');
-    return res.json();
+    return res.data;
   },
 
   deleteCategory: async (groupId, categoryId) => {
-    const res = await fetch(`${API_BASE_URL}/groups/${groupId}/categories/${categoryId}`, {
-      method: 'DELETE',
-      headers: getHeaders(),
-    });
-    if (!res.ok) throw new Error('Failed to delete category');
+    await api.delete(`/groups/${groupId}/categories/${categoryId}`);
     return true;
   },
 
-  // --- FILES ---
-
   getFiles: async (groupId) => {
-    const res = await fetch(`${API_BASE_URL}/groups/${groupId}/files`, {
-      headers: getHeaders(),
-    });
-    if (!res.ok) throw new Error('Failed to fetch files');
-    return res.json();
+    const res = await api.get(`/groups/${groupId}/files`);
+    return res.data;
   },
 
+  // REMOVED manual Content-Type header so Axios handles boundary & auth headers cleanly
   uploadFile: async (groupId, formData) => {
-    const res = await fetch(`${API_BASE_URL}/groups/${groupId}/files`, {
-      method: 'POST',
-      headers: getHeaders(),
-      body: formData
-    });
-
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      throw new Error(errorData.message || 'Upload failed');
-    }
-    return res.json();
+    const res = await api.post(`/groups/${groupId}/files`, formData);
+    return res.data;
   },
 
   deleteFile: async (groupId, fileId) => {
-    const res = await fetch(`${API_BASE_URL}/groups/${groupId}/files/${fileId}`, {
-      method: 'DELETE',
-      headers: getHeaders(),
-    });
-    if (!res.ok) throw new Error('Failed to delete file');
+    await api.delete(`/groups/${groupId}/files/${fileId}`);
     return true;
   },
 
-  // GET: /api/groups/{groupId}/files/{fileId}/download?disposition=inline|attachment
   getFileDownloadUrl: async (groupId, fileId, disposition = 'inline') => {
-    const res = await fetch(
-      `${API_BASE_URL}/groups/${groupId}/files/${fileId}/download?disposition=${disposition}`, 
-      { headers: getHeaders() }
+    const res = await api.get(
+      `/groups/${groupId}/files/${fileId}/download?disposition=${disposition}`
     );
-    if (!res.ok) throw new Error('Failed to generate download URL');
-    return res.json(); // Returns { downloadUrl: "https://..." }
-  }
+    return res.data;
+  },
 };

@@ -29,10 +29,12 @@ jobs:
         with:
           node-version: 20
 
-      - name: Build Frontend
+      - name: Lint, Test, and Build Frontend
         run: |
           cd frontend
           npm ci
+          npm run lint
+          npm test
           npm run build
 
   publish-docker-images:
