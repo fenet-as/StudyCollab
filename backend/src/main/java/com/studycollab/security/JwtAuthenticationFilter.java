@@ -1,5 +1,6 @@
 package com.studycollab.security;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,32 +12,27 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
-// Registers this class as a Spring-managed component bean for security filtering.
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-// Extends OncePerRequestFilter to guarantee execution once per HTTP request lifecycle.
 
     private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
-    // Initializes the logger instance for logging filter errors and diagnostics.
-
     private static final String BEARER_PREFIX = "Bearer ";
-    // Defines the standard prefix string expected in the HTTP Authorization header.
 
     private final JwtTokenProvider tokenProvider;
-    private final UserDetailsService userDetailsService;
+    private final CustomUserDetailsService customUserDetailsService; // Fixed type here
 
-    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider, UserDetailsService userDetailsService) {
-        // Injects dependencies needed to parse/validate tokens and load user security details.
+    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider, CustomUserDetailsService customUserDetailsService) {
         this.tokenProvider = tokenProvider;
-        this.userDetailsService = userDetailsService;
+        this.customUserDetailsService = customUserDetailsService; // Fixed type here
     }
 
     @Override
@@ -45,60 +41,42 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        // Intercepts incoming requests to perform JWT extraction and authentication setup.
-        try {
-            String jwt = getJwtFromRequest(request);
-            // Extracts the raw token string from the request headers.
+        String jwt = getJwtFromRequest(request);
 
-            if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-                // Checks if the token is present and validly signed and unexpired.
+        if (StringUtils.hasText(jwt)) {
+            Optional<Claims> claimsOptional = tokenProvider.parseAndValidateToken(jwt);
 
-                String email = tokenProvider.getEmailFromJWT(jwt);
-                // Retrieves the user's email/username claim stored inside the token payload.
+            if (claimsOptional.isPresent()) {
+                try {
+                    Long userId = tokenProvider.getUserIdFromClaims(claimsOptional.get());
+                    UserDetails userDetails = customUserDetailsService.loadUserById(userId);
 
-                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-                // Fetches user account credentials and authorities from the database.
+                    if (userDetails.isEnabled() && userDetails.isAccountNonLocked()) {
+                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
 
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                // Builds an authentication object containing user identity and granted roles.
-
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                // Attaches web-specific request details like IP address and session ID to authentication.
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-                // Stores the populated authentication object into Spring Security's context for current thread.
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                } catch (UsernameNotFoundException ex) {
+                    log.debug("User from JWT subject no longer exists: {}", ex.getMessage());
+                } catch (NumberFormatException ex) {
+                    log.debug("Could not parse Long ID from token subject: {}", ex.getMessage());
+                }
             }
-        } catch (Exception ex) {
-            log.error("Could not set user authentication in security context", ex);
-            // Logs any token parsing or user loading failures without halting the filter chain.
         }
 
         filterChain.doFilter(request, response);
-        // Passes the request and response along to the next filter in the security chain.
     }
 
-
-
-
-
     private String getJwtFromRequest(HttpServletRequest request) {
-        // Helper method to extract the JWT token from the HTTP Authorization header.
-
         String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-        // Reads the raw value of the Authorization HTTP header.
-
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-            // Verifies the header exists and starts with the "Bearer " prefix.
-
             return bearerToken.substring(BEARER_PREFIX.length());
-            // Strips the "Bearer " prefix and returns only the clean token string.
         }
-
         return null;
-        // Returns null if the header is missing or improperly formatted.
     }
 }

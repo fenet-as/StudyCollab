@@ -10,6 +10,7 @@ import com.studycollab.model.Category;
 import com.studycollab.model.FileResource;
 import com.studycollab.model.StudyGroup;
 import com.studycollab.model.User;
+import com.studycollab.repository.auth.UserRepository;
 import com.studycollab.repository.files.CategoryRepository;
 import com.studycollab.repository.files.FilesRepository;
 import com.studycollab.repository.group.GroupMemberRepository;
@@ -39,23 +40,39 @@ public class FilesService {
     private static final Logger log = LoggerFactory.getLogger(FilesService.class);
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
+
+
+
+
+
+
     private static final Set<String> ALLOWED_MIME_TYPES = Set.of(
+            // Documents
             "application/pdf",
             "application/msword",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            "application/vnd.ms-excel",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            "application/vnd.ms-powerpoint",
-            "application/vnd.openxmlformats-officedocument.presentationml.slideshow",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
             "text/plain",
+
+            // Spreadsheets
+            "application/vnd.ms-excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+            "text/csv",
+
+            // Presentations
+            "application/vnd.ms-powerpoint",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
+            "application/vnd.openxmlformats-officedocument.presentationml.slideshow", // .ppsx
+
+            // Images
             "image/jpeg",
-            "image/png"
+            "image/png",
+            "image/webp",
+            "image/gif",
+            "image/svg+xml"
     );
 
     @Value("${app.files.max-file-size-bytes:52428800}")
     private long maxSizeBytes;
-
-
 
     @Value("${app.files.group-quota-bytes:5368709120}")
     private long groupQuotaBytes;
@@ -64,6 +81,7 @@ public class FilesService {
     private final CategoryRepository categoryRepository;
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
+    private final UserRepository userRepository;
     private final StorageService storageService;
     private final Tika tika = new Tika();
 
@@ -72,11 +90,13 @@ public class FilesService {
             CategoryRepository categoryRepository,
             GroupRepository groupRepository,
             GroupMemberRepository groupMemberRepository,
+            UserRepository userRepository,
             StorageService storageService) {
         this.filesRepository = filesRepository;
         this.categoryRepository = categoryRepository;
         this.groupRepository = groupRepository;
         this.groupMemberRepository = groupMemberRepository;
+        this.userRepository = userRepository;
         this.storageService = storageService;
     }
 
@@ -148,7 +168,7 @@ public class FilesService {
 
     @Transactional
     @PreAuthorize("@groupSecurity.isMember(#groupId, principal.id)")
-    public FileResponse uploadFile(Long groupId, MultipartFile file, Long categoryId, User user) {
+    public FileResponse uploadFile(Long groupId, MultipartFile file, Long categoryId, Long userId) {
         if (file.getSize() > maxSizeBytes) {
             throw new InvalidRequestException("File size exceeds maximum allowed limit of " + formatBytes(maxSizeBytes));
         }
@@ -170,6 +190,9 @@ public class FilesService {
         if (!category.getStudyGroup().getId().equals(groupId)) {
             throw new InvalidRequestException("Category does not belong to the target study group.");
         }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
         String rawFilename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "file";
         String cleanOriginalName = FilenameUtils.getName(rawFilename);

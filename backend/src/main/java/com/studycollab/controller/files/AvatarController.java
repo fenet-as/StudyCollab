@@ -1,8 +1,8 @@
 package com.studycollab.controller.files;
 
 import com.studycollab.dto.files.AvatarUploadResponse;
-import com.studycollab.dto.user.UserProfileResponse; // <-- Use UserProfileResponse
-import com.studycollab.model.User;
+import com.studycollab.dto.user.UserProfileResponse;
+import com.studycollab.security.CustomUserDetails;
 import com.studycollab.service.files.AvatarService;
 import com.studycollab.service.user.UserService;
 import org.springframework.http.ResponseEntity;
@@ -27,17 +27,19 @@ public class AvatarController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserProfileResponse> getCurrentUser(@AuthenticationPrincipal User currentUser) {
-        UserProfileResponse userDto = userService.getUserProfile(currentUser.getId());
+    public ResponseEntity<UserProfileResponse> getCurrentUser(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        UserProfileResponse userDto = userService.getUserProfile(userDetails.getId());
         return ResponseEntity.ok(userDto);
     }
 
     @PostMapping("/upload")
     public ResponseEntity<AvatarUploadResponse> uploadAvatar(
             @RequestParam("avatar") MultipartFile file,
-            @AuthenticationPrincipal User currentUser
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        AvatarUploadResponse response = avatarService.processAndSaveAvatar(file, currentUser.getId());
+        AvatarUploadResponse response = avatarService.processAndSaveAvatar(file, userDetails.getId());
         return ResponseEntity.ok(response);
     }
 }

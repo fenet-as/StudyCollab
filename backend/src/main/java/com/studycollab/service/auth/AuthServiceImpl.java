@@ -3,99 +3,169 @@ package com.studycollab.service.auth;
 import com.studycollab.dto.auth.AuthResponse;
 import com.studycollab.dto.auth.LoginRequest;
 import com.studycollab.dto.auth.RegisterRequest;
+import com.studycollab.dto.auth.ResendVerificationRequest;
+import com.studycollab.exception.AccountNotVerifiedException;
 import com.studycollab.exception.EmailAlreadyExistsException;
 import com.studycollab.exception.InvalidCredentialsException;
+import com.studycollab.exception.InvalidTokenException;
+import com.studycollab.model.EmailVerificationToken;
 import com.studycollab.model.User;
+import com.studycollab.repository.auth.EmailVerificationTokenRepository;
 import com.studycollab.repository.auth.UserRepository;
 import com.studycollab.security.JwtTokenProvider;
+import com.studycollab.service.email.EmailService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.UUID;
+
 @Service
-// Marks this class as a Spring service bean handling authentication business logic.
 @Transactional
-// Wraps method executions in database transactions to ensure data consistency.
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+    private final EmailVerificationTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
+    private final EmailService emailService;
 
     public AuthServiceImpl(
             UserRepository userRepository,
+            EmailVerificationTokenRepository tokenRepository,
             PasswordEncoder passwordEncoder,
             JwtTokenProvider tokenProvider,
-            AuthenticationManager authenticationManager
+            AuthenticationManager authenticationManager,
+            EmailService emailService
     ) {
-        // Injects required data access, encoding, token, and authentication components.
         this.userRepository = userRepository;
+        this.tokenRepository = tokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenProvider = tokenProvider;
         this.authenticationManager = authenticationManager;
+        this.emailService = emailService;
+    }
+
+    private String normalizeEmail(String email) {
+        return email == null ? "" : email.trim().toLowerCase(Locale.ROOT);
     }
 
     @Override
-    public AuthResponse register(RegisterRequest request) {
-        // Executes user registration workflow by checking uniqueness, hashing passwords, and issuing JWTs.
+    public void register(RegisterRequest request) {
+        String normalizedEmail = normalizeEmail(request.email());
 
-        if (userRepository.existsByEmail(request.email())) {
-            // Checks if an account with the given email address already exists.
-
-            throw new EmailAlreadyExistsException(request.email());
-            // Throws a custom exception if the email is already in use.
+        if (userRepository.existsByEmail(normalizedEmail)) {
+            throw new EmailAlreadyExistsException(normalizedEmail);
         }
 
         User user = new User();
-        // Instantiates a new User entity.
-
         user.setFullName(request.fullName().trim());
-        // Sets the user's full name after removing trailing whitespace.
-
-        user.setEmail(request.email().toLowerCase().trim());
-        // Sets the user's email converted to lowercase for consistent lookups.
-
+        user.setEmail(normalizedEmail);
         user.setPassword(passwordEncoder.encode(request.password()));
-        // Hashes the plain-text password using the configured PasswordEncoder before saving.
+        user.setEnabled(false);
 
-        User savedUser = userRepository.save(user);
-        // Persists the newly created user entity into the database.
-
-        String token = tokenProvider.generateToken(savedUser.getEmail());
-        // Generates a JWT token bound to the saved user's email.
-
-        return new AuthResponse(savedUser.getId(), token, savedUser.getEmail());
-        // Returns an AuthResponse containing user identity details and the issued JWT token.
+        try {
+            User savedUser = userRepository.save(user);
+            createAndSendToken(savedUser);
+        } catch (DataIntegrityViolationException ex) {
+            throw new EmailAlreadyExistsException(normalizedEmail);
+        }
     }
+
+
+
+    private void createAndSendToken(User user) {
+        String token = UUID.randomUUID().toString();
+        EmailVerificationToken verificationToken = new EmailVerificationToken(
+                token,
+                user,
+                LocalDateTime.now().plusHours(24)
+        );
+        tokenRepository.save(verificationToken);
+
+        emailService.sendVerificationEmail(user.getEmail(), token);
+    }
+
+
 
     @Override
     @Transactional(readOnly = true)
-    // Marks transaction as read-only to optimize database performance for login checks.
     public AuthResponse login(LoginRequest request) {
-        // Authenticates user credentials and returns a new JWT token upon success.
+        String normalizedEmail = normalizeEmail(request.email());
 
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.email(), request.password())
+                    new UsernamePasswordAuthenticationToken(normalizedEmail, request.password())
             );
-            // Delegates credentials verification (email and password match) to Spring Security.
+        } catch (DisabledException ex) {
+            throw new AccountNotVerifiedException("Account is not verified. Please check your email.");
         } catch (BadCredentialsException ex) {
             throw new InvalidCredentialsException();
-            // Catches authentication failure and throws a uniform custom credentials exception.
         }
 
-        User user = userRepository.findByEmail(request.email())
+        User user = userRepository.findByEmail(normalizedEmail)
                 .orElseThrow(InvalidCredentialsException::new);
-        // Retrieves the user account from the database or throws an exception if missing.
 
-        String token = tokenProvider.generateToken(user.getEmail());
-        // Generates a fresh JWT token for the successfully authenticated user.
-
+        String token = tokenProvider.generateToken(user.getId(), user.getEmail());
         return new AuthResponse(user.getId(), token, user.getEmail());
-        // Returns authentication response payload containing the user ID, JWT token, and email.
+    }
+
+    @Override
+    public AuthResponse generateAccessTokenResponse(User user) {
+        String newAccessToken = tokenProvider.generateToken(user.getId(), user.getEmail());
+        return new AuthResponse(user.getId(), newAccessToken, user.getEmail());
+    }
+
+
+
+
+
+    @Override
+    public void resendVerificationEmail(ResendVerificationRequest request) {
+        String normalizedEmail = normalizeEmail(request.email());
+        Optional<User> userOptional = userRepository.findByEmail(normalizedEmail);
+
+        if (userOptional.isEmpty() || userOptional.get().isEnabled()) {
+            return;
+        }
+
+        User user = userOptional.get();
+
+        // 1. Delete old tokens and force an immediate flush to clean DB state
+        tokenRepository.deleteByUser(user);
+        tokenRepository.flush();
+
+        // 2. Generate and send fresh token
+        createAndSendToken(user);
+    }
+
+    @Override
+    public AuthResponse verifyEmail(String token) {
+        EmailVerificationToken verificationToken = tokenRepository.findByToken(token)
+                .orElseThrow(() -> new InvalidTokenException("Invalid verification token"));
+
+        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new InvalidTokenException("Verification token has expired");
+        }
+
+        User user = verificationToken.getUser();
+        user.setEnabled(true);
+
+        // Save and flush user update BEFORE deleting the token
+        userRepository.saveAndFlush(user);
+
+        tokenRepository.delete(verificationToken);
+
+        String jwt = tokenProvider.generateToken(user.getId(), user.getEmail());
+        return new AuthResponse(user.getId(), jwt, user.getEmail());
     }
 }
