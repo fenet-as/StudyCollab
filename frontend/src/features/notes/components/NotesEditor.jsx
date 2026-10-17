@@ -1,6 +1,5 @@
-// frontend/src/features/notes/components/NotesEditor.jsx
 import React from 'react';
-import { Save, FileText, Maximize2, Minimize2, PanelLeftClose, PanelLeft } from 'lucide-react';
+import { Save, FileText, Maximize2, Minimize2, PanelLeftClose, PanelLeft, RotateCcw } from 'lucide-react';
 import styles from './NotesEditor.module.css';
 import { parseMarkdownAndLaTeX } from '../utils/markdownParser';
 
@@ -21,7 +20,9 @@ export default function NotesEditor({
   isExpanded,
   onToggleExpand,
   isNotesListCollapsed,
-  onToggleNotesList
+  onToggleNotesList,
+  isDirty,
+  onDiscardDraft
 }) {
   const titleLength = editorTitle?.length || 0;
   const contentLength = editorContent?.length || 0;
@@ -61,6 +62,20 @@ export default function NotesEditor({
                 <span className={styles.btnText}>Export PDF</span>
               </button>
 
+              {/* Discard Unsaved Changes Button */}
+              {isDirty && onDiscardDraft && (
+                <button
+                  type="button"
+                  className={styles.secondaryActionBtn}
+                  onClick={onDiscardDraft}
+                  title="Discard unsaved changes"
+                  aria-label="Discard unsaved changes"
+                >
+                  <RotateCcw size={16} />
+                  <span className={styles.btnText}>Discard</span>
+                </button>
+              )}
+
               {/* Direct Save Button */}
               <button
                 type="button"
@@ -71,7 +86,7 @@ export default function NotesEditor({
                 aria-label="Save note"
               >
                 <Save size={16} />
-                <span className={styles.btnText}>Save</span>
+                <span className={styles.btnText}>{isDirty ? 'Save *' : 'Save'}</span>
               </button>
 
               {/* Focus Mode Toggle */}

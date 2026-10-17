@@ -13,7 +13,8 @@ export default function NotesSidebar({
   onPromptDelete,
   isSidebarOpen,
   onCloseSidebar,
-  isCollapsed
+  isCollapsed,
+  hasDraft
 }) {
   if (isCollapsed) return null;
 
@@ -60,7 +61,25 @@ export default function NotesSidebar({
             >
               <div className={styles.noteCardContent}>
                 <div className={styles.noteCardLeft}>
-                  <h4 className={styles.noteTitle}>{note.title}</h4>
+                  <h4 className={styles.noteTitle}>
+                    {note.title}
+                    {hasDraft && hasDraft(note.id) && (
+                      <span 
+                        style={{
+                          marginLeft: '6px',
+                          fontSize: '0.7rem',
+                          fontWeight: 600,
+                          color: '#f59e0b',
+                          backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          display: 'inline-block'
+                        }}
+                      >
+                        Draft
+                      </span>
+                    )}
+                  </h4>
                   <span className={styles.noteTime}>
                     By {note.ownerName || note.creatorName || 'Group Member'}
                   </span>
