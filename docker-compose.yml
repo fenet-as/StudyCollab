@@ -28,6 +28,8 @@ services:
     environment:
       # Ensures backend uses internal docker network database address
       SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
     depends_on:
       database:
         condition: service_healthy
