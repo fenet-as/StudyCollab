@@ -53,10 +53,21 @@ export default function NotesSidebar({
           {notes.map((note) => (
             <div 
               key={note.id}
+              role="button"
+              tabIndex={0}
+              aria-selected={selectedNoteId === note.id}
+              aria-label={`Note: ${note.title}. Press Enter to view.`}
               className={`${styles.noteCard} ${selectedNoteId === note.id ? styles.activeCard : ''}`}
               onClick={() => {
                 onSelectNote(note.id);
                 onCloseSidebar();
+              }}
+              onKeyDown={(e) => {
+                if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
+                  e.preventDefault();
+                  onSelectNote(note.id);
+                  onCloseSidebar();
+                }
               }}
             >
               <div className={styles.noteCardContent}>
@@ -88,6 +99,7 @@ export default function NotesSidebar({
                   className={styles.inlineDeleteBtn} 
                   onClick={(e) => onPromptDelete(e, note)}
                   title="Delete Note"
+                  aria-label={`Delete note ${note.title}`}
                 >
                   <Trash2 size={16} />
                 </button>

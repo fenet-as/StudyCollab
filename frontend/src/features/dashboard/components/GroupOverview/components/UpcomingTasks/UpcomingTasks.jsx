@@ -20,10 +20,12 @@ export default function UpcomingTasks({ upcomingTasks, handleTabChange }) {
             const priorityLower = task.priority?.toLowerCase() || 'medium';
 
             return (
-              <div 
+              <button 
                 key={task.id} 
+                type="button"
                 className={styles.taskRow}
                 onClick={() => handleTabChange('Tasks')}
+                aria-label={`View task ${task.title} in Tasks`}
               >
                 <div className={styles.rowMain}>
                   <div className={styles.titleGroup}>
@@ -46,7 +48,7 @@ export default function UpcomingTasks({ upcomingTasks, handleTabChange }) {
                     <span>To: <strong>{assignee}</strong></span>
                   </div>
                 </div>
-              </div>
+              </button>
             );
           })
         )}

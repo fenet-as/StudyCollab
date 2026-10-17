@@ -124,10 +124,15 @@ export default function Register() {
       </button>
 
       <div className={styles.authCard}>
-        <div className={styles.logo} onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+        <button
+          type="button"
+          className={styles.logo}
+          onClick={() => navigate('/')}
+          aria-label="StudyCollab home"
+        >
           <GraduationCap size={28} className={styles.logoIcon} />
           <span>StudyCollab</span>
-        </div>
+        </button>
 
         {isSubmitted ? (
           <div style={{ textAlign: 'center', padding: '1rem 0' }}>

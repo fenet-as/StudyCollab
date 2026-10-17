@@ -72,10 +72,15 @@ export default function VerifyEmail() {
       </button>
 
       <div className={styles.authCard}>
-        <div className={styles.logo} onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+        <button
+          type="button"
+          className={styles.logo}
+          onClick={() => navigate('/')}
+          aria-label="StudyCollab home"
+        >
           <GraduationCap size={28} className={styles.logoIcon} />
           <span>StudyCollab</span>
-        </div>
+        </button>
 
         {status === 'verifying' && (
           <div style={{ textAlign: 'center', padding: '2rem 0' }}>

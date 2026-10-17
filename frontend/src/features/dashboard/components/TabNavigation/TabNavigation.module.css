@@ -13,6 +13,18 @@
   color: var(--text-secondary);
   transition: background-color 0.15s ease, color 0.15s ease;
   font-weight: 500;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tabLink:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
 }
 
 .tabLink:hover {

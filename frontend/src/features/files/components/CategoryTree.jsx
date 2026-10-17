@@ -32,8 +32,18 @@ export default function CategoryTree({
     return (
       <div key={category.id} style={{ marginLeft: `${depth * 8}px` }}>
         <div 
+          role="button"
+          tabIndex={0}
+          aria-selected={isSelected}
+          aria-label={`Category ${category.name}`}
           className={`${styles.categoryItem} ${isSelected ? styles.categorySelected : ''}`}
           onClick={() => onSelectCategory(category.id)}
+          onKeyDown={(e) => {
+            if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
+              e.preventDefault();
+              onSelectCategory(category.id);
+            }
+          }}
         >
           <div className={styles.categoryLeft}>
             {hasChildren ? (
@@ -92,15 +102,17 @@ export default function CategoryTree({
 
   return (
     <div className={styles.categoryTree}>
-      <div 
+      <button 
+        type="button"
         className={`${styles.categoryItem} ${selectedCategoryId === null ? styles.categorySelected : ''}`}
         onClick={() => onSelectCategory(null)}
+        aria-label="All Files"
       >
         <span className={styles.folderIcon}>
           <Files size={16} />
         </span>
         <strong className={styles.categoryLabelText}>All Files</strong>
-      </div>
+      </button>
       {categories.map(cat => renderCategoryNode(cat))}
     </div>
   );

@@ -12,17 +12,20 @@ const TABS = [
 
 export default function TabNavigation({ activeTab, setActiveTab }) {
   return (
-    <nav className={styles.tabsNav}>
+    <nav className={styles.tabsNav} role="tablist" aria-label="Dashboard sections">
       {TABS.map((tab) => (
-        <span
+        <button
           key={tab}
+          type="button"
+          role="tab"
+          aria-selected={activeTab === tab}
           className={`${styles.tabLink} ${
             activeTab === tab ? styles.activeTab : ""
           }`}
           onClick={() => setActiveTab(tab)}
         >
           {tab}
-        </span>
+        </button>
       ))}
     </nav>
   );

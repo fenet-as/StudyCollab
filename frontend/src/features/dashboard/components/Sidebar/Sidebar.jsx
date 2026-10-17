@@ -166,8 +166,10 @@ export default function Sidebar({
         `}
       >
         <div className={styles.sidebarTopRow}>
-          <div
+          <button
+            type="button"
             className={styles.sidebarLogo}
+            aria-label="StudyCollab home"
             onClick={() => {
               if (groups.length > 0 && !activeGroup) {
                 handleGroupSelect(groups[0]);
@@ -181,7 +183,7 @@ export default function Sidebar({
           >
             <GraduationCap className={styles.logoIcon} size={22} />
             <span className={styles.collapseHideText}>StudyCollab</span>
-          </div>
+          </button>
 
           <button
             className={styles.collapseToggleBtn}
@@ -227,6 +229,10 @@ export default function Sidebar({
               return (
                 <li
                   key={group.id}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Select group ${group.name}`}
+                  aria-selected={activeGroup?.id === group.id && activeTab !== "Settings"}
                   className={`
                     ${styles.groupItem} 
                     ${
@@ -236,6 +242,12 @@ export default function Sidebar({
                     }
                   `}
                   onClick={() => handleGroupSelect(group)}
+                  onKeyDown={(e) => {
+                    if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) {
+                      e.preventDefault();
+                      handleGroupSelect(group);
+                    }
+                  }}
                   title={group.name}
                 >
                   <div className={styles.groupMainInfo}>
@@ -265,6 +277,7 @@ export default function Sidebar({
                         }
                       }}
                       title="Delete Group"
+                      aria-label={`Delete group ${group.name}`}
                     >
                       <Trash2 size={16} />
                     </button>
@@ -297,10 +310,12 @@ export default function Sidebar({
         </div>
 
         <div className={styles.sidebarFooter}>
-          <div
+          <button
+            type="button"
             className={styles.footerAction}
             onClick={handleThemeToggle}
-            title="Toggle Theme"
+            title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            aria-label={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
           >
             {isDarkMode ? (
               <Sun className={styles.footerIcon} size={18} />
@@ -310,11 +325,13 @@ export default function Sidebar({
             <span className={styles.collapseHideText}>
               {isDarkMode ? " Light Mode" : " Dark Mode"}
             </span>
-          </div>
+          </button>
 
-          <div
+          <button
+            type="button"
             className={styles.userInfo}
             title="Account Settings"
+            aria-label="Account Settings"
             onClick={() => {
               if (typeof setActiveTab === "function") {
                 setActiveTab("Settings");
@@ -339,16 +356,18 @@ export default function Sidebar({
             >
               {resolvedDisplayName}
             </span>
-          </div>
+          </button>
 
-          <div
+          <button
+            type="button"
             className={`${styles.footerAction} ${styles.logoutAction}`}
             onClick={handleUserLogout}
             title="Logout"
+            aria-label="Logout"
           >
             <LogOut className={styles.footerIcon} size={18} />
             <span className={styles.collapseHideText}> Logout</span>
-          </div>
+          </button>
         </div>
       </aside>
     </>
