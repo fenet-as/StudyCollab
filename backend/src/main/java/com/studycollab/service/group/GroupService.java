@@ -5,6 +5,7 @@ import com.studycollab.dto.group.*;
 import com.studycollab.exception.CustomExceptions;
 import com.studycollab.model.*;
 import com.studycollab.repository.auth.UserRepository;
+import com.studycollab.repository.chat.ChannelRepository;
 import com.studycollab.repository.group.GroupRepository;
 import com.studycollab.repository.group.GroupMemberRepository;
 import org.springframework.stereotype.Service;
@@ -23,16 +24,26 @@ public class GroupService {
     private final GroupMemberRepository groupMemberRepository;
     private final UserRepository userRepository;
     private final GroupAvatarService groupAvatarService;
+    private final ChannelRepository channelRepository;
 
     // Constructor injection for all repositories
     public GroupService(GroupRepository groupRepository,
                         GroupMemberRepository groupMemberRepository,
                         UserRepository userRepository,
                         GroupAvatarService groupAvatarService) {
+        this(groupRepository, groupMemberRepository, userRepository, groupAvatarService, null);
+    }
+
+    public GroupService(GroupRepository groupRepository,
+                        GroupMemberRepository groupMemberRepository,
+                        UserRepository userRepository,
+                        GroupAvatarService groupAvatarService,
+                        ChannelRepository channelRepository) {
         this.groupRepository = groupRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.userRepository = userRepository;
         this.groupAvatarService = groupAvatarService;
+        this.channelRepository = channelRepository;
     }
 
 
@@ -61,6 +72,18 @@ public class GroupService {
         // 2. If an avatar file was provided, upload to Cloudflare R2 via GroupAvatarService
         if (file != null && !file.isEmpty()) {
             groupAvatarService.uploadGroupAvatar(savedGroup.getId(), file);
+        }
+
+        // 3. Seed default '#general' channel
+        if (channelRepository != null) {
+            Channel defaultChannel = Channel.builder()
+                    .studyGroup(savedGroup)
+                    .name("general")
+                    .description("General discussions for the study group")
+                    .isDefault(true)
+                    .createdBy(creator)
+                    .build();
+            channelRepository.save(defaultChannel);
         }
 
         return savedGroup;
@@ -499,4 +522,25 @@ public class GroupService {
     }
 
 
+
+
+    @Transactional
+    public Channel getOrCreateDefaultChannel(Long groupId, User user) {
+        if (channelRepository == null) {
+            return null;
+        }
+        return channelRepository.findByStudyGroupIdAndIsDefaultTrue(groupId)
+                .orElseGet(() -> {
+                    StudyGroup group = groupRepository.findById(groupId)
+                            .orElseThrow(() -> new CustomExceptions.ResourceNotFoundException("Group not found with id: " + groupId));
+                    Channel defaultChannel = Channel.builder()
+                            .studyGroup(group)
+                            .name("general")
+                            .description("General discussions for the study group")
+                            .isDefault(true)
+                            .createdBy(user)
+                            .build();
+                    return channelRepository.save(defaultChannel);
+                });
+    }
 }
