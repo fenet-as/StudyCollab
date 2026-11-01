@@ -50,7 +50,7 @@ export default function GroupSettingsPane({
         await onLeaveSuccess(group.id);
       }
     } catch (error) {
-      setModalError(error.message || 'Failed to leave the group.');
+      setModalError(error.response?.data?.message || error.message || 'Failed to leave the group.');
     } finally {
       setIsSubmitting(false);
     }

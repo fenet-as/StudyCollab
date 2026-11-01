@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { GraduationCap, Sun, Moon, CheckCircle2, AlertTriangle, Loader2, ArrowRight, Send } from 'lucide-react';
 import { verifyEmailToken, resendVerificationEmail } from '../../../api/authApi';
@@ -19,11 +19,13 @@ export default function VerifyEmail() {
   );
   const [resendEmail, setResendEmail] = useState('');
   const [resendStatus, setResendStatus] = useState({ loading: false, success: false, message: '' });
+  const hasRequested = useRef(false);
 
   useEffect(() => {
-    if (!token) {
+    if (!token || hasRequested.current) {
       return;
     }
+    hasRequested.current = true;
 
     verifyEmailToken(token)
       .then((data) => {

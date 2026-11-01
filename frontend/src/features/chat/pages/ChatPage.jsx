@@ -1,10 +1,11 @@
 import React from "react";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Sparkles } from "lucide-react";
+import styles from "./ChatPage.module.css";
 
 /**
  * ChatPage - Entry point component for the Chat workspace tab.
  *
- * Current Status: Placeholder / Planned Feature.
+ * Current Status: Planned / In-Development Prototype.
  * Interactive chat prototype components are maintained in `../components/`
  * and will be activated once backend WebSocket services are implemented.
  * See `features/chat/README.md` for full component inventory and roadmap.
@@ -12,32 +13,25 @@ import { MessageSquare } from "lucide-react";
 export default function ChatPage() {
   return (
     <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        textAlign: "center",
-      }}
+      className={styles.container}
       role="region"
       aria-label="Chat feature placeholder"
     >
-      <div
-        style={{
-          marginBottom: "1rem",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <MessageSquare size={48} strokeWidth={1.5} color="#94a3b8" />
+      <div className={styles.placeholderCard}>
+        <div className={styles.iconBadge}>
+          <MessageSquare size={32} strokeWidth={1.75} />
+        </div>
+        <h3 className={styles.title}>
+          Chat Feature Space
+        </h3>
+        <p className={styles.description}>
+          Coming soon to the StudyCollab workspace. Real-time messaging, topic channels, and study discussions are currently in development.
+        </p>
+        <div className={styles.badge}>
+          <Sparkles size={13} />
+          <span>In Development</span>
+        </div>
       </div>
-      <h3 style={{ margin: "0 0 0.5rem 0", color: "var(--text-primary)" }}>
-        Chat Feature Space
-      </h3>
-      <p style={{ margin: 0, color: "var(--text-secondary)" }}>
-        Coming soon to the StudyCollab workspace.
-      </p>
     </div>
   );
 }

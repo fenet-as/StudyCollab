@@ -63,7 +63,7 @@ export default function GroupDetailsCard({ group, onGroupUpdated, isReadOnly = f
         onGroupUpdated(updatedGroup);
       }
     } catch (error) {
-      setInfoMessage({ text: error.message || 'Failed to update details.', isError: true });
+      setInfoMessage({ text: error.response?.data?.message || error.message || 'Failed to update details.', isError: true });
     } finally {
       setIsUpdatingInfo(false);
     }
