@@ -3,9 +3,9 @@
 .card {
   background-color: var(--card-bg, #1e293b);
   border: 1px solid var(--border-color, #334155);
-  border-radius: 12px;
+  border-radius: var(--radius-lg, 12px);
   padding: 1.25rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-sm);
 }
 
 .cardHeader {
