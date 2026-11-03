@@ -194,6 +194,25 @@ class ChannelServiceTest {
                     .isInstanceOf(CustomExceptions.BadRequestException.class)
                     .hasMessageContaining("already exists");
         }
+
+        @Test
+        @DisplayName("Exceeding maximum channel limit (10 channels) throws BadRequestException")
+        void createChannel_MaxChannelsReached_ThrowsBadRequest() {
+            GroupMember admin = new GroupMember();
+            admin.setRole(GroupRole.ADMIN);
+
+            CreateChannelRequest request = CreateChannelRequest.builder()
+                    .name("eleventh-channel")
+                    .build();
+
+            when(groupRepository.findById(10L)).thenReturn(Optional.of(testGroup));
+            when(groupMemberRepository.findByGroupIdAndUserId(10L, 1L)).thenReturn(Optional.of(admin));
+            when(channelRepository.countByStudyGroupId(10L)).thenReturn(10L);
+
+            assertThatThrownBy(() -> channelService.createChannel(10L, request, testUser))
+                    .isInstanceOf(CustomExceptions.BadRequestException.class)
+                    .hasMessageContaining("maximum limit of 10 channels");
+        }
     }
 
     @Nested
