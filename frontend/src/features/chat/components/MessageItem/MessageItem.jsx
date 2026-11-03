@@ -74,18 +74,18 @@ export default function MessageItem({
           )}
           <span className={styles.timestamp}>
             {message.timestamp}{" "}
-            {message.isEdited && (
+            {message.isEdited && !message.isDeleted && (
               <span className={styles.editedLabel}>(edited)</span>
             )}
           </span>
-          {message.pinned && (
+          {message.pinned && !message.isDeleted && (
             <span className={styles.pinnedBadge} title="Pinned message">
               <Pin size={10} /> Pinned
             </span>
           )}
         </div>
 
-        {message.replyTo && (
+        {message.replyTo && !message.isDeleted && (
           <button
             type="button"
             className={styles.repliedContext}
@@ -100,142 +100,162 @@ export default function MessageItem({
 
         <div className={styles.messageBubbleContainer}>
           <div
-            className={styles.messageBubble}
-            onClick={() => setShowMobileActions((prev) => !prev)}
+            className={`${styles.messageBubble} ${
+              message.isDeleted ? styles.deletedBubble : ""
+            }`}
+            onClick={() => !message.isDeleted && setShowMobileActions((prev) => !prev)}
           >
-            <p>{message.content}</p>
+            {message.isDeleted ? (
+              <p className={styles.deletedText}>
+                <em>This message has been deleted</em>
+              </p>
+            ) : (
+              <p>{message.content}</p>
+            )}
           </div>
 
-          {/* Quick Mobile Menu Trigger Button */}
-          <button
-            className={styles.mobileMoreBtn}
-            onClick={() => setShowMobileActions((prev) => !prev)}
-            aria-label="Toggle message actions"
-          >
-            <MoreHorizontal size={14} />
-          </button>
-
-          {/* Hover & Touch Action Menu */}
-          <div
-            className={`${styles.hoverActions} ${
-              showMobileActions ? styles.mobileActionsVisible : ""
-            }`}
-          >
-            <div className={styles.reactionPickerContainer}>
+          {!message.isDeleted && (
+            <>
+              {/* Quick Mobile Menu Trigger Button */}
               <button
-                className={styles.actionBtn}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowEmojiPicker(!showEmojiPicker);
-                }}
-                title="Add Reaction"
-                aria-label="Add reaction"
+                type="button"
+                className={styles.mobileMoreBtn}
+                onClick={() => setShowMobileActions((prev) => !prev)}
+                aria-label="Toggle message actions"
               >
-                <Smile size={15} />
+                <MoreHorizontal size={14} />
               </button>
 
-              {showEmojiPicker && (
-                <div
-                  className={`${styles.emojiPickerPopover} ${
-                    message.isMine ? styles.popoverLeft : styles.popoverRight
-                  }`}
-                >
-                  <div className={styles.categoryTabs}>
-                    {Object.keys(CATEGORIZED_EMOJIS).map((cat) => (
-                      <button
-                        key={cat}
-                        className={`${styles.tabBtn} ${
-                          activeCategory === cat ? styles.activeTab : ""
-                        }`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setActiveCategory(cat);
-                        }}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
+              {/* Hover & Touch Action Menu */}
+              <div
+                className={`${styles.hoverActions} ${
+                  showMobileActions ? styles.mobileActionsVisible : ""
+                }`}
+              >
+                <div className={styles.reactionPickerContainer}>
+                  <button
+                    type="button"
+                    className={styles.actionBtn}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowEmojiPicker(!showEmojiPicker);
+                    }}
+                    title="Add Reaction"
+                    aria-label="Add reaction"
+                  >
+                    <Smile size={15} />
+                  </button>
 
-                  <div className={styles.emojiGrid}>
-                    {CATEGORIZED_EMOJIS[activeCategory].map((emoji) => (
-                      <button
-                        key={emoji}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onAddReaction(message.id, emoji);
-                          setShowEmojiPicker(false);
-                          setShowMobileActions(false);
-                        }}
-                      >
-                        {emoji}
-                      </button>
-                    ))}
-                  </div>
+                  {showEmojiPicker && (
+                    <div
+                      className={`${styles.emojiPickerPopover} ${
+                        message.isMine ? styles.popoverLeft : styles.popoverRight
+                      }`}
+                    >
+                      <div className={styles.categoryTabs}>
+                        {Object.keys(CATEGORIZED_EMOJIS).map((cat) => (
+                          <button
+                            type="button"
+                            key={cat}
+                            className={`${styles.tabBtn} ${
+                              activeCategory === cat ? styles.activeTab : ""
+                            }`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveCategory(cat);
+                            }}
+                          >
+                            {cat}
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className={styles.emojiGrid}>
+                        {CATEGORIZED_EMOJIS[activeCategory].map((emoji) => (
+                          <button
+                            type="button"
+                            key={emoji}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onAddReaction(message.id, emoji);
+                              setShowEmojiPicker(false);
+                              setShowMobileActions(false);
+                            }}
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
 
-            <button
-              className={styles.actionBtn}
-              onClick={(e) => {
-                e.stopPropagation();
-                onReply(message);
-                setShowMobileActions(false);
-              }}
-              title="Reply"
-              aria-label="Reply to message"
-            >
-              <Reply size={15} />
-            </button>
-
-            <button
-              className={`${styles.actionBtn} ${
-                message.pinned ? styles.pinnedActionBtn : ""
-              }`}
-              onClick={(e) => {
-                e.stopPropagation();
-                onTogglePin(message.id);
-                setShowMobileActions(false);
-              }}
-              title={message.pinned ? "Unpin Message" : "Pin Message"}
-              aria-label="Toggle pin"
-            >
-              <Pin size={15} />
-            </button>
-
-            {message.isMine && (
-              <>
                 <button
+                  type="button"
                   className={styles.actionBtn}
                   onClick={(e) => {
                     e.stopPropagation();
-                    onStartEdit(message);
+                    onReply(message);
                     setShowMobileActions(false);
                   }}
-                  title="Edit Message"
-                  aria-label="Edit message"
+                  title="Reply"
+                  aria-label="Reply to message"
                 >
-                  <Pencil size={15} />
+                  <Reply size={15} />
                 </button>
+
                 <button
-                  className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                  type="button"
+                  className={`${styles.actionBtn} ${
+                    message.pinned ? styles.pinnedActionBtn : ""
+                  }`}
                   onClick={(e) => {
                     e.stopPropagation();
-                    onRequestDelete(message);
+                    onTogglePin(message.id);
                     setShowMobileActions(false);
                   }}
-                  title="Delete Message"
-                  aria-label="Delete message"
+                  title={message.pinned ? "Unpin Message" : "Pin Message"}
+                  aria-label="Toggle pin"
                 >
-                  <Trash2 size={15} />
+                  <Pin size={15} />
                 </button>
-              </>
-            )}
-          </div>
+
+                {message.isMine && (
+                  <>
+                    <button
+                      type="button"
+                      className={styles.actionBtn}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onStartEdit(message);
+                        setShowMobileActions(false);
+                      }}
+                      title="Edit Message"
+                      aria-label="Edit message"
+                    >
+                      <Pencil size={15} />
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRequestDelete(message);
+                        setShowMobileActions(false);
+                      }}
+                      title="Delete Message"
+                      aria-label="Delete message"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
-        {message.reactions && message.reactions.length > 0 && (
+        {!message.isDeleted && message.reactions && message.reactions.length > 0 && (
           <div className={styles.reactionsList}>
             {message.reactions.map((rxn, idx) => (
               <button

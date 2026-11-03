@@ -90,6 +90,11 @@ export const groupApi = {
     return res.data;
   },
 
+  getGroupMembers: async (groupId) => {
+    const res = await api.get(`/groups/${groupId}/members`);
+    return res.data;
+  },
+
   fetchGroupOverview: async (groupId) => {
     if (!groupId) throw new Error('No Group ID provided.');
     const res = await api.get(`/groups/${groupId}/overview`);

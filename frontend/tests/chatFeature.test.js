@@ -66,7 +66,7 @@ test('FE-005: Chat feature inventory and isolation', async (t) => {
     );
   });
 
-  await t.test('verifies ChatPage source defines accessible placeholder', () => {
+  await t.test('verifies ChatPage source defines accessible live workspace', () => {
     const chatPagePath = path.join(chatDir, 'pages', 'ChatPage.jsx');
     assert.ok(fs.existsSync(chatPagePath), 'ChatPage.jsx must exist');
     const content = fs.readFileSync(chatPagePath, 'utf8');
@@ -76,16 +76,28 @@ test('FE-005: Chat feature inventory and isolation', async (t) => {
       'ChatPage must have role="region" for accessibility'
     );
     assert.ok(
-      content.includes('aria-label="Chat feature placeholder"'),
-      'ChatPage must have an aria-label'
+      content.includes('aria-label="StudyCollab Chat Workspace"'),
+      'ChatPage must have an accessible aria-label'
     );
     assert.ok(
-      content.includes('Chat Feature Space'),
-      'ChatPage must render "Chat Feature Space"'
+      content.includes('<ChannelList'),
+      'ChatPage must assemble ChannelList'
     );
     assert.ok(
-      content.includes('Coming soon to the StudyCollab workspace.'),
-      'ChatPage must state that the feature is coming soon'
+      content.includes('<ChatHeader'),
+      'ChatPage must assemble ChatHeader'
+    );
+    assert.ok(
+      content.includes('<MessageFeed'),
+      'ChatPage must assemble MessageFeed'
+    );
+    assert.ok(
+      content.includes('<ChatInput'),
+      'ChatPage must assemble ChatInput'
+    );
+    assert.ok(
+      content.includes('<MemberList'),
+      'ChatPage must assemble MemberList'
     );
     assert.ok(
       content.includes('export default function ChatPage'),
