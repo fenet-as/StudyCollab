@@ -34,7 +34,7 @@ import { useGroupsContext } from "../../../context/useGroupsContext";
 export default function Dashboard() {
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
-  const { logout } = useAuthContext();
+  const { user: authUser, logout } = useAuthContext();
   const {
     groups,
     activeGroup,
@@ -373,9 +373,15 @@ export default function Dashboard() {
               )}
 
               {activeTab === "Chat" && (
-                <div className={styles.placeholderTabContent}>
-                  <ChatPage />
-                </div>
+                <ChatPage
+                  group={activeGroup}
+                  currentUser={userProfile || authUser}
+                  canManageChannels={
+                    permissions?.isOwnerOrAdmin ||
+                    permissions?.isAdmin ||
+                    permissions?.isCreator
+                  }
+                />
               )}
             </div>
           </>

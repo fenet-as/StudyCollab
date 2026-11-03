@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { X, Users, AlertCircle, Loader2 } from "lucide-react";
-import { groupApi } from "../../../api/groupApi.js";
+import { groupApi } from "../../../../api/groupApi.js";
 import {
   formatMemberRole,
   getMemberInitials,
