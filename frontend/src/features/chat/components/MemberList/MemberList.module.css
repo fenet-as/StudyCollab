@@ -27,6 +27,9 @@
   letter-spacing: 0.05em;
   color: var(--text-secondary);
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .closeDrawerBtn {
@@ -82,6 +85,13 @@
   justify-content: center;
   border: 1px solid var(--border-color);
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .online::after {
@@ -112,6 +122,7 @@
   display: flex;
   flex-direction: column;
   min-width: 0; /* Truncation container */
+  gap: 0.1rem;
 }
 
 .memberName {
@@ -123,9 +134,71 @@
   text-overflow: ellipsis;
 }
 
+.youIndicator {
+  color: var(--primary-color);
+  font-size: 0.775rem;
+  font-weight: 600;
+}
+
 .memberRole {
   font-size: 0.725rem;
+  font-weight: 500;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+  width: fit-content;
+}
+
+.roleCreator {
+  background-color: rgba(234, 88, 12, 0.12);
+  color: #ea580c;
+}
+
+.roleAdmin {
+  background-color: rgba(99, 102, 241, 0.12);
+  color: #6366f1;
+}
+
+.roleMember {
+  background-color: var(--bg-highlight);
   color: var(--text-secondary);
+}
+
+.loadingContainer,
+.errorContainer,
+.emptyContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.5rem 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  color: var(--primary-color);
+}
+
+.errorIcon {
+  color: #ef4444;
+}
+
+.emptyIcon {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ==========================================================================
