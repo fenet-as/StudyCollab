@@ -104,6 +104,36 @@
   gap: 1rem;
 }
 
+.loadMoreContainer {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0;
+}
+
+.loadMoreBtn {
+  background-color: var(--bg-highlight);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  padding: 0.4rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 36px;
+}
+
+.loadMoreBtn:hover:not(:disabled) {
+  background-color: var(--card-bg);
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.loadMoreBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .emptyChat {
   display: flex;
   flex-direction: column;

@@ -503,7 +503,8 @@ public class GroupService {
                 .map(member -> new GroupMemberSummaryDto(
                         member.getUser().getId(),
                         member.getUser().getFullName(), // Use getUser().getName() if that's your field name
-                        member.getUser().getEmail()
+                        member.getUser().getEmail(),
+                        member.getRole() != null ? member.getRole().name() : null
                 ))
                 .collect(Collectors.toList());
     }

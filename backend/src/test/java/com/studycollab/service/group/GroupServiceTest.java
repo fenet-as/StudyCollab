@@ -472,6 +472,8 @@ class GroupServiceTest {
             assertThat(summaries).hasSize(1);
             assertThat(summaries.get(0).getId()).isEqualTo(10L);
             assertThat(summaries.get(0).getEmail()).isEqualTo("member@example.com");
+            assertThat(summaries.get(0).getRole()).isEqualTo("MEMBER");
+            assertThat(summaries.get(0).getName()).isEqualTo("Alice Member");
         }
 
         @Test

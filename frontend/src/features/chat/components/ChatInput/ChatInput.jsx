@@ -17,43 +17,68 @@ export default function ChatInput({
   const [prevEditingMessage, setPrevEditingMessage] = useState(null);
   const inputRef = useRef(null);
 
+  // Sync text when entering or changing edit message
   if (editingMessage !== prevEditingMessage) {
     setPrevEditingMessage(editingMessage);
     if (editingMessage) {
-      setText(editingMessage.content);
+      setText(editingMessage.content || "");
     }
   }
 
   useEffect(() => {
-    if (editingMessage) {
+    if (editingMessage || replyingTo) {
       inputRef.current?.focus();
     }
-  }, [editingMessage]);
+  }, [editingMessage, replyingTo]);
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();
+    }
     const trimmed = text.trim();
     if (!trimmed || trimmed.length > MAX_CHAR_LIMIT) return;
 
     if (editingMessage) {
-      onSaveEdit(editingMessage.id, trimmed);
+      onSaveEdit?.(editingMessage.id, trimmed);
+    } else if (replyingTo) {
+      onSendMessage?.({
+        content: trimmed,
+        replyToId: replyingTo.id,
+        replySnippet: replyingTo.content,
+      });
+      onCancelReply?.();
     } else {
-      onSendMessage(trimmed);
+      onSendMessage?.(trimmed);
     }
     setText("");
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
+    } else if (e.key === "Escape") {
+      if (editingMessage) {
+        handleCancelEdit();
+      } else if (replyingTo) {
+        onCancelReply?.();
+      }
+    }
+  };
+
   const handleCancelEdit = () => {
     setText("");
-    onCancelEdit();
+    onCancelEdit?.();
   };
 
   const remainingChars = MAX_CHAR_LIMIT - text.length;
+  const isOverLimit = text.length > MAX_CHAR_LIMIT;
+  const isNearLimit = remainingChars <= 50;
 
   return (
     <div className={styles.inputContainer}>
       {editingMessage && (
-        <div className={styles.contextBanner}>
+        <div className={styles.contextBanner} role="status">
           <div className={styles.contextText}>
             <Pencil size={14} className={styles.editIcon} />
             <span className={styles.bannerMessage}>
@@ -61,6 +86,7 @@ export default function ChatInput({
             </span>
           </div>
           <button
+            type="button"
             className={styles.cancelBtn}
             onClick={handleCancelEdit}
             aria-label="Cancel editing"
@@ -71,7 +97,7 @@ export default function ChatInput({
       )}
 
       {replyingTo && !editingMessage && (
-        <div className={styles.contextBanner}>
+        <div className={styles.contextBanner} role="status">
           <div className={styles.contextText}>
             <span className={styles.bannerMessage}>
               Replying to <strong>{replyingTo.senderName}</strong>:{" "}
@@ -79,6 +105,7 @@ export default function ChatInput({
             </span>
           </div>
           <button
+            type="button"
             className={styles.cancelBtn}
             onClick={onCancelReply}
             aria-label="Cancel reply"
@@ -89,9 +116,9 @@ export default function ChatInput({
       )}
 
       <form className={styles.inputForm} onSubmit={handleSubmit}>
-        <input
+        <textarea
           ref={inputRef}
-          type="text"
+          rows={1}
           className={styles.textInput}
           maxLength={MAX_CHAR_LIMIT}
           placeholder={
@@ -101,13 +128,21 @@ export default function ChatInput({
           }
           value={text}
           onChange={(e) => setText(e.target.value)}
+          onKeyDown={handleKeyDown}
+          aria-label={
+            editingMessage
+              ? "Edit message content"
+              : `Message #${channelName || "channel"}`
+          }
         />
 
         <div className={styles.inputControls}>
           <span
             className={`${styles.charCounter} ${
-              remainingChars < 50 ? styles.nearLimit : ""
+              isNearLimit ? styles.nearLimit : ""
             }`}
+            aria-live="polite"
+            aria-atomic="true"
           >
             {remainingChars}
           </span>
@@ -115,7 +150,7 @@ export default function ChatInput({
           <button
             type="submit"
             className={styles.sendBtn}
-            disabled={!text.trim() || text.length > MAX_CHAR_LIMIT}
+            disabled={!text.trim() || isOverLimit}
             aria-label={editingMessage ? "Save edit" : "Send message"}
           >
             {editingMessage ? <Check size={18} /> : <Send size={18} />}

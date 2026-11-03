@@ -350,7 +350,9 @@ export function useChat({ groupId, channelId, currentUser }) {
 
   // 5. Send message via STOMP with optimistic UI fallback
   const sendMessage = useCallback(
-    ({ content, replyToId = null, replySnippet = null }) => {
+    (input) => {
+      const payload = typeof input === 'string' ? { content: input } : (input || {});
+      const { content, replyToId = null, replySnippet = null } = payload;
       if (!content || !content.trim() || !channelId || !groupId) return;
 
       const trimmedContent = content.trim();
