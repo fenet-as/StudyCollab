@@ -149,6 +149,19 @@
   white-space: pre-wrap;
 }
 
+.deletedBubble {
+  background-color: var(--bg-highlight, #f1f5f9) !important;
+  color: var(--text-secondary, #64748b) !important;
+  border: 1px dashed var(--border-color, #cbd5e1) !important;
+  cursor: default !important;
+}
+
+.deletedText {
+  color: var(--text-secondary, #64748b);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
 .mobileMoreBtn {
   display: none; /* Desktop default: hidden */
   background: transparent;

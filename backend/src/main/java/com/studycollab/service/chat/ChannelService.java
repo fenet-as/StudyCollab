@@ -66,6 +66,11 @@ public class ChannelService {
             throw new AccessDeniedException("Only group admins or creators can create channels");
         }
 
+        long currentCount = channelRepository.countByStudyGroupId(groupId);
+        if (currentCount >= 10) {
+            throw new CustomExceptions.BadRequestException("Study group has reached the maximum limit of 10 channels");
+        }
+
         String normalizedName = request.getName().trim().toLowerCase();
         if (channelRepository.existsByStudyGroupIdAndName(groupId, normalizedName)) {
             throw new CustomExceptions.BadRequestException("A channel named '" + normalizedName + "' already exists in this study group");

@@ -262,3 +262,4 @@ test('CHAT-09: In-channel message search filtering', async (t) => {
     assert.equal(whitespaceResults.length, 3);
   });
 });
+
