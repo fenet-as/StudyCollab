@@ -1,53 +1,107 @@
-import React, { useState } from "react";
-import { X } from "lucide-react";
-import styles from "./AddChannelModal.module.css";
+import React, { useState } from 'react';
+import { X, Loader2 } from 'lucide-react';
+import { validateChannelName } from '../../utils/chatValidation.js';
+import styles from './AddChannelModal.module.css';
 
 export default function AddChannelModal({ isOpen, onClose, onCreateChannel }) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [error, setError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!name.trim()) return;
+  const handleNameChange = (e) => {
+    // Automatically slugify: lowercase and replace spaces with hyphens
+    const val = e.target.value.toLowerCase().replace(/\s+/g, '-');
+    setName(val);
+    if (error) setError(null);
+  };
 
-    // Convert spaces to hyphens and lowercase for channel slug formatting
-    const formattedName = name.trim().toLowerCase().replace(/\s+/g, "-");
-
-    onCreateChannel({
-      id: formattedName,
-      name: formattedName,
-      description: description.trim() || "No description provided.",
-    });
-
-    setName("");
-    setDescription("");
+  const handleClose = () => {
+    if (isSubmitting) return;
+    setName('');
+    setDescription('');
+    setError(null);
     onClose();
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+
+    const validationError = validateChannelName(name);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      await onCreateChannel({
+        name: name.trim(),
+        description: description.trim() || undefined,
+      });
+
+      setName('');
+      setDescription('');
+      onClose();
+    } catch (err) {
+      const serverMsg =
+        err.response?.data?.message || err.message || 'Failed to create channel.';
+      setError(serverMsg);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
+    <div
+      className={styles.modalOverlay}
+      onClick={handleClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="add-channel-title"
+    >
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
-          <h3>Create Channel</h3>
-          <button className={styles.closeBtn} onClick={onClose}>
+          <h3 id="add-channel-title">Create Channel</h3>
+          <button
+            type="button"
+            className={styles.closeBtn}
+            onClick={handleClose}
+            aria-label="Close dialog"
+            disabled={isSubmitting}
+          >
             <X size={18} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className={styles.modalForm}>
+          {error && (
+            <div className={styles.errorMessage} role="alert">
+              {error}
+            </div>
+          )}
+
           <div className={styles.formGroup}>
             <label htmlFor="channelName">Channel Name</label>
             <input
               id="channelName"
               type="text"
-              placeholder="e.g. study-notes"
+              placeholder="e.g. homework-help"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={handleNameChange}
+              disabled={isSubmitting}
+              maxLength={50}
               required
               autoFocus
             />
+            <span className={styles.fieldHint}>
+              Lowercase letters, numbers, and hyphens (2-50 chars).
+            </span>
           </div>
 
           <div className={styles.formGroup}>
@@ -58,19 +112,33 @@ export default function AddChannelModal({ isOpen, onClose, onCreateChannel }) {
               placeholder="What is this channel about?"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              disabled={isSubmitting}
+              maxLength={255}
             />
           </div>
 
           <div className={styles.modalActions}>
-            <button type="button" className={styles.cancelBtn} onClick={onClose}>
+            <button
+              type="button"
+              className={styles.cancelBtn}
+              onClick={handleClose}
+              disabled={isSubmitting}
+            >
               Cancel
             </button>
             <button
               type="submit"
               className={styles.submitBtn}
-              disabled={!name.trim()}
+              disabled={isSubmitting || !name.trim()}
             >
-              Create Channel
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" style={{ marginRight: 6 }} />
+                  Creating...
+                </>
+              ) : (
+                'Create Channel'
+              )}
             </button>
           </div>
         </form>
