@@ -3,9 +3,13 @@ package com.studycollab.service.email;
 import com.resend.Resend;
 import com.resend.services.emails.model.CreateEmailOptions;
 import com.resend.services.emails.model.CreateEmailResponse;
+import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -14,27 +18,28 @@ public class EmailService {
 
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
 
+    private final JavaMailSender mailSender;
+    private final String smtpUsername;
     private final Resend resend;
-    private final String fromEmail;
+    private final String resendFromEmail;
     private final String clientBaseUrl;
 
     public EmailService(
-            @Value("${resend.api-key:}") String apiKey,
-            @Value("${resend.from-email:onboarding@resend.dev}") String fromEmail,
+            @Autowired(required = false) JavaMailSender mailSender,
+            @Value("${spring.mail.username:}") String smtpUsername,
+            @Value("${resend.api-key:}") String resendApiKey,
+            @Value("${resend.from-email:onboarding@resend.dev}") String resendFromEmail,
             @Value("${app.frontend-url:http://localhost:5173}") String clientBaseUrl
     ) {
-        this.resend = (apiKey != null && !apiKey.isBlank()) ? new Resend(apiKey) : null;
-        this.fromEmail = fromEmail;
+        this.mailSender = mailSender;
+        this.smtpUsername = smtpUsername;
+        this.resend = (resendApiKey != null && !resendApiKey.isBlank()) ? new Resend(resendApiKey) : null;
+        this.resendFromEmail = resendFromEmail;
         this.clientBaseUrl = clientBaseUrl;
     }
 
     @Async
     public void sendVerificationEmail(String recipientEmail, String token) {
-        if (resend == null) {
-            log.warn("Resend API key is not configured. Skipping verification email to {}", recipientEmail);
-            return;
-        }
-
         String confirmationUrl = clientBaseUrl + "/verify-email?token=" + token;
 
         String htmlBody = """
@@ -46,18 +51,42 @@ public class EmailService {
             </div>
             """.formatted(confirmationUrl);
 
-        CreateEmailOptions params = CreateEmailOptions.builder()
-                .from(fromEmail)
-                .to(recipientEmail)
-                .subject("StudyCollab - Verify your email address")
-                .html(htmlBody)
-                .build();
+        // 1. Try sending via SMTP (e.g. Gmail) if configured
+        if (mailSender != null && smtpUsername != null && !smtpUsername.isBlank()) {
+            try {
+                MimeMessage message = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+                helper.setFrom(smtpUsername, "StudyCollab");
+                helper.setTo(recipientEmail);
+                helper.setSubject("StudyCollab - Verify your email address");
+                helper.setText(htmlBody, true);
 
-        try {
-            CreateEmailResponse response = resend.emails().send(params);
-            log.info("Email sent successfully with ID: {}", response.getId());
-        } catch (Exception e) {
-            log.error("Failed to send email via Resend to {}: {}", recipientEmail, e.getMessage(), e);
+                mailSender.send(message);
+                log.info("Verification email sent via SMTP to: {}", recipientEmail);
+                return;
+            } catch (Exception e) {
+                log.error("Failed to send verification email via SMTP to {}: {}", recipientEmail, e.getMessage(), e);
+            }
         }
+
+        // 2. Fallback to Resend if configured
+        if (resend != null) {
+            try {
+                CreateEmailOptions params = CreateEmailOptions.builder()
+                        .from(resendFromEmail)
+                        .to(recipientEmail)
+                        .subject("StudyCollab - Verify your email address")
+                        .html(htmlBody)
+                        .build();
+
+                CreateEmailResponse response = resend.emails().send(params);
+                log.info("Verification email sent via Resend with ID: {}", response.getId());
+                return;
+            } catch (Exception e) {
+                log.error("Failed to send verification email via Resend to {}: {}", recipientEmail, e.getMessage(), e);
+            }
+        }
+
+        log.warn("No email provider configured (SPRING_MAIL_USERNAME or RESEND_API_KEY). Skipping email to {}", recipientEmail);
     }
 }

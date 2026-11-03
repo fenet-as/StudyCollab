@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { groupApi } from '../../../../../api/groupApi';
+import ConfirmModal from '../../../../../components/common/ConfirmModal/ConfirmModal';
 import styles from './InviteLinkCard.module.css';
 
 export default function InviteLinkCard({ 
@@ -12,6 +13,7 @@ export default function InviteLinkCard({
   const [copied, setCopied] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Sync prop changes to state if needed
   React.useEffect(() => {
@@ -25,13 +27,13 @@ export default function InviteLinkCard({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleRegenerate = async () => {
-    if (!groupId || isRegenerating) return;
+  const handleOpenModal = () => {
+    setErrorMsg(null);
+    setIsModalOpen(true);
+  };
 
-    const confirmRegenerate = window.confirm(
-      "Are you sure you want to regenerate the invite link? The old link will immediately stop working."
-    );
-    if (!confirmRegenerate) return;
+  const handleConfirmRegenerate = async () => {
+    if (!groupId || isRegenerating) return;
 
     setIsRegenerating(true);
     setErrorMsg(null);
@@ -46,6 +48,7 @@ export default function InviteLinkCard({
       }
 
       setCurrentInviteCode(newCode);
+      setIsModalOpen(false);
 
       // Notify parent component if callback provided
       if (onRegenerate) {
@@ -111,7 +114,7 @@ export default function InviteLinkCard({
             {canManage && (
               <button
                 type="button"
-                onClick={handleRegenerate}
+                onClick={handleOpenModal}
                 className={styles.regenerateBtn}
                 disabled={isRegenerating}
                 title="Invalidate old link and create a new one"
@@ -137,6 +140,19 @@ export default function InviteLinkCard({
           Caution: Anyone with this link can join directly. Regenerating will revoke access for the old link.
         </p>
       </div>
+
+      <ConfirmModal
+        isOpen={isModalOpen}
+        onClose={() => !isRegenerating && setIsModalOpen(false)}
+        onConfirm={handleConfirmRegenerate}
+        title="Regenerate Invite Link"
+        message="Are you sure you want to regenerate the invite link? The old link will immediately stop working."
+        confirmText="Regenerate Link"
+        cancelText="Cancel"
+        isDestructive={true}
+        isLoading={isRegenerating}
+        error={errorMsg || ''}
+      />
     </div>
   );
 }

@@ -29,7 +29,8 @@ export default function AddMemberCard({ groupId, onMemberAdded }) {
       setMessage({ text: 'Member added successfully!', isError: false });
       if (onMemberAdded) onMemberAdded(updatedGroup);
     } catch (error) {
-      setMessage({ text: error.message || 'Could not add member.', isError: true });
+      const serverMessage = error.response?.data?.message;
+      setMessage({ text: serverMessage || error.message || 'Could not add member.', isError: true });
     } finally {
       setIsSubmitting(false);
     }

@@ -328,7 +328,7 @@ export default function Dashboard() {
                     <Loader2
                       size={40}
                       className="animate-spin"
-                      color="#6366f1"
+                      style={{ color: "var(--primary-color)" }}
                     />
                     <p style={{ marginTop: "1rem" }}>Checking permissions...</p>
                   </div>
@@ -345,7 +345,7 @@ export default function Dashboard() {
                       <ShieldAlert
                         size={56}
                         strokeWidth={1.5}
-                        color="#ef4444"
+                        style={{ color: "var(--danger-text)" }}
                       />
                     </div>
                     <h3>Access Restricted</h3>

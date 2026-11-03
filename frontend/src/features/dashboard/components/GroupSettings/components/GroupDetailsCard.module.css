@@ -1,15 +1,15 @@
 .card {
   background-color: var(--card-bg, #1e293b);
   border: 1px solid var(--border-color, #334155);
-  border-radius: 12px;
+  border-radius: var(--radius-lg, 12px);
   padding: 1.25rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-sm);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card.editingActive {
   border-color: var(--primary-color, #3b82f6);
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+  box-shadow: var(--shadow-md);
 }
 
 .cardHeader {

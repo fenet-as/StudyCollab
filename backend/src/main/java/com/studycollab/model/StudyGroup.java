@@ -38,9 +38,13 @@ public class StudyGroup {
     @OneToMany(mappedBy = "studyGroup", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> tasks = new ArrayList<>();
 
-    // 4. Categories relationship (ADDED THIS TO FIX YOUR SQL ERROR)
+    // 4. Categories relationship
     @OneToMany(mappedBy = "studyGroup", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Category> categories = new ArrayList<>();
+
+    // 5. Channels relationship
+    @OneToMany(mappedBy = "studyGroup", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Channel> channels = new ArrayList<>();
 
     // Boilerplate Getters and Setters
     public Long getId() { return id; }
@@ -67,4 +71,7 @@ public class StudyGroup {
 
     public List<Category> getCategories() { return categories; }
     public void setCategories(List<Category> categories) { this.categories = categories; }
+
+    public List<Channel> getChannels() { return channels; }
+    public void setChannels(List<Channel> channels) { this.channels = channels; }
 }

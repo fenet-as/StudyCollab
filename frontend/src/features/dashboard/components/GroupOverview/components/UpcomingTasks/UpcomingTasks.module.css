@@ -2,7 +2,7 @@
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: 1.25rem;
+  padding: 1.5rem;
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
@@ -12,16 +12,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 0.75rem;
+  padding-bottom: 0.85rem;
 }
 
 .cardHeader h3 {
   font-family: 'Poppins', 'Inter', sans-serif;
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-main);
   margin: 0;
 }
 
@@ -29,14 +29,17 @@
   background: transparent;
   border: none;
   color: var(--primary-color);
-  font-family: 'Inter', sans-serif;
-  font-size: 0.825rem;
+  font-family: inherit;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--radius-sm);
+  transition: background-color 0.15s ease;
 }
 
 .viewAllBtn:hover {
-  text-decoration: underline;
+  background-color: var(--icon-bg);
 }
 
 .cardContent {
@@ -93,7 +96,6 @@
 }
 
 .itemTitle {
-  font-family: 'Inter', sans-serif;
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--text-primary);
@@ -107,7 +109,6 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-family: 'Inter', sans-serif;
   font-size: 0.775rem;
   color: var(--text-secondary);
 }
@@ -119,7 +120,6 @@
 
 /* Compact Badges */
 .prioBadge {
-  font-family: 'Inter', sans-serif;
   font-size: 0.625rem;
   font-weight: 700;
   padding: 0.15rem 0.45rem;

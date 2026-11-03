@@ -1,7 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
 .authContainer {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-body);
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -60,7 +58,7 @@
   justify-content: center;
   gap: 0.5rem;
   font-size: 1.25rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--primary-color);
   margin-bottom: 1.5rem;
@@ -68,7 +66,7 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  font-family: inherit;
+  font-family: var(--font-heading);
   width: 100%;
 }
 
@@ -79,8 +77,9 @@
 }
 
 .authTitle {
+  font-family: var(--font-heading);
   font-size: 1.75rem;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--text-primary);
   text-align: center;
   margin-bottom: 2rem;

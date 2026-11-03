@@ -1,4 +1,5 @@
 import React from 'react';
+import { AlertTriangle, AlertCircle } from 'lucide-react';
 import styles from './ConfirmModal.module.css';
 
 export default function ConfirmModal({ 
@@ -16,10 +17,12 @@ export default function ConfirmModal({
   if (!isOpen) return null;
 
   return (
-    <div className={styles.modalOverlay}>
-      <div className={styles.modalContent}>
+    <div className={styles.modalOverlay} onClick={() => !isLoading && onClose()}>
+      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
-          <span className={styles.warningIcon}>⚠️</span>
+          <div className={`${styles.iconWrapper} ${isDestructive ? styles.destructiveIcon : ''}`}>
+            <AlertTriangle size={20} />
+          </div>
           <h3>{title}</h3>
         </div>
         
@@ -28,7 +31,8 @@ export default function ConfirmModal({
           
           {error && (
             <div className={styles.errorBox}>
-              <span>❌</span> {error}
+              <AlertCircle size={16} className={styles.errorIcon} />
+              <span>{error}</span>
             </div>
           )}
         </div>

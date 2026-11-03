@@ -32,8 +32,26 @@
   padding: 1.5rem 1.5rem 0.75rem 1.5rem;
 }
 
-.warningIcon {
-  font-size: 1.5rem;
+.iconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background-color: var(--warning-btn-bg, rgba(245, 158, 11, 0.12));
+  color: var(--warning-btn-text, #f59e0b);
+  flex-shrink: 0;
+}
+
+.destructiveIcon {
+  background-color: var(--danger-bg, #fef2f2);
+  color: var(--danger-text, #ef4444);
+}
+
+.errorIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .modalHeader h3 {

@@ -153,7 +153,7 @@ export default function GroupAdminPane({
       setPendingMember(null);
       setModalActionType(null);
     } catch (error) {
-      setModalError(error.message || 'Failed to complete action.');
+      setModalError(error.response?.data?.message || error.message || 'Failed to complete action.');
     } finally {
       setIsModalSubmitting(false);
     }
